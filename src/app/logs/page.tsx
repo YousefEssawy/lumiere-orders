@@ -3,22 +3,88 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useLogs } from "@/hooks/useLogs";
 import { useUserDirectory } from "@/hooks/useUserDirectory";
-import { LOG_ACTIONS, type LogAction, type LogEntry } from "@/lib/types";
+import {
+  LOG_ACTIONS, ORDER_STATUSES, type LogAction, type LogEntry, type OrderStatus,
+} from "@/lib/types";
 import { EMPTY_DISPLAY, formatDateTime } from "@/lib/appGlobals";
+import { STATUS_CLASS } from "@/lib/statusStyles";
 import AppShell from "@/components/layout/AppShell";
 import PageHero from "@/components/ui/PageHero";
 import EmptyState from "@/components/ui/EmptyState";
 
 const ALL = "all";
 
-/** التفاصيل المعروضة: نص + عدد، أو "n أوردر" مترجمة للعمليات الجماعية */
-function detailText(
-  l: LogEntry,
-  t: (key: string, values?: Record<string, string | number | Date>) => string
-): string {
-  if (l.detail) return l.count !== undefined ? `${l.detail} (${l.count})` : l.detail;
-  if (l.count !== undefined) return t("items", { n: l.count });
-  return EMPTY_DISPLAY;
+/** عمليات تفاصيلها = اسم عميل */
+const CUSTOMER_ACTIONS: LogAction[] = [
+  "order.add", "order.update", "order.delete", "history.update", "history.delete",
+];
+/** عمليات تفاصيلها = مستخدم (إيميل) */
+const USER_ACTIONS: LogAction[] = [
+  "user.create", "user.update", "user.activate", "user.deactivate", "user.password",
+];
+
+interface DetailProps {
+  l: LogEntry;
+  resolveUser: (v?: string) => string;
+}
+
+/** عرض دلالي للتفاصيل حسب نوع العملية — بدل النص الخام */
+function LogDetail({ l, resolveUser }: DetailProps) {
+  const t = useTranslations("logs");
+  const tStatuses = useTranslations("history.statuses");
+  const action = l.action as LogAction;
+
+  // تغيير حالة: "اسم العميل: statusKey" → اسم + badge مترجمة
+  if (action === "history.status") {
+    const idx = l.detail.lastIndexOf(": ");
+    const name = idx >= 0 ? l.detail.slice(0, idx) : l.detail;
+    const statusKey = idx >= 0 ? (l.detail.slice(idx + 2) as OrderStatus) : null;
+    return (
+      <span className="inline-flex items-center gap-2 flex-wrap">
+        <span>{name}</span>
+        {statusKey && ORDER_STATUSES.includes(statusKey) && (
+          <>
+            <span className="icon !text-[14px] text-ink-300 rtl:rotate-180" aria-hidden>arrow_forward</span>
+            <span className={"pill " + STATUS_CLASS[statusKey]}>{tStatuses(statusKey)}</span>
+          </>
+        )}
+      </span>
+    );
+  }
+
+  // عمليات على مستخدم: الاسم المحلول + الإيميل صغير لو مختلف
+  if (USER_ACTIONS.includes(action) && l.detail) {
+    const name = resolveUser(l.detail);
+    return (
+      <span className="inline-flex items-center gap-1.5 flex-wrap">
+        <span className="icon !text-[15px] text-ink-300" aria-hidden>person</span>
+        <span>{name}</span>
+        {name !== l.detail && (
+          <span className="text-xs text-ink-300" dir="ltr">({l.detail})</span>
+        )}
+      </span>
+    );
+  }
+
+  // عمليات على أوردر: اسم العميل بأيقونة
+  if (CUSTOMER_ACTIONS.includes(action) && l.detail) {
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <span className="icon !text-[15px] text-ink-300" aria-hidden>package_2</span>
+        <span>{l.detail}</span>
+      </span>
+    );
+  }
+
+  // عمليات جماعية: العدد كشارة واضحة
+  if (l.count !== undefined) {
+    const label = action === "system.migrate"
+      ? t("records", { n: l.count })
+      : t("items", { n: l.count });
+    return <span className="pill bg-soft text-ink-700">{label}</span>;
+  }
+
+  return <span>{l.detail || EMPTY_DISPLAY}</span>;
 }
 
 function LogsPage() {
@@ -87,7 +153,9 @@ function LogsPage() {
                       {t(`actions.${l.action as LogAction}`)}
                     </span>
                   </td>
-                  <td className="cell-wrap">{detailText(l, t)}</td>
+                  <td className="cell-wrap">
+                    <LogDetail l={l} resolveUser={resolveUser} />
+                  </td>
                 </tr>
               ))}
             </tbody>
