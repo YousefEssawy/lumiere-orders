@@ -24,8 +24,8 @@
       "administration": "Administration",
       "support": "Support"
     },
-    "orders": "Orders",
-    "history": "History",
+    "orders": "Preparation",
+    "history": "Shipments",
     "users": "Users",
     "logs": "Activity Log",
     "help": "Help",
@@ -48,8 +48,8 @@
     "setupWarn": "Firebase is not configured yet. Copy .env.example to .env.local, fill in your project values, and check README.md."
   },
   "orders": {
-    "title": "Orders",
-    "subtitle": "Add orders manually or import from Sllr, then export the Wassalha sheet",
+    "title": "Order Preparation",
+    "subtitle": "Add orders manually or import from Sllr, then move the batch to Shipments",
     "addTitle": "Add manual order",
     "addSub": "For WhatsApp / Instagram orders or any order outside the store",
     "name": "Customer name",
@@ -82,8 +82,7 @@
     "importNote": "Note: governorates and phone numbers are converted to the Wassalha format automatically. Unknown governorates are flagged in the table so you can fix them.",
     "total": "Total orders:",
     "bySource": "(Sllr {sllr} · WhatsApp {wa} · Instagram {ig})",
-    "clearAll": "Clear all",
-    "export": "Export Wassalha file",
+    "moveBtn": "Move to Shipments",
     "table": {
       "source": "Source",
       "name": "Customer",
@@ -113,17 +112,18 @@
       "fileEmpty": "The file is empty",
       "deleted": "Order deleted",
       "deleteErr": "Failed to delete",
-      "cleared": "All orders moved to History ✓",
-      "clearErr": "Failed to clear",
-      "exported": "Exported {n} orders to Wassalha ✓",
-      "exportEmpty": "No orders to export"
+      "cleared": "Moved to Shipments ✓",
+      "clearErr": "Failed to move"
     },
-    "confirmClear": "Move ALL orders to History? The current list will be emptied for a new batch.",
-    "confirmExportBadCity": "{n} orders have an invalid governorate (they will export empty). Continue?"
+    "confirmClear": "Move ALL orders to Shipments? The list will be emptied for a new batch."
   },
   "history": {
-    "title": "Order History",
-    "subtitle": "Orders archived from the preparation page — kept here permanently until you delete them",
+    "title": "Shipments",
+    "subtitle": "Orders moved from Preparation — export the Wassalha file, track statuses, and keep the history",
+    "selected": "{n} selected",
+    "export": "Export Wassalha",
+    "exportEmpty": "No orders to export",
+    "confirmExportBadCity": "{n} orders have an invalid governorate (they will export empty). Continue?",
     "total": "Archived orders:",
     "archivedAt": "Archived",
     "archivedBy": "By",
@@ -136,7 +136,7 @@
       "returned": "Returned",
       "cancelled": "Cancelled"
     },
-    "empty": "No archived orders yet — use “Clear all” on the Orders page after shipping a batch",
+    "empty": "No shipments yet — use “Move to Shipments” on the Preparation page",
     "clearAll": "Delete entire history",
     "confirmDelete": "Permanently delete the order of “{name}” from history?",
     "confirmClear": "Permanently delete ALL {n} archived orders? This cannot be undone.",
@@ -147,7 +147,8 @@
       "cleared": "History cleared",
       "clearErr": "Failed to clear history",
       "statusChanged": "Status changed to “{status}” ✓",
-      "statusErr": "Failed to change status"
+      "statusErr": "Failed to change status",
+      "exported": "Exported {n} orders to Wassalha ✓"
     }
   },
   "account": {
@@ -218,7 +219,7 @@
       "orders": {
         "import": "Imported from Sllr",
         "export": "Exported Wassalha file",
-        "clear": "Archived all orders to History"
+        "clear": "Moved all orders to Shipments"
       },
       "history": {
         "delete": "Deleted from history",
@@ -243,8 +244,8 @@
       "s2": "Sllr orders: download the export file from Sllr and drop it in the import box — everything is converted automatically.",
       "s3": "WhatsApp / Instagram orders: add them with the manual form.",
       "s4": "Review the table — any order flagged with ⚠ needs its governorate fixed.",
-      "s5": "Press “Export Wassalha file” to download the shipping sheet, then upload it to Wassalha.",
-      "s6": "After shipping, press “Clear all” — the batch moves to the History page (it is not deleted), and the list is empty for the next day."
+      "s5": "Press “Move to Shipments” — the batch moves to the Shipments page and the list empties for the next batch.",
+      "s6": "From Shipments: export the Wassalha file (all orders or only the selected ones), then update each order's status as it progresses — preparing, shipped, delivered, returned."
     },
     "rules": {
       "title": "Fixed conversion rules",

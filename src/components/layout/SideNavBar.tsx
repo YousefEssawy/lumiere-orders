@@ -22,7 +22,7 @@ const NAV_SECTIONS: NavSection[] = [
     sectionKey: "operations",
     items: [
       { labelKey: "orders", icon: "package_2", href: AppRoutes.orders, adminOnly: false },
-      { labelKey: "history", icon: "archive", href: AppRoutes.history, adminOnly: false },
+      { labelKey: "history", icon: "local_shipping", href: AppRoutes.history, adminOnly: false },
     ],
   },
   {
