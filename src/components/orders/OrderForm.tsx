@@ -44,7 +44,7 @@ export default function OrderForm({ onAdd }: { onAdd: (o: FormState) => void }) 
       <form onSubmit={submit}>
         <label className="form-label">{t("name")} <span className="req">*</span></label>
         <input className="form-input" value={f.name} onChange={up("name")} required placeholder={t("namePh")} />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className="form-label">{t("phone")} <span className="req">*</span></label>
             <input className="form-input" value={f.phone} onChange={up("phone")} required placeholder={t("phonePh")} dir="ltr" />
@@ -60,7 +60,7 @@ export default function OrderForm({ onAdd }: { onAdd: (o: FormState) => void }) 
         </div>
         <label className="form-label">{t("address")} <span className="req">*</span></label>
         <textarea className="form-input min-h-[60px]" value={f.address} onChange={up("address")} required placeholder={t("addressPh")} />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className="form-label">{t("city")} <span className="req">*</span></label>
             <select className="form-input" value={f.city} onChange={up("city")} required>
@@ -75,7 +75,7 @@ export default function OrderForm({ onAdd }: { onAdd: (o: FormState) => void }) 
         </div>
         <label className="form-label">{t("items")} <span className="req">*</span></label>
         <textarea className="form-input min-h-[60px]" value={f.items} onChange={up("items")} required placeholder={t("itemsPh")} />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className="form-label">{t("vol")}</label>
             <select className="form-input" value={f.vol} onChange={up("vol")}>

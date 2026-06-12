@@ -32,12 +32,12 @@ function LogsPage() {
     <>
       <PageHero icon="history" title={t("title")} subtitle={t("subtitle")} />
 
-      <div className="flex flex-wrap gap-3 mb-4">
-        <select className="form-input !w-auto" value={userFilter} onChange={(e) => setUserFilter(e.target.value)}>
+      <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
+        <select className="form-input sm:!w-auto" value={userFilter} onChange={(e) => setUserFilter(e.target.value)}>
           <option value={ALL}>{t("filterUser")}</option>
           {emails.map((e) => <option key={e} value={e}>{e}</option>)}
         </select>
-        <select className="form-input !w-auto" value={actionFilter} onChange={(e) => setActionFilter(e.target.value)}>
+        <select className="form-input sm:!w-auto" value={actionFilter} onChange={(e) => setActionFilter(e.target.value)}>
           <option value={ALL}>{t("filterAction")}</option>
           {LOG_ACTIONS.map((a) => <option key={a} value={a}>{t(`actions.${a}`)}</option>)}
         </select>
