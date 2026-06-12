@@ -5,6 +5,7 @@ import { runMigration, type MigrationResult } from "@/lib/migration";
 import { logAction } from "@/lib/logger";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
+import { useConfirm } from "@/components/ConfirmProvider";
 import PageHero from "@/components/ui/PageHero";
 
 type Phase = "idle" | "scanning" | "scanned" | "migrating" | "done";
@@ -13,6 +14,7 @@ function MigrationPage() {
   const t = useTranslations("migration");
   const { profile } = useSession();
   const flash = useToast();
+  const confirm = useConfirm();
   const [phase, setPhase] = useState<Phase>("idle");
   const [result, setResult] = useState<MigrationResult | null>(null);
   const [error, setError] = useState("");
@@ -31,7 +33,7 @@ function MigrationPage() {
   }
 
   async function handleMigrate() {
-    if (!window.confirm(t("confirmRun"))) return;
+    if (!(await confirm({ title: t("title"), message: t("confirmRun"), danger: false }))) return;
     setError("");
     setPhase("migrating");
     try {

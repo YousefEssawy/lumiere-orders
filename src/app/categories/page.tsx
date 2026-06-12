@@ -7,6 +7,7 @@ import { logAction } from "@/lib/logger";
 import type { Category } from "@/lib/types";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
+import { useConfirm } from "@/components/ConfirmProvider";
 import PageHero from "@/components/ui/PageHero";
 import EmptyState from "@/components/ui/EmptyState";
 import Toggle from "@/components/ui/Toggle";
@@ -19,6 +20,7 @@ function CategoriesPage() {
   const { categories, error, addCategory, updateCategory, deleteCategory, deleteCategories } = useCategories(true);
   const { products } = useProducts(true);
   const flash = useToast();
+  const confirm = useConfirm();
   const actor = { uid: profile.uid, email: profile.email };
 
   const [showCreate, setShowCreate] = useState(false);
@@ -57,7 +59,7 @@ function CategoriesPage() {
       flash(t("toast.allInUse"));
       return;
     }
-    if (!window.confirm(t("confirmDeleteSelected", { n: deletable.length }))) return;
+    if (!(await confirm({ title: t("deleteSelected", { n: deletable.length }), message: t("confirmDeleteSelected", { n: deletable.length }) }))) return;
     try {
       await deleteCategories(deletable.map((c) => c.id!));
       flash(skipped > 0 ? t("toast.bulkDeletedSkipped", { n: deletable.length, s: skipped }) : t("toast.bulkDeleted", { n: deletable.length }));
@@ -100,7 +102,7 @@ function CategoriesPage() {
       flash(t("toast.hasProducts", { n: count }));
       return;
     }
-    if (!window.confirm(t("confirmDelete", { name: c.name }))) return;
+    if (!(await confirm({ title: tCommon("delete"), message: t("confirmDelete", { name: c.name }) }))) return;
     try {
       await deleteCategory(c.id);
       flash(t("toast.deleted"));
