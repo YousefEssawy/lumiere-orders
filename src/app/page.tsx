@@ -11,6 +11,7 @@ import OrderForm from "@/components/orders/OrderForm";
 import SllrImport from "@/components/orders/SllrImport";
 import OrdersTable from "@/components/orders/OrdersTable";
 import EditOrderModal from "@/components/orders/EditOrderModal";
+import OrderDetailsModal from "@/components/orders/OrderDetailsModal";
 import type { OrderFormState } from "@/components/orders/OrderFields";
 
 function OrdersPage() {
@@ -19,6 +20,7 @@ function OrdersPage() {
   const { orders, addOrder, importOrders, updateOrder, deleteOrder, archiveAll } = useOrders(true);
   const flash = useToast();
   const [editOrder, setEditOrder] = useState<Order | null>(null);
+  const [viewOrder, setViewOrder] = useState<Order | null>(null);
   const actor = { uid: profile.uid, email: profile.email };
 
   async function handleAdd(o: OrderFormState) {
@@ -99,8 +101,11 @@ function OrdersPage() {
           {t("moveBtn")}
         </button>
       </div>
-      <OrdersTable orders={orders} onEdit={setEditOrder} onDelete={handleDelete} />
+      <OrdersTable orders={orders} onView={setViewOrder} onEdit={setEditOrder} onDelete={handleDelete} />
 
+      {viewOrder && (
+        <OrderDetailsModal order={viewOrder} onClose={() => setViewOrder(null)} />
+      )}
       {editOrder && (
         <EditOrderModal
           order={editOrder}
