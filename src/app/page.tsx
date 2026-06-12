@@ -1,68 +1,73 @@
 "use client";
-import { useRef, useState } from "react";
-import { signOut } from "firebase/auth";
-import { auth, isFirebaseConfigured } from "@/lib/firebase";
-import { useAuth } from "@/hooks/useAuth";
+import { useTranslations } from "next-intl";
 import { useOrders } from "@/hooks/useOrders";
 import { exportWassalha, type Order } from "@/lib/wassalha";
-import Login from "@/components/Login";
-import OrderForm from "@/components/OrderForm";
-import SllrImport from "@/components/SllrImport";
-import OrdersTable from "@/components/OrdersTable";
-import Toast from "@/components/Toast";
+import { logAction } from "@/lib/logger";
+import AppShell, { useSession } from "@/components/layout/AppShell";
+import { useToast } from "@/components/ToastProvider";
+import PageHero from "@/components/ui/PageHero";
+import OrderForm from "@/components/orders/OrderForm";
+import SllrImport from "@/components/orders/SllrImport";
+import OrdersTable from "@/components/orders/OrdersTable";
 
-export default function Page() {
-  const user = useAuth();
-  const enabled = !!user;
-  const { orders, addOrder, importOrders, deleteOrder, clearAll } = useOrders(enabled);
-  const [toast, setToast] = useState("");
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  function flash(m: string) {
-    setToast(m);
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(""), 2600);
-  }
-
-  // إعدادات Firebase مش متظبطة
-  if (!isFirebaseConfigured) {
-    return (
-      <div className="login-wrap">
-        <div className="login-box">
-          <div className="logo">LUMI<span>È</span>RE</div>
-          <div className="lsub">مركز الأوردرات والشحن</div>
-          <div className="setup-warn">
-            ⚠ لسه ماظبطتش إعدادات Firebase.<br />
-            انسخ <b>.env.example</b> لـ <b>.env.local</b> وحط بيانات مشروعك، وراجع <b>README.md</b>.
-          </div>
-        </div>
-      </div>
-    );
-  }
-  if (user === undefined) return <div className="center-msg">جاري التحميل…</div>;
-  if (user === null) return <Login />;
+function OrdersPage() {
+  const t = useTranslations("orders");
+  const { profile } = useSession();
+  const { orders, addOrder, importOrders, deleteOrder, clearAll } = useOrders(true);
+  const flash = useToast();
+  const actor = { uid: profile.uid, email: profile.email };
 
   async function handleAdd(o: Omit<Order, "id" | "createdAt">) {
-    try { await addOrder(o); flash("تمت إضافة الأوردر ✓"); } catch { flash("حصل خطأ في الحفظ"); }
+    try {
+      await addOrder(o);
+      flash(t("toast.added"));
+      logAction(actor, "order.add", o.name);
+    } catch {
+      flash(t("toast.addErr"));
+    }
   }
+
   async function handleImport(list: Omit<Order, "id" | "createdAt">[]) {
-    if (!list.length) { flash("الملف فاضي"); return; }
-    try { await importOrders(list); flash(`تم استيراد ${list.length} أوردر من سلر`); } catch { flash("حصل خطأ في الاستيراد"); }
+    if (!list.length) { flash(t("toast.fileEmpty")); return; }
+    try {
+      await importOrders(list);
+      flash(t("toast.imported", { n: list.length }));
+      logAction(actor, "orders.import", "", list.length);
+    } catch {
+      flash(t("toast.importErr"));
+    }
   }
-  async function handleDelete(id: string) {
-    try { await deleteOrder(id); flash("تم حذف الأوردر"); } catch { flash("حصل خطأ في الحذف"); }
+
+  async function handleDelete(o: Order) {
+    if (!o.id) return;
+    try {
+      await deleteOrder(o.id);
+      flash(t("toast.deleted"));
+      logAction(actor, "order.delete", o.name);
+    } catch {
+      flash(t("toast.deleteErr"));
+    }
   }
+
   async function handleClear() {
     if (!orders.length) return;
-    if (!window.confirm("متأكد إنك عايز تمسح كل الأوردرات؟ مش هينفع ترجعها.")) return;
-    try { await clearAll(orders); flash("تم مسح الكل"); } catch { flash("حصل خطأ في المسح"); }
+    if (!window.confirm(t("confirmClear"))) return;
+    try {
+      await clearAll(orders);
+      flash(t("toast.cleared"));
+      logAction(actor, "orders.clear", "", orders.length);
+    } catch {
+      flash(t("toast.clearErr"));
+    }
   }
+
   function handleExport() {
-    if (!orders.length) { flash("مفيش أوردرات تصدّرها"); return; }
+    if (!orders.length) { flash(t("toast.exportEmpty")); return; }
     const bad = orders.filter((o) => !o.city);
-    if (bad.length && !window.confirm(`فيه ${bad.length} أوردر محافظتهم مش مظبوطة (هيتصدّروا فاضيين). تكمّل؟`)) return;
+    if (bad.length && !window.confirm(t("confirmExportBadCity", { n: bad.length }))) return;
     exportWassalha(orders);
-    flash(`تم تصدير ${orders.length} أوردر لملف وصلها ✓`);
+    flash(t("toast.exported", { n: orders.length }));
+    logAction(actor, "orders.export", "", orders.length);
   }
 
   const c = { Sllr: 0, WhatsApp: 0, Instagram: 0, Other: 0 } as Record<string, number>;
@@ -70,32 +75,38 @@ export default function Page() {
 
   return (
     <>
-      <header>
-        <div className="logo">LUMI<span>È</span>RE</div>
-        <div className="tag">مركز الأوردرات والشحن</div>
-        <div className="spacer" />
-        <div className="who">{user.email}</div>
-        <button className="logout" onClick={() => auth && signOut(auth)}>خروج</button>
-      </header>
-      <div className="wrap">
-        <div className="grid">
-          <OrderForm onAdd={handleAdd} />
-          <SllrImport onImport={handleImport} />
-        </div>
-        <div className="bar">
-          <div className="stats">
-            إجمالي الأوردرات: <b>{orders.length}</b>{" "}
-            {orders.length ? <span>(سلر {c.Sllr} · واتساب {c.WhatsApp} · إنستجرام {c.Instagram})</span> : null}
-          </div>
-          <div className="actions">
-            <button className="btn btn-ghost" onClick={handleClear}>🗑️ مسح الكل</button>
-            <button className="btn btn-green" onClick={handleExport}>⬇️ صدّر ملف وصلها</button>
-          </div>
-        </div>
-        <OrdersTable orders={orders} onDelete={handleDelete} />
-        <div className="foot">Lumière Orders · بياناتك متزامنة وآمنة على Firebase · مطلوب تسجيل دخول</div>
+      <PageHero icon="package_2" title={t("title")} subtitle={t("subtitle")} />
+      <div className="grid gap-5 lg:grid-cols-2">
+        <OrderForm onAdd={handleAdd} />
+        <SllrImport onImport={handleImport} />
       </div>
-      <Toast msg={toast} />
+      <div className="flex flex-wrap items-center justify-between gap-3 mt-6 mb-3.5">
+        <div className="text-sm text-ink-500">
+          {t("total")} <b className="text-ink-900 text-lg">{orders.length}</b>{" "}
+          {orders.length ? (
+            <span>{t("bySource", { sllr: c.Sllr, wa: c.WhatsApp, ig: c.Instagram })}</span>
+          ) : null}
+        </div>
+        <div className="flex gap-2.5">
+          <button className="btn-ghost" onClick={handleClear}>
+            <span className="icon text-base" aria-hidden>delete_sweep</span>
+            {t("clearAll")}
+          </button>
+          <button className="btn-primary" onClick={handleExport}>
+            <span className="icon text-base" aria-hidden>download</span>
+            {t("export")}
+          </button>
+        </div>
+      </div>
+      <OrdersTable orders={orders} onDelete={handleDelete} />
     </>
+  );
+}
+
+export default function Page() {
+  return (
+    <AppShell>
+      <OrdersPage />
+    </AppShell>
   );
 }

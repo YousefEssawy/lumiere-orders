@@ -1,0 +1,207 @@
+{
+  "brand": {
+    "name": "Lumière",
+    "sub": "Orders & Shipping Hub",
+    "slogan": "Not just inspired. Reimagined."
+  },
+  "common": {
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "close": "Close",
+    "optional": "optional",
+    "error": "Something went wrong",
+    "empty": "—",
+    "yes": "Yes",
+    "no": "No",
+    "search": "Search"
+  },
+  "nav": {
+    "orders": "Orders",
+    "users": "Users",
+    "logs": "Activity Log",
+    "help": "Help",
+    "logout": "Sign out",
+    "language": "العربية",
+    "menu": "Menu"
+  },
+  "auth": {
+    "title": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "errInvalid": "Wrong email or password",
+    "errEmail": "Invalid email format",
+    "errGeneric": "Sign-in failed",
+    "inactive": "Your account is deactivated. Contact the administrator.",
+    "noProfile": "Your account has no profile yet. Contact the administrator.",
+    "forbidden": "You don't have permission to view this page.",
+    "setupWarn": "Firebase is not configured yet. Copy .env.example to .env.local, fill in your project values, and check README.md."
+  },
+  "orders": {
+    "title": "Orders",
+    "subtitle": "Add orders manually or import from Sllr, then export the Wassalha sheet",
+    "addTitle": "Add manual order",
+    "addSub": "For WhatsApp / Instagram orders or any order outside the store",
+    "name": "Customer name",
+    "namePh": "e.g. Sara Mohamed",
+    "phone": "Mobile number",
+    "phonePh": "01xxxxxxxxx",
+    "source": "Source",
+    "address": "Full address",
+    "addressPh": "Street, area, building, floor, apartment, landmark",
+    "city": "Governorate",
+    "cityPick": "— Select —",
+    "cod": "COD amount (EGP)",
+    "codPh": "470",
+    "items": "Items",
+    "itemsPh": "e.g. Creamy Gold U07 X 1\nLattea W13 X 1",
+    "vol": "Package size",
+    "notes": "Shipping notes",
+    "notesPh": "Optional",
+    "ref": "Internal reference",
+    "refPh": "Optional — for your own tracking",
+    "addBtn": "Add order",
+    "importTitle": "Import Sllr file",
+    "importSub": "Upload the Sllr export file (.xlsx) — it is parsed and converted automatically",
+    "dropText": "Drag the Sllr file here or <b>click to browse</b>",
+    "dropHint": "Items, address, governorate and phone are converted automatically",
+    "importedOk": "Imported {n} orders from Sllr.",
+    "importedUnknown": "{n} orders need a governorate fix.",
+    "importErr": "Could not read the file. Make sure it is a valid Sllr export.",
+    "importNote": "Note: governorates and phone numbers are converted to the Wassalha format automatically. Unknown governorates are flagged in the table so you can fix them.",
+    "total": "Total orders:",
+    "bySource": "(Sllr {sllr} · WhatsApp {wa} · Instagram {ig})",
+    "clearAll": "Clear all",
+    "export": "Export Wassalha file",
+    "table": {
+      "source": "Source",
+      "name": "Customer",
+      "phone": "Mobile",
+      "address": "Address",
+      "city": "Governorate",
+      "items": "Items",
+      "cod": "COD",
+      "vol": "Size",
+      "ref": "Ref",
+      "fixCity": "⚠ Fix",
+      "empty": "No orders yet — add manually or upload a Sllr file"
+    },
+    "sources": {
+      "Sllr": "Sllr",
+      "WhatsApp": "WhatsApp",
+      "Instagram": "Instagram",
+      "Other": "Other"
+    },
+    "toast": {
+      "added": "Order added ✓",
+      "addErr": "Failed to save the order",
+      "imported": "Imported {n} orders from Sllr",
+      "importErr": "Import failed",
+      "fileEmpty": "The file is empty",
+      "deleted": "Order deleted",
+      "deleteErr": "Failed to delete",
+      "cleared": "All orders cleared",
+      "clearErr": "Failed to clear",
+      "exported": "Exported {n} orders to Wassalha ✓",
+      "exportEmpty": "No orders to export"
+    },
+    "confirmClear": "Delete ALL orders? This cannot be undone.",
+    "confirmExportBadCity": "{n} orders have an invalid governorate (they will export empty). Continue?"
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Create accounts for your team and control their access",
+    "create": "New user",
+    "createTitle": "Create user",
+    "name": "Name",
+    "namePh": "e.g. Ahmed Ali",
+    "email": "Email",
+    "password": "Temporary password",
+    "passwordHint": "At least 6 characters — share it with the user privately",
+    "role": "Role",
+    "roles": { "admin": "Admin", "staff": "Staff" },
+    "rolesHint": "Admin: full access including users and logs. Staff: orders only.",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Deactivated",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "createdAt": "Created",
+    "table": { "empty": "No users yet" },
+    "confirmDeactivate": "Deactivate {email}? They will immediately lose access to everything.",
+    "toast": {
+      "created": "User {email} created ✓",
+      "createErr": "Failed to create user",
+      "emailInUse": "This email is already registered",
+      "weakPassword": "Password is too weak (minimum 6 characters)",
+      "updated": "User updated ✓",
+      "updateErr": "Failed to update user"
+    },
+    "deleteNote": "Permanent account deletion is done from the Firebase Console. Here you can deactivate a user, which blocks all their access immediately."
+  },
+  "logs": {
+    "title": "Activity Log",
+    "subtitle": "Who did what and when — records cannot be edited or deleted",
+    "table": {
+      "when": "When",
+      "who": "User",
+      "action": "Action",
+      "detail": "Details",
+      "empty": "No activity yet"
+    },
+    "filterUser": "All users",
+    "filterAction": "All actions",
+    "actions": {
+      "order.add": "Added order",
+      "order.delete": "Deleted order",
+      "orders.import": "Imported from Sllr",
+      "orders.export": "Exported Wassalha file",
+      "orders.clear": "Cleared all orders",
+      "user.create": "Created user",
+      "user.activate": "Activated user",
+      "user.deactivate": "Deactivated user"
+    }
+  },
+  "help": {
+    "title": "Help & Guide",
+    "subtitle": "How Lumière Orders works, step by step",
+    "flow": {
+      "title": "The daily flow",
+      "s1": "Orders arrive from the Sllr store, WhatsApp, or Instagram.",
+      "s2": "Sllr orders: download the export file from Sllr and drop it in the import box — everything is converted automatically.",
+      "s3": "WhatsApp / Instagram orders: add them with the manual form.",
+      "s4": "Review the table — any order flagged with ⚠ needs its governorate fixed.",
+      "s5": "Press “Export Wassalha file” to download the shipping sheet, then upload it to Wassalha.",
+      "s6": "After shipping, clear the list to start a fresh batch."
+    },
+    "rules": {
+      "title": "Fixed conversion rules",
+      "r1": "Weight is always 500 in the export file.",
+      "r2": "Reference Number is always empty in the export (Wassalha rejects Sllr IDs). The Sllr ID is kept internally for tracking.",
+      "r3": "Phone numbers are converted to local format (+20… → 0…).",
+      "r4": "Governorates are converted to Wassalha names (e.g. Sohag → SOUHAGE).",
+      "r5": "COD equals the order amount for Cash on Delivery, otherwise 0.",
+      "r6": "Merchant_Name = Lumiere, Warehouse_Name = Home."
+    },
+    "rolesSection": {
+      "title": "Roles & permissions",
+      "admin": "Admin: everything — orders, user management, activity log.",
+      "staff": "Staff: orders only (add, import, export, delete)."
+    },
+    "usersSection": {
+      "title": "Managing users",
+      "u1": "Only admins see the Users page.",
+      "u2": "Create a user with name, email, temporary password, and role.",
+      "u3": "Deactivating a user blocks all their access immediately; you can reactivate them anytime.",
+      "u4": "Every action in the system is recorded in the Activity Log with who did it and when."
+    },
+    "langSection": {
+      "title": "Language",
+      "l1": "Use the language button in the top bar to switch between English and Arabic. Your choice is saved on this device."
+    }
+  }
+}
