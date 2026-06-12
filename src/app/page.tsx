@@ -13,7 +13,7 @@ import OrdersTable from "@/components/orders/OrdersTable";
 function OrdersPage() {
   const t = useTranslations("orders");
   const { profile } = useSession();
-  const { orders, addOrder, importOrders, deleteOrder, clearAll } = useOrders(true);
+  const { orders, addOrder, importOrders, deleteOrder, archiveAll } = useOrders(true);
   const flash = useToast();
   const actor = { uid: profile.uid, email: profile.email };
 
@@ -53,7 +53,7 @@ function OrdersPage() {
     if (!orders.length) return;
     if (!window.confirm(t("confirmClear"))) return;
     try {
-      await clearAll(orders);
+      await archiveAll(orders, profile.email);
       flash(t("toast.cleared"));
       logAction(actor, "orders.clear", "", orders.length);
     } catch {
