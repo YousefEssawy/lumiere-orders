@@ -15,7 +15,7 @@ export interface Order {
   vol: string;
   notes: string;
   ref: string;
-  // Audit entity (راجع lib/audit.ts)
+  // Audit entity (راجع lib/audit.ts) — createdBy/updatedBy = uid
   createdBy?: string;
   createdAt?: unknown;
   updatedBy?: string;

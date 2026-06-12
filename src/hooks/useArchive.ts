@@ -49,9 +49,9 @@ export function useArchive(enabled: boolean) {
     await deleteDoc(doc(db, COL, id));
   }, []);
 
-  const setStatus = useCallback(async (id: string, status: OrderStatus, byEmail: string) => {
+  const setStatus = useCallback(async (id: string, status: OrderStatus, byUid: string) => {
     if (!db) return;
-    await updateDoc(doc(db, COL, id), { status, ...updateAudit(byEmail) });
+    await updateDoc(doc(db, COL, id), { status, ...updateAudit(byUid) });
   }, []);
 
   const clearArchive = useCallback(async (current: ArchivedOrder[]) => {

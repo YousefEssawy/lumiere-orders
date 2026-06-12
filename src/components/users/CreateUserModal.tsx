@@ -7,12 +7,12 @@ import { USER_ROLES, type UserRole } from "@/lib/types";
 import { createUser } from "@/lib/adminUsers";
 
 interface CreateUserModalProps {
-  adminEmail: string;
+  adminUid: string;
   onCreated: (email: string) => void;
   onClose: () => void;
 }
 
-export default function CreateUserModal({ adminEmail, onCreated, onClose }: CreateUserModalProps) {
+export default function CreateUserModal({ adminUid, onCreated, onClose }: CreateUserModalProps) {
   const t = useTranslations("users");
   const tCommon = useTranslations("common");
   const [name, setName] = useState("");
@@ -27,7 +27,7 @@ export default function CreateUserModal({ adminEmail, onCreated, onClose }: Crea
     setErr("");
     setBusy(true);
     try {
-      await createUser(adminEmail, { name, email, password, role });
+      await createUser(adminUid, { name, email, password, role });
       onCreated(email.trim());
     } catch (er) {
       const code = (er as AuthError).code;

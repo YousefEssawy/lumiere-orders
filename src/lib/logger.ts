@@ -1,5 +1,5 @@
 // تسجيل النشاط — كل عملية بتتسجل في logs (append-only بالـ rules)
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { FIRESTORE_COLLECTIONS, type LogAction } from "@/lib/types";
 
@@ -19,7 +19,9 @@ export async function logAction(
 ): Promise<void> {
   if (!db) return;
   try {
-    await addDoc(collection(db, FIRESTORE_COLLECTIONS.logs), {
+    const ref = doc(collection(db, FIRESTORE_COLLECTIONS.logs));
+    await setDoc(ref, {
+      id: ref.id,
       uid: actor.uid,
       email: actor.email,
       action,
