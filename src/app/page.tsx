@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useOrders } from "@/hooks/useOrders";
-import { exportWassalha, type Order } from "@/lib/wassalha";
+import type { Order } from "@/lib/wassalha";
 import { logAction } from "@/lib/logger";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
@@ -65,7 +65,7 @@ function OrdersPage() {
     }
   }
 
-  async function handleClear() {
+  async function handleMove() {
     if (!orders.length) return;
     if (!window.confirm(t("confirmClear"))) return;
     try {
@@ -75,15 +75,6 @@ function OrdersPage() {
     } catch {
       flash(t("toast.clearErr"));
     }
-  }
-
-  function handleExport() {
-    if (!orders.length) { flash(t("toast.exportEmpty")); return; }
-    const bad = orders.filter((o) => !o.city);
-    if (bad.length && !window.confirm(t("confirmExportBadCity", { n: bad.length }))) return;
-    exportWassalha(orders);
-    flash(t("toast.exported", { n: orders.length }));
-    logAction(actor, "orders.export", "", orders.length);
   }
 
   const c = { Sllr: 0, WhatsApp: 0, Instagram: 0, Other: 0 } as Record<string, number>;
@@ -103,16 +94,10 @@ function OrdersPage() {
             <span>{t("bySource", { sllr: c.Sllr, wa: c.WhatsApp, ig: c.Instagram })}</span>
           ) : null}
         </div>
-        <div className="flex gap-2.5">
-          <button className="btn-ghost" onClick={handleClear}>
-            <span className="icon text-base" aria-hidden>delete_sweep</span>
-            {t("clearAll")}
-          </button>
-          <button className="btn-primary" onClick={handleExport}>
-            <span className="icon text-base" aria-hidden>download</span>
-            {t("export")}
-          </button>
-        </div>
+        <button className="btn-primary" onClick={handleMove} disabled={!orders.length}>
+          <span className="icon text-base" aria-hidden>local_shipping</span>
+          {t("moveBtn")}
+        </button>
       </div>
       <OrdersTable orders={orders} onEdit={setEditOrder} onDelete={handleDelete} />
 
