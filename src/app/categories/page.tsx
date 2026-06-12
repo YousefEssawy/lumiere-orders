@@ -95,7 +95,7 @@ function CategoriesPage() {
         </div>
       )}
 
-      <div className="table-wrap fade-up fade-up-delay-2 max-w-2xl">
+      <div className="table-wrap fade-up fade-up-delay-2">
         {categories.length === 0 ? (
           <EmptyState icon="category" text={t("empty")} />
         ) : (
