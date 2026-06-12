@@ -15,6 +15,7 @@ import PageHero from "@/components/ui/PageHero";
 import EmptyState from "@/components/ui/EmptyState";
 import Toggle from "@/components/ui/Toggle";
 import ProductModal from "@/components/catalog/ProductModal";
+import ProductDetailsModal from "@/components/catalog/ProductDetailsModal";
 import ImportProductsModal from "@/components/catalog/ImportProductsModal";
 
 const ALL = "all";
@@ -31,6 +32,7 @@ function ProductsPage() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>(ALL);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [viewProduct, setViewProduct] = useState<Product | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -250,6 +252,14 @@ function ProductsPage() {
                     <div className="flex items-center gap-1">
                       <button
                         className="btn-ghost text-[13px] px-2.5 py-1.5"
+                        onClick={() => setViewProduct(p)}
+                        aria-label={tCommon("view")}
+                        title={tCommon("view")}
+                      >
+                        <span className="icon text-base" aria-hidden>visibility</span>
+                      </button>
+                      <button
+                        className="btn-ghost text-[13px] px-2.5 py-1.5"
                         onClick={() => setEditProduct(p)}
                         aria-label={t("editTitle")}
                         title={t("editTitle")}
@@ -333,6 +343,9 @@ function ProductsPage() {
           onSave={handleSave}
           onClose={() => { setShowCreate(false); setEditProduct(null); }}
         />
+      )}
+      {viewProduct && (
+        <ProductDetailsModal product={viewProduct} onClose={() => setViewProduct(null)} />
       )}
       {showImport && (
         <ImportProductsModal onImport={handleImport} onClose={() => setShowImport(false)} />

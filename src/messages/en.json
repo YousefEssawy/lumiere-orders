@@ -201,6 +201,7 @@
     "originalPriceHint": "Shown crossed-out on the store when set",
     "quantity": "Quantity",
     "active": "Active",
+    "inactive": "Inactive",
     "searchPh": "Search by code or name…",
     "filterCategory": "All categories",
     "total": "Products:",
