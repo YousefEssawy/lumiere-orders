@@ -29,6 +29,7 @@ export interface UserProfile {
 // أنواع الأحداث المسجلة في اللوجز — append-only
 export const LOG_ACTIONS = [
   "order.add",
+  "order.update",
   "order.delete",
   "orders.import",
   "orders.export",

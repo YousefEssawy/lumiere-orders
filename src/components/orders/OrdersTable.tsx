@@ -10,7 +10,13 @@ const SRC_PILL_CLASS: Record<OrderSource, string> = {
   Other: "bg-soft text-ink-500",
 };
 
-export default function OrdersTable({ orders, onDelete }: { orders: Order[]; onDelete: (o: Order) => void }) {
+interface OrdersTableProps {
+  orders: Order[];
+  onEdit: (o: Order) => void;
+  onDelete: (o: Order) => void;
+}
+
+export default function OrdersTable({ orders, onEdit, onDelete }: OrdersTableProps) {
   const t = useTranslations("orders");
   const tCommon = useTranslations("common");
 
@@ -59,14 +65,24 @@ export default function OrdersTable({ orders, onDelete }: { orders: Order[]; onD
               <td>{o.vol}</td>
               <td>{o.ref || ""}</td>
               <td>
-                <button
-                  className="btn-danger-soft text-[13px]"
-                  onClick={() => onDelete(o)}
-                  aria-label={tCommon("delete")}
-                  title={tCommon("delete")}
-                >
-                  <span className="icon text-base" aria-hidden>delete</span>
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    className="btn-ghost text-[13px] px-2.5 py-1.5"
+                    onClick={() => onEdit(o)}
+                    aria-label={t("editTitle")}
+                    title={t("editTitle")}
+                  >
+                    <span className="icon text-base" aria-hidden>edit</span>
+                  </button>
+                  <button
+                    className="btn-danger-soft text-[13px]"
+                    onClick={() => onDelete(o)}
+                    aria-label={tCommon("delete")}
+                    title={tCommon("delete")}
+                  >
+                    <span className="icon text-base" aria-hidden>delete</span>
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useOrders } from "@/hooks/useOrders";
 import { exportWassalha, type Order } from "@/lib/wassalha";
@@ -9,12 +10,15 @@ import PageHero from "@/components/ui/PageHero";
 import OrderForm from "@/components/orders/OrderForm";
 import SllrImport from "@/components/orders/SllrImport";
 import OrdersTable from "@/components/orders/OrdersTable";
+import EditOrderModal from "@/components/orders/EditOrderModal";
+import type { OrderFormState } from "@/components/orders/OrderFields";
 
 function OrdersPage() {
   const t = useTranslations("orders");
   const { profile } = useSession();
-  const { orders, addOrder, importOrders, deleteOrder, archiveAll } = useOrders(true);
+  const { orders, addOrder, importOrders, updateOrder, deleteOrder, archiveAll } = useOrders(true);
   const flash = useToast();
+  const [editOrder, setEditOrder] = useState<Order | null>(null);
   const actor = { uid: profile.uid, email: profile.email };
 
   async function handleAdd(o: Omit<Order, "id" | "createdAt">) {
@@ -36,6 +40,18 @@ function OrdersPage() {
     } catch {
       flash(t("toast.importErr"));
     }
+  }
+
+  async function handleEditSave(changes: OrderFormState) {
+    if (!editOrder?.id) return;
+    try {
+      await updateOrder(editOrder.id, changes);
+      flash(t("toast.updated"));
+      logAction(actor, "order.update", changes.name);
+    } catch {
+      flash(t("toast.updateErr"));
+    }
+    setEditOrder(null);
   }
 
   async function handleDelete(o: Order) {
@@ -98,7 +114,15 @@ function OrdersPage() {
           </button>
         </div>
       </div>
-      <OrdersTable orders={orders} onDelete={handleDelete} />
+      <OrdersTable orders={orders} onEdit={setEditOrder} onDelete={handleDelete} />
+
+      {editOrder && (
+        <EditOrderModal
+          order={editOrder}
+          onSave={handleEditSave}
+          onClose={() => setEditOrder(null)}
+        />
+      )}
     </>
   );
 }
