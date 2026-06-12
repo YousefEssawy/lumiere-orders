@@ -240,12 +240,36 @@
     "subtitle": "How Lumière Orders works, step by step",
     "flow": {
       "title": "The daily flow",
-      "s1": "Orders arrive from the Sllr store, WhatsApp, or Instagram.",
-      "s2": "Sllr orders: download the export file from Sllr and drop it in the import box — everything is converted automatically.",
-      "s3": "WhatsApp / Instagram orders: add them with the manual form.",
-      "s4": "Review the table — any order flagged with ⚠ needs its governorate fixed.",
-      "s5": "Press “Move to Shipments” — the batch moves to the Shipments page and the list empties for the next batch.",
-      "s6": "From Shipments: export the Wassalha file (all orders or only the selected ones), then update each order's status as it progresses — preparing, shipped, delivered, returned."
+      "steps": {
+        "s1": {
+          "title": "Collect the orders",
+          "body": "On the Preparation page: drop the Sllr export file in the import box (everything converts automatically), and add WhatsApp / Instagram orders with the manual form."
+        },
+        "s2": {
+          "title": "Review & edit",
+          "body": "Check the table and edit any order with the pencil button. An order flagged ⚠ needs its governorate fixed before export."
+        },
+        "s3": {
+          "title": "Move to Shipments",
+          "body": "One button moves the whole batch safely to the Shipments page and empties the list for the next day. Nothing is ever deleted in this step."
+        },
+        "s4": {
+          "title": "Export the Wassalha file",
+          "body": "From Shipments: tick specific orders to export only them, or leave everything unticked to export all (respecting the status filter). Then upload the file to Wassalha."
+        },
+        "s5": {
+          "title": "Track each order",
+          "body": "Update the status pill as the order progresses — the history stays here permanently until you delete it."
+        }
+      }
+    },
+    "statuses": {
+      "title": "Order statuses",
+      "preparing": "Default after moving — the package is being prepared for the courier pickup.",
+      "shipped": "The courier picked it up and it is on the way.",
+      "delivered": "Delivered to the customer and COD collected.",
+      "returned": "The customer refused or it came back — follow up in the Wassalha settlement.",
+      "cancelled": "Cancelled after the move, for any reason."
     },
     "rules": {
       "title": "Fixed conversion rules",
@@ -266,7 +290,8 @@
       "u1": "Only admins see the Users page.",
       "u2": "Create a user with name, email, temporary password, and role.",
       "u3": "Deactivating a user blocks all their access immediately; you can reactivate them anytime.",
-      "u4": "Every action in the system is recorded in the Activity Log with who did it and when."
+      "u4": "Every action in the system is recorded in the Activity Log with who did it and when.",
+      "u5": "Anyone can change their own password from the key button in the top bar (the current password is required)."
     },
     "langSection": {
       "title": "Language",
