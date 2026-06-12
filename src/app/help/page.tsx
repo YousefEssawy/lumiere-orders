@@ -101,17 +101,10 @@ function HelpPage() {
   return (
     <>
       <PageHero icon="help" title={t("title")} subtitle={t("subtitle")} />
-      <div className="grid gap-5 lg:grid-cols-2 items-start">
+      {/* masonry: الكروت بتترص ورا بعض في عمودين من غير فجوات بين الصفوف */}
+      <div className="columns-1 lg:columns-2 gap-5 [&>*]:break-inside-avoid [&>*]:mb-5">
         <FlowTimeline />
-        <div className="grid gap-5">
-          <StatusLegend />
-          <HelpSection
-            icon="rule"
-            title={t("rules.title")}
-            delayClass="fade-up-delay-3"
-            items={[t("rules.r1"), t("rules.r2"), t("rules.r3"), t("rules.r4"), t("rules.r5"), t("rules.r6")]}
-          />
-        </div>
+        <StatusLegend />
         <HelpSection
           icon="inventory_2"
           title={t("catalogSection.title")}
@@ -120,6 +113,12 @@ function HelpPage() {
             t("catalogSection.c1"), t("catalogSection.c2"), t("catalogSection.c3"),
             t("catalogSection.c4"), t("catalogSection.c5"),
           ]}
+        />
+        <HelpSection
+          icon="rule"
+          title={t("rules.title")}
+          delayClass="fade-up-delay-3"
+          items={[t("rules.r1"), t("rules.r2"), t("rules.r3"), t("rules.r4"), t("rules.r5"), t("rules.r6")]}
         />
         <HelpSection
           icon="admin_panel_settings"
