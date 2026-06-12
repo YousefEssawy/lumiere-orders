@@ -124,7 +124,7 @@ export default function AppShell({ children, adminOnly = false }: AppShellProps)
           (menuOpen ? "md:ms-64" : "md:ms-0")
         }
       >
-        <div className="max-w-6xl">{children}</div>
+        {children}
       </main>
     </Ctx.Provider>
   );
