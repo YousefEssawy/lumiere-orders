@@ -149,7 +149,9 @@
       "clearErr": "Failed to clear history",
       "statusChanged": "Status changed to “{status}” ✓",
       "statusErr": "Failed to change status",
-      "exported": "Exported {n} orders to Wassalha ✓"
+      "exported": "Exported {n} orders to Wassalha ✓",
+      "updated": "Shipment updated ✓",
+      "updateErr": "Failed to update the shipment"
     }
   },
   "migration": {
@@ -247,6 +249,7 @@
         "clear": "Moved all orders to Shipments"
       },
       "history": {
+        "update": "Edited shipment",
         "delete": "Deleted from history",
         "clear": "Cleared the history",
         "status": "Changed order status"

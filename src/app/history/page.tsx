@@ -2,17 +2,19 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useArchive, type ArchivedOrder } from "@/hooks/useArchive";
+import { useUserDirectory } from "@/hooks/useUserDirectory";
 import { logAction } from "@/lib/logger";
-import { EMPTY_DISPLAY, formatDateTime } from "@/lib/format";
+import { EMPTY_DISPLAY, formatDateTime } from "@/lib/appGlobals";
 import {
   DEFAULT_ORDER_STATUS, ORDER_STATUSES, type OrderStatus,
 } from "@/lib/types";
 import { exportWassalha, type OrderSource } from "@/lib/wassalha";
 import AppShell, { useSession } from "@/components/layout/AppShell";
-import { useAppLocale } from "@/components/IntlProvider";
 import { useToast } from "@/components/ToastProvider";
 import PageHero from "@/components/ui/PageHero";
 import EmptyState from "@/components/ui/EmptyState";
+import EditOrderModal from "@/components/orders/EditOrderModal";
+import type { OrderFormState } from "@/components/orders/OrderFields";
 
 const ALL = "all";
 
@@ -41,12 +43,13 @@ function ShipmentsPage() {
   const t = useTranslations("history");
   const tOrders = useTranslations("orders");
   const tCommon = useTranslations("common");
-  const { locale } = useAppLocale();
   const { profile } = useSession();
-  const { archived, error, deleteArchived, clearArchive, setStatus } = useArchive(true);
+  const { archived, error, deleteArchived, clearArchive, setStatus, updateArchived } = useArchive(true);
+  const resolveUser = useUserDirectory();
   const flash = useToast();
   const [statusFilter, setStatusFilter] = useState<string>(ALL);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [editOrder, setEditOrder] = useState<ArchivedOrder | null>(null);
   const actor = { uid: profile.uid, email: profile.email };
 
   const filtered = statusFilter === ALL
@@ -84,6 +87,18 @@ function ShipmentsPage() {
     flash(t("toast.exported", { n: targets.length }));
     logAction(actor, "orders.export", "", targets.length);
     setSelected(new Set());
+  }
+
+  async function handleEditSave(changes: OrderFormState) {
+    if (!editOrder?.id) return;
+    try {
+      await updateArchived(editOrder.id, changes, profile.uid);
+      flash(t("toast.updated"));
+      logAction(actor, "history.update", changes.name);
+    } catch {
+      flash(t("toast.updateErr"));
+    }
+    setEditOrder(null);
   }
 
   async function handleStatus(o: ArchivedOrder, status: OrderStatus) {
@@ -179,6 +194,7 @@ function ShipmentsPage() {
           <table className="data-table min-w-[1080px]">
             <thead>
               <tr>
+                <th></th>
                 <th className="w-10">
                   <input
                     type="checkbox"
@@ -198,7 +214,6 @@ function ShipmentsPage() {
                 <th>{tOrders("table.items")}</th>
                 <th>{tOrders("table.cod")}</th>
                 <th>{t("archivedBy")}</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -206,6 +221,26 @@ function ShipmentsPage() {
                 const status = statusOf(o);
                 return (
                   <tr key={o.id}>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        <button
+                          className="btn-ghost text-[13px] px-2.5 py-1.5"
+                          onClick={() => setEditOrder(o)}
+                          aria-label={tOrders("editTitle")}
+                          title={tOrders("editTitle")}
+                        >
+                          <span className="icon text-base" aria-hidden>edit</span>
+                        </button>
+                        <button
+                          className="btn-danger-soft text-[13px]"
+                          onClick={() => handleDelete(o)}
+                          aria-label={tCommon("delete")}
+                          title={tCommon("delete")}
+                        >
+                          <span className="icon text-base" aria-hidden>delete</span>
+                        </button>
+                      </div>
+                    </td>
                     <td>
                       <input
                         type="checkbox"
@@ -227,7 +262,7 @@ function ShipmentsPage() {
                         ))}
                       </select>
                     </td>
-                    <td className="text-ink-500">{formatDateTime(o.archivedAt, locale)}</td>
+                    <td className="text-ink-500" dir="ltr">{formatDateTime(o.archivedAt)}</td>
                     <td><span className={"pill " + SRC_PILL_CLASS[o.source]}>{tOrders(`sources.${o.source}`)}</span></td>
                     <td>{o.name}</td>
                     <td dir="ltr">{o.phone}</td>
@@ -237,20 +272,10 @@ function ShipmentsPage() {
                       {String(o.items || "").split("\n").map((line, i) => <div key={i}>{line}</div>)}
                     </td>
                     <td>{o.cod}</td>
-                    <td dir="ltr" className="text-ink-500 text-xs">
-                      <span className="block max-w-[120px] truncate" title={o.archivedBy}>
-                        {o.archivedBy || EMPTY_DISPLAY}
+                    <td className="text-ink-500 text-xs">
+                      <span className="block max-w-[140px] truncate" title={resolveUser(o.archivedBy)}>
+                        {resolveUser(o.archivedBy) || EMPTY_DISPLAY}
                       </span>
-                    </td>
-                    <td>
-                      <button
-                        className="btn-danger-soft text-[13px]"
-                        onClick={() => handleDelete(o)}
-                        aria-label={tCommon("delete")}
-                        title={tCommon("delete")}
-                      >
-                        <span className="icon text-base" aria-hidden>delete</span>
-                      </button>
                     </td>
                   </tr>
                 );
@@ -259,6 +284,14 @@ function ShipmentsPage() {
           </table>
         )}
       </div>
+
+      {editOrder && (
+        <EditOrderModal
+          order={editOrder}
+          onSave={handleEditSave}
+          onClose={() => setEditOrder(null)}
+        />
+      )}
     </>
   );
 }
