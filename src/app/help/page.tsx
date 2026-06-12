@@ -113,6 +113,15 @@ function HelpPage() {
           />
         </div>
         <HelpSection
+          icon="inventory_2"
+          title={t("catalogSection.title")}
+          delayClass="fade-up-delay-2"
+          items={[
+            t("catalogSection.c1"), t("catalogSection.c2"), t("catalogSection.c3"),
+            t("catalogSection.c4"), t("catalogSection.c5"),
+          ]}
+        />
+        <HelpSection
           icon="admin_panel_settings"
           title={t("rolesSection.title")}
           delayClass="fade-up-delay-2"
