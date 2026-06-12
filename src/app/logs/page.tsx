@@ -7,7 +7,7 @@ import {
   LOG_ACTIONS, ORDER_STATUSES, type LogAction, type LogEntry, type OrderStatus,
 } from "@/lib/types";
 import { EMPTY_DISPLAY, formatDateTime } from "@/lib/appGlobals";
-import { STATUS_CLASS } from "@/lib/statusStyles";
+import { ACTION_CLASS, STATUS_CLASS } from "@/lib/statusStyles";
 import AppShell from "@/components/layout/AppShell";
 import PageHero from "@/components/ui/PageHero";
 import EmptyState from "@/components/ui/EmptyState";
@@ -149,7 +149,7 @@ function LogsPage() {
                   <td className="text-ink-500" dir="ltr">{formatDateTime(l.createdAt)}</td>
                   <td title={l.email}>{resolveUser(l.uid)}</td>
                   <td>
-                    <span className="pill bg-pastel-lavender text-ink-700">
+                    <span className={"pill " + (ACTION_CLASS[l.action as LogAction] ?? "bg-soft text-ink-500")}>
                       {t(`actions.${l.action as LogAction}`)}
                     </span>
                   </td>
