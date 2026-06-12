@@ -1,12 +1,16 @@
 "use client";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { signOut } from "firebase/auth";
 import { useTranslations } from "next-intl";
 import { auth } from "@/lib/firebase";
 import { AppRoutes } from "@/lib/appRoutes";
+import { logAction } from "@/lib/logger";
 import type { UserProfile } from "@/lib/types";
 import LanguageToggle from "@/components/LanguageToggle";
+import ChangePasswordModal from "@/components/ChangePasswordModal";
+import { useToast } from "@/components/ToastProvider";
 // static import — بيضمن basePath صحيح على GitHub Pages
 import logo from "@/assets/logo.jpg";
 
@@ -23,6 +27,14 @@ interface TopNavBarProps {
  */
 export default function TopNavBar({ profile, onToggleMenu, menuOpen }: TopNavBarProps) {
   const t = useTranslations();
+  const flash = useToast();
+  const [showPassword, setShowPassword] = useState(false);
+
+  function handlePasswordChanged() {
+    setShowPassword(false);
+    flash(t("account.changed"));
+    logAction({ uid: profile.uid, email: profile.email }, "user.password", profile.email);
+  }
 
   return (
     <header className="fixed top-3 inset-x-3 z-50">
@@ -66,6 +78,15 @@ export default function TopNavBar({ profile, onToggleMenu, menuOpen }: TopNavBar
           </span>
           <button
             type="button"
+            onClick={() => setShowPassword(true)}
+            aria-label={t("account.changePassword")}
+            title={t("account.changePassword")}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-500 hover:text-ink-900 hover:bg-canvas/70 transition-colors"
+          >
+            <span className="icon" aria-hidden>key</span>
+          </button>
+          <button
+            type="button"
             onClick={() => auth && signOut(auth)}
             aria-label={t("nav.logout")}
             title={t("nav.logout")}
@@ -75,6 +96,13 @@ export default function TopNavBar({ profile, onToggleMenu, menuOpen }: TopNavBar
           </button>
         </div>
       </div>
+
+      {showPassword && (
+        <ChangePasswordModal
+          onChanged={handlePasswordChanged}
+          onClose={() => setShowPassword(false)}
+        />
+      )}
     </header>
   );
 }

@@ -21,8 +21,10 @@ export const LOG_ACTIONS = [
   "orders.export",
   "orders.clear",
   "user.create",
+  "user.update",
   "user.activate",
   "user.deactivate",
+  "user.password",
 ] as const;
 export type LogAction = (typeof LOG_ACTIONS)[number];
 

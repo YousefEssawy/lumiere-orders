@@ -13,7 +13,7 @@ const ALL = "all";
 function LogsPage() {
   const t = useTranslations("logs");
   const { locale } = useAppLocale();
-  const logs = useLogs(true);
+  const { logs, error } = useLogs(true);
   const [userFilter, setUserFilter] = useState<string>(ALL);
   const [actionFilter, setActionFilter] = useState<string>(ALL);
 
@@ -31,6 +31,13 @@ function LogsPage() {
   return (
     <>
       <PageHero icon="history" title={t("title")} subtitle={t("subtitle")} />
+
+      {error && (
+        <div className="card !border-danger/40 text-danger text-sm mb-4">
+          {t("loadError")}
+          <div className="text-xs text-ink-500 mt-1 break-all" dir="ltr">{error}</div>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
         <select className="form-input sm:!w-auto" value={userFilter} onChange={(e) => setUserFilter(e.target.value)}>

@@ -117,11 +117,25 @@
     "confirmClear": "Delete ALL orders? This cannot be undone.",
     "confirmExportBadCity": "{n} orders have an invalid governorate (they will export empty). Continue?"
   },
+  "account": {
+    "changePassword": "Change password",
+    "current": "Current password",
+    "new": "New password",
+    "confirm": "Confirm new password",
+    "mismatch": "Passwords do not match",
+    "wrongPassword": "Current password is incorrect",
+    "weak": "Password is too weak (minimum 6 characters)",
+    "changed": "Password changed ✓",
+    "error": "Failed to change password"
+  },
   "users": {
     "title": "Users",
     "subtitle": "Create accounts for your team and control their access",
     "create": "New user",
     "createTitle": "Create user",
+    "edit": "Edit",
+    "editTitle": "Edit user",
+    "emailLocked": "Email cannot be changed",
     "name": "Name",
     "namePh": "e.g. Ahmed Ali",
     "email": "Email",
@@ -160,6 +174,7 @@
     },
     "filterUser": "All users",
     "filterAction": "All actions",
+    "loadError": "Could not load the activity log. Make sure the latest firestore.rules file is published in Firebase Console → Firestore → Rules.",
     "actions": {
       "order.add": "Added order",
       "order.delete": "Deleted order",
@@ -167,8 +182,10 @@
       "orders.export": "Exported Wassalha file",
       "orders.clear": "Cleared all orders",
       "user.create": "Created user",
+      "user.update": "Updated user",
       "user.activate": "Activated user",
-      "user.deactivate": "Deactivated user"
+      "user.deactivate": "Deactivated user",
+      "user.password": "Changed their password"
     }
   },
   "help": {
