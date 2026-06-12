@@ -2,9 +2,10 @@
 // الحيلة: Firebase app ثانوي مؤقت — بينشئ الحساب من غير ما يمس جلسة الأدمن الحالية.
 import { deleteApp, getApps, initializeApp } from "firebase/app";
 import { createUserWithEmailAndPassword, getAuth, signOut } from "firebase/auth";
-import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { db, firebaseConfig } from "@/lib/firebase";
 import { FIRESTORE_COLLECTIONS, type UserRole } from "@/lib/types";
+import { creationAudit, updateAudit } from "@/lib/audit";
 
 const SECONDARY_APP_NAME = "user-mgmt";
 
@@ -20,7 +21,7 @@ export interface NewUserInput {
  * بيرمي AuthError كود زي auth/email-already-in-use أو auth/weak-password.
  */
 export async function createUser(
-  adminUid: string,
+  adminEmail: string,
   input: NewUserInput
 ): Promise<string> {
   if (!db) throw new Error("firebase-not-configured");
@@ -44,8 +45,7 @@ export async function createUser(
       name: input.name.trim(),
       role: input.role,
       active: true,
-      createdAt: serverTimestamp(),
-      createdBy: adminUid,
+      ...creationAudit(adminEmail),
     });
     return uid;
   } finally {
@@ -54,19 +54,24 @@ export async function createUser(
 }
 
 /** تفعيل / تعطيل مستخدم */
-export async function setUserActive(uid: string, active: boolean): Promise<void> {
+export async function setUserActive(uid: string, active: boolean, byEmail: string): Promise<void> {
   if (!db) throw new Error("firebase-not-configured");
-  await updateDoc(doc(db, FIRESTORE_COLLECTIONS.users, uid), { active });
+  await updateDoc(doc(db, FIRESTORE_COLLECTIONS.users, uid), {
+    active,
+    ...updateAudit(byEmail),
+  });
 }
 
 /** تعديل بيانات مستخدم (الاسم والدور — الإيميل ثابت) */
 export async function updateUserProfile(
   uid: string,
-  changes: { name: string; role: UserRole }
+  changes: { name: string; role: UserRole },
+  byEmail: string
 ): Promise<void> {
   if (!db) throw new Error("firebase-not-configured");
   await updateDoc(doc(db, FIRESTORE_COLLECTIONS.users, uid), {
     name: changes.name.trim(),
     role: changes.role,
+    ...updateAudit(byEmail),
   });
 }

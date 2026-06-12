@@ -24,7 +24,7 @@ function UsersPage() {
     const activating = !u.active;
     if (!activating && !window.confirm(t("confirmDeactivate", { email: u.email }))) return;
     try {
-      await setUserActive(u.uid, activating);
+      await setUserActive(u.uid, activating, profile.email);
       flash(t("toast.updated"));
       logAction(actor, activating ? "user.activate" : "user.deactivate", u.email);
     } catch {
@@ -118,7 +118,7 @@ function UsersPage() {
 
       {showCreate && (
         <CreateUserModal
-          adminUid={profile.uid}
+          adminEmail={profile.email}
           onCreated={handleCreated}
           onClose={() => setShowCreate(false)}
         />
@@ -126,6 +126,7 @@ function UsersPage() {
       {editUser && (
         <EditUserModal
           user={editUser}
+          byEmail={profile.email}
           onSaved={() => handleEdited(editUser.email)}
           onClose={() => setEditUser(null)}
         />
