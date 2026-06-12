@@ -2,13 +2,85 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // الأوردرات: قراءة وكتابة فقط لأي مستخدم مسجّل دخول
-    // (المستخدمين بتتنشأ يدوياً من Firebase Console، فمحدش بره يقدر يدخل)
-    match /orders/{orderId} {
-      allow read, write: if request.auth != null;
+    // ============================================================
+    // الأدمن المؤسس — أول حساب في النظام (Yousef).
+    // بيقدر ينشئ ملفه بنفسه أول مرة، وبعدها كل حاجة بتمشي بالأدوار.
+    // ============================================================
+    function isBootstrapAdmin() {
+      return request.auth != null
+        && request.auth.uid == "cie1ZcD5JedNKW0eHqgVCOk6gFp2";
     }
 
-    // أي حاجة تانية ممنوعة افتراضياً
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function profileExists() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function profile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // مستخدم نشط: عنده ملف ومتفعّل (الأدمن المؤسس نشط دايماً)
+    function isActiveUser() {
+      return isSignedIn()
+        && (isBootstrapAdmin() || (profileExists() && profile().active == true));
+    }
+
+    // أدمن نشط
+    function isAdmin() {
+      return isSignedIn()
+        && (isBootstrapAdmin()
+            || (profileExists() && profile().active == true && profile().role == "admin"));
+    }
+
+    function validUserDoc() {
+      let d = request.resource.data;
+      return d.email is string
+        && d.name is string
+        && d.role in ["admin", "staff"]
+        && d.active is bool;
+    }
+
+    // ============================================================
+    // الأوردرات — أي مستخدم نشط
+    // ============================================================
+    match /orders/{orderId} {
+      allow read, write: if isActiveUser();
+    }
+
+    // ============================================================
+    // المستخدمين
+    // - كل مستخدم يقرأ ملفه (عشان التطبيق يعرف دوره وحالته)
+    // - الأدمن يقرأ ويكتب الكل
+    // - الأدمن المؤسس يقدر ينشئ ملفه بنفسه أول مرة (bootstrap)
+    // - مفيش حذف نهائي — تعطيل بس
+    // ============================================================
+    match /users/{uid} {
+      allow get: if isSignedIn() && request.auth.uid == uid;
+      allow read: if isAdmin();
+      allow create: if validUserDoc()
+        && (isAdmin() || (isBootstrapAdmin() && request.auth.uid == uid));
+      allow update: if isAdmin() && validUserDoc();
+      allow delete: if false;
+    }
+
+    // ============================================================
+    // اللوجز — append-only
+    // - أي مستخدم نشط يضيف لوج باسمه هو بس
+    // - القراءة للأدمن بس
+    // - ممنوع التعديل أو الحذف نهائياً (حتى للأدمن)
+    // ============================================================
+    match /logs/{logId} {
+      allow create: if isActiveUser()
+        && request.resource.data.uid == request.auth.uid;
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // أي حاجة تانية ممنوعة
     match /{document=**} {
       allow read, write: if false;
     }
