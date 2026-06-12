@@ -4,6 +4,7 @@ export const AppRoutes = {
   history: "/history/",
   users: "/users/",
   logs: "/logs/",
+  migration: "/migration/",
   help: "/help/",
 } as const;
 
