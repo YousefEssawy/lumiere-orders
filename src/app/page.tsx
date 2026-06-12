@@ -94,7 +94,7 @@ function OrdersPage() {
             <span>{t("bySource", { sllr: c.Sllr, wa: c.WhatsApp, ig: c.Instagram })}</span>
           ) : null}
         </div>
-        <button className="btn-primary" onClick={handleMove} disabled={!orders.length}>
+        <button className="btn-primary w-full sm:w-auto" onClick={handleMove} disabled={!orders.length}>
           <span className="icon text-base" aria-hidden>local_shipping</span>
           {t("moveBtn")}
         </button>
