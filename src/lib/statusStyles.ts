@@ -30,5 +30,12 @@ export const ACTION_CLASS: Record<LogAction, string> = {
   "user.activate": "bg-pastel-mint text-ink-700",
   "user.deactivate": "bg-pastel-pink text-danger",
   "user.password": "bg-pastel-lavender text-ink-700",
+  "product.create": "bg-pastel-mint text-ink-700",
+  "product.update": "bg-pastel-sky text-ink-700",
+  "product.delete": "bg-pastel-pink text-danger",
+  "products.import": "bg-pastel-butter text-ink-700",
+  "category.create": "bg-pastel-mint text-ink-700",
+  "category.update": "bg-pastel-sky text-ink-700",
+  "category.delete": "bg-pastel-pink text-danger",
   "system.migrate": "bg-soft text-ink-700",
 };

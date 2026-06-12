@@ -22,11 +22,14 @@
   "nav": {
     "sections": {
       "operations": "Operations",
+      "catalog": "Catalog",
       "administration": "Administration",
       "support": "Support"
     },
     "orders": "Preparation",
     "history": "Shipments",
+    "products": "Products",
+    "categories": "Categories",
     "users": "Users",
     "logs": "Activity Log",
     "migration": "Data Upgrade",
@@ -67,6 +70,16 @@
     "codPh": "470",
     "items": "Items",
     "itemsPh": "e.g. Creamy Gold U07 X 1\nLattea W13 X 1",
+    "picker": {
+      "title": "Pick from catalog",
+      "product": "Product",
+      "productPick": "— Pick a product —",
+      "size": "Size",
+      "qty": "Qty",
+      "addBtn": "Add",
+      "outOfStock": "out of stock",
+      "lowStock": "Only {n} left in stock — the order will exceed it."
+    },
     "vol": "Package size",
     "notes": "Shipping notes",
     "notesPh": "Optional",
@@ -153,6 +166,76 @@
       "exported": "Exported {n} orders to Wassalha ✓",
       "updated": "Shipment updated ✓",
       "updateErr": "Failed to update the shipment"
+    }
+  },
+  "products": {
+    "title": "Products",
+    "subtitle": "Your perfume catalog — sizes, prices and stock per size",
+    "create": "New product",
+    "createTitle": "Add product",
+    "editTitle": "Edit product",
+    "importBtn": "Import sheet",
+    "code": "Code",
+    "codeLocked": "The code cannot be changed (it is the product id)",
+    "name": "Name (EN)",
+    "nameAr": "Name (AR)",
+    "category": "Category",
+    "categoryPick": "— Pick —",
+    "imageUrl": "Image URL",
+    "image": "Image",
+    "variants": "Sizes",
+    "addVariant": "Add size",
+    "variantsHint": "Each size has its own price and stock quantity. Format: size · price · ×quantity",
+    "variantsRequired": "Add at least one size",
+    "size": "Size",
+    "price": "Price",
+    "quantity": "Quantity",
+    "active": "Active",
+    "searchPh": "Search by code or name…",
+    "filterCategory": "All categories",
+    "total": "Products:",
+    "empty": "No products yet — add manually or import the sheet",
+    "confirmDelete": "Delete “{name}” permanently?",
+    "loadError": "Could not load products. Make sure the latest firestore.rules are published.",
+    "toast": {
+      "created": "Product added ✓",
+      "updated": "Product updated ✓",
+      "deleted": "Product deleted",
+      "saveErr": "Failed to save the product"
+    },
+    "import": {
+      "title": "Import products sheet",
+      "hint": "Same format as the Lumière products sheet (v22): a product row followed by its size rows. Existing codes are updated, new ones are added, and new categories are created automatically.",
+      "dropText": "Drop the .xlsx file here or click to browse",
+      "empty": "No products found in the file",
+      "parseErr": "Could not read the file — make sure it matches the products sheet format",
+      "applyErr": "Import failed",
+      "preview": "{n} products ready to import",
+      "previewCategories": "{n} categories in the sheet",
+      "previewSkipped": "{n} rows skipped (unrecognized)",
+      "applyBtn": "Import",
+      "done": "Imported {n} products ✓"
+    }
+  },
+  "categories": {
+    "title": "Categories",
+    "subtitle": "Product groups — Men, Women, Unisex or custom",
+    "create": "New category",
+    "createTitle": "Add category",
+    "editTitle": "Edit category",
+    "name": "Name",
+    "namePh": "e.g. Men",
+    "productsCount": "Products",
+    "active": "Active",
+    "empty": "No categories yet",
+    "confirmDelete": "Delete the category “{name}”?",
+    "loadError": "Could not load categories. Make sure the latest firestore.rules are published.",
+    "toast": {
+      "created": "Category added ✓",
+      "updated": "Category updated ✓",
+      "deleted": "Category deleted",
+      "saveErr": "Failed to save",
+      "hasProducts": "Cannot delete — {n} products use this category"
     }
   },
   "details": {
@@ -269,6 +352,19 @@
         "activate": "Activated user",
         "deactivate": "Deactivated user",
         "password": "Changed their password"
+      },
+      "product": {
+        "create": "Added product",
+        "update": "Updated product",
+        "delete": "Deleted product"
+      },
+      "products": {
+        "import": "Imported products sheet"
+      },
+      "category": {
+        "create": "Added category",
+        "update": "Updated category",
+        "delete": "Deleted category"
       },
       "system": {
         "migrate": "Ran the data upgrade"
