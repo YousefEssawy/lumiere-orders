@@ -64,6 +64,18 @@ export function useProducts(enabled: boolean) {
     await deleteDoc(doc(db, COL, id));
   }, []);
 
+  /** حذف جماعي — على دفعات */
+  const deleteProducts = useCallback(async (ids: string[]) => {
+    if (!db || !ids.length) return;
+    const database = db;
+    for (let i = 0; i < ids.length; i += IMPORT_CHUNK) {
+      const chunk = ids.slice(i, i + IMPORT_CHUNK);
+      const batch = writeBatch(database);
+      chunk.forEach((id) => batch.delete(doc(database, COL, id)));
+      await batch.commit();
+    }
+  }, []);
+
   /** استيراد الشيت — upsert بالكود؛ الموجود بيتحدّث والجديد بيتضاف */
   const importProducts = useCallback(
     async (list: ProductInput[], existingIds: Set<string>, byUid: string) => {
@@ -87,5 +99,5 @@ export function useProducts(enabled: boolean) {
     []
   );
 
-  return { products, error, saveProduct, deleteProduct, importProducts };
+  return { products, error, saveProduct, deleteProduct, deleteProducts, importProducts };
 }

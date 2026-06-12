@@ -196,11 +196,16 @@
     "total": "المنتجات:",
     "empty": "مفيش منتجات لسه — ضيف يدوي أو استورد الشيت",
     "confirmDelete": "حذف «{name}» نهائياً؟",
+    "deleteSelected": "حذف المحدد ({n})",
+    "deleteAll": "حذف الكل",
+    "confirmDeleteSelected": "حذف نهائي لـ {n} منتج محدد؟",
+    "confirmDeleteAll": "حذف نهائي لكل المنتجات ({n})؟ مش هينفع ترجعهم.",
     "loadError": "تعذّر تحميل المنتجات. اتأكد إن آخر نسخة من firestore.rules منشورة.",
     "toast": {
       "created": "تمت إضافة المنتج ✓",
       "updated": "تم تحديث المنتج ✓",
       "deleted": "اتحذف المنتج",
+      "bulkDeleted": "اتحذف {n} منتج",
       "saveErr": "حصل خطأ في حفظ المنتج"
     },
     "import": {
@@ -229,11 +234,17 @@
     "active": "نشطة",
     "empty": "مفيش فئات لسه",
     "confirmDelete": "حذف فئة «{name}»؟",
+    "deleteSelected": "حذف المحدد ({n})",
+    "deleteAll": "حذف الكل",
+    "confirmDeleteSelected": "حذف {n} فئة؟ (الفئات اللي فيها منتجات بتتعدى)",
     "loadError": "تعذّر تحميل الفئات. اتأكد إن آخر نسخة من firestore.rules منشورة.",
     "toast": {
       "created": "تمت إضافة الفئة ✓",
       "updated": "تم تحديث الفئة ✓",
       "deleted": "اتحذفت الفئة",
+      "bulkDeleted": "اتحذف {n} فئة",
+      "bulkDeletedSkipped": "اتحذف {n} · اتعدى {s} (مستخدمة)",
+      "allInUse": "مفيش حاجة تتحذف — كل الفئات المحددة فيها منتجات",
       "saveErr": "حصل خطأ في الحفظ",
       "hasProducts": "مينفعش تتحذف — فيه {n} منتج بيستخدمها"
     }

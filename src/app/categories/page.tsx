@@ -16,13 +16,14 @@ function CategoriesPage() {
   const t = useTranslations("categories");
   const tCommon = useTranslations("common");
   const { profile } = useSession();
-  const { categories, error, addCategory, updateCategory, deleteCategory } = useCategories(true);
+  const { categories, error, addCategory, updateCategory, deleteCategory, deleteCategories } = useCategories(true);
   const { products } = useProducts(true);
   const flash = useToast();
   const actor = { uid: profile.uid, email: profile.email };
 
   const [showCreate, setShowCreate] = useState(false);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const countByCategory = useMemo(() => {
     const map: Record<string, number> = {};
@@ -31,6 +32,41 @@ function CategoriesPage() {
     }
     return map;
   }, [products]);
+
+  const selectedCategories = categories.filter((c) => c.id && selected.has(c.id));
+  const allSelected = categories.length > 0 && selectedCategories.length === categories.length;
+
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll() {
+    setSelected(allSelected ? new Set() : new Set(categories.map((c) => c.id!).filter(Boolean)));
+  }
+
+  /** حذف جماعي — الفئات المستخدمة بتتعدى ويتبلغ عنها */
+  async function bulkDelete(targets: Category[]) {
+    const deletable = targets.filter((c) => (countByCategory[c.name] ?? 0) === 0 && c.id);
+    const skipped = targets.length - deletable.length;
+    if (!deletable.length) {
+      flash(t("toast.allInUse"));
+      return;
+    }
+    if (!window.confirm(t("confirmDeleteSelected", { n: deletable.length }))) return;
+    try {
+      await deleteCategories(deletable.map((c) => c.id!));
+      flash(skipped > 0 ? t("toast.bulkDeletedSkipped", { n: deletable.length, s: skipped }) : t("toast.bulkDeleted", { n: deletable.length }));
+      logAction(actor, "category.delete", "", deletable.length);
+      setSelected(new Set());
+    } catch {
+      flash(t("toast.saveErr"));
+    }
+  }
 
   async function handleSave(name: string) {
     if (editCategory?.id) {
@@ -81,10 +117,24 @@ function CategoriesPage() {
         title={t("title")}
         subtitle={t("subtitle")}
         trailing={
-          <button className="btn-primary" onClick={() => setShowCreate(true)}>
-            <span className="icon text-base" aria-hidden>add_box</span>
-            {t("create")}
-          </button>
+          <>
+            {categories.length > 0 && (
+              <button className="btn-ghost !text-danger" onClick={() => bulkDelete(categories)}>
+                <span className="icon text-base" aria-hidden>delete_forever</span>
+                {t("deleteAll")}
+              </button>
+            )}
+            {selectedCategories.length > 0 && (
+              <button className="btn-danger" onClick={() => bulkDelete(selectedCategories)}>
+                <span className="icon text-base" aria-hidden>delete</span>
+                {t("deleteSelected", { n: selectedCategories.length })}
+              </button>
+            )}
+            <button className="btn-primary" onClick={() => setShowCreate(true)}>
+              <span className="icon text-base" aria-hidden>add_box</span>
+              {t("create")}
+            </button>
+          </>
         }
       />
 
@@ -103,6 +153,15 @@ function CategoriesPage() {
             <thead>
               <tr>
                 <th></th>
+                <th className="w-10">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 accent-ink-900 cursor-pointer align-middle"
+                    checked={allSelected}
+                    onChange={toggleAll}
+                    aria-label={t("title")}
+                  />
+                </th>
                 <th>{t("name")}</th>
                 <th>{t("productsCount")}</th>
                 <th>{t("active")}</th>
@@ -130,6 +189,15 @@ function CategoriesPage() {
                         <span className="icon text-base" aria-hidden>delete</span>
                       </button>
                     </div>
+                  </td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 accent-ink-900 cursor-pointer align-middle"
+                      checked={!!c.id && selected.has(c.id)}
+                      onChange={() => c.id && toggleOne(c.id)}
+                      aria-label={c.name}
+                    />
                   </td>
                   <td className="font-semibold">{c.name}</td>
                   <td>{countByCategory[c.name] ?? 0}</td>
