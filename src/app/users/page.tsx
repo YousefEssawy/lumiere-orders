@@ -10,6 +10,7 @@ import { useToast } from "@/components/ToastProvider";
 import PageHero from "@/components/ui/PageHero";
 import CreateUserModal from "@/components/users/CreateUserModal";
 import EditUserModal from "@/components/users/EditUserModal";
+import Toggle from "@/components/ui/Toggle";
 
 function UsersPage() {
   const t = useTranslations("users");
@@ -76,7 +77,7 @@ function UsersPage() {
               {users.map((u) => (
                 <tr key={u.uid} className={u.active ? "" : "opacity-60"}>
                   <td>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2.5">
                       <button
                         className="btn-ghost text-[13px] px-3 py-1.5"
                         onClick={() => setEditUser(u)}
@@ -85,14 +86,12 @@ function UsersPage() {
                       >
                         <span className="icon text-base" aria-hidden>edit</span>
                       </button>
-                      {u.uid !== profile.uid && (
-                        <button
-                          className={u.active ? "btn-danger-soft text-[13px]" : "btn-ghost text-[13px] px-3 py-1.5"}
-                          onClick={() => toggleActive(u)}
-                        >
-                          {u.active ? t("deactivate") : t("activate")}
-                        </button>
-                      )}
+                      <Toggle
+                        checked={u.active}
+                        onChange={() => toggleActive(u)}
+                        disabled={u.uid === profile.uid}
+                        label={u.active ? t("deactivate") : t("activate")}
+                      />
                     </div>
                   </td>
                   <td>{u.name}</td>
