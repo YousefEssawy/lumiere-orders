@@ -1,9 +1,9 @@
 "use client";
 import { useState, type FormEvent } from "react";
-import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { USER_ROLES, type UserProfile, type UserRole } from "@/lib/types";
 import { updateUserProfile } from "@/lib/adminUsers";
+import ModalShell from "@/components/ui/ModalShell";
 
 interface EditUserModalProps {
   user: UserProfile;
@@ -33,19 +33,9 @@ export default function EditUserModal({ user, byUid, onSaved, onClose }: EditUse
     }
   }
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
-      onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}
-    >
-      <form onSubmit={submit} className="card w-full max-w-lg shadow-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="text-base font-bold flex items-center gap-2 mb-2">
-          <span className="icon text-accent" aria-hidden>edit</span>
-          {t("editTitle")}
-        </h2>
-
+  return (
+    <ModalShell icon="edit" title={t("editTitle")} onClose={onClose} locked={busy}>
+      <form onSubmit={submit}>
         <label className="form-label">{t("email")}</label>
         <input type="email" className="form-input opacity-60 cursor-not-allowed" value={user.email} disabled dir="ltr" />
         <div className="text-xs text-ink-300 mt-1">{t("emailLocked")}</div>
@@ -70,7 +60,6 @@ export default function EditUserModal({ user, byUid, onSaved, onClose }: EditUse
           </button>
         </div>
       </form>
-    </div>,
-    document.body
+    </ModalShell>
   );
 }

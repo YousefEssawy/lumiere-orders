@@ -1,8 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { parseProductsSheet, type ProductsParseResult } from "@/lib/productsImport";
+import ModalShell from "@/components/ui/ModalShell";
 
 interface ImportProductsModalProps {
   onImport: (result: ProductsParseResult) => Promise<void> | void;
@@ -51,18 +51,9 @@ export default function ImportProductsModal({ onImport, onClose }: ImportProduct
     }
   }
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
-      onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}
-    >
-      <div className="card w-full max-w-lg shadow-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="text-base font-bold flex items-center gap-2 mb-2">
-          <span className="icon text-accent" aria-hidden>upload_file</span>
-          {t("title")}
-        </h2>
+  return (
+    <ModalShell icon="upload_file" title={t("title")} onClose={onClose} locked={busy}>
+      <div>
         <p className="text-[13px] text-ink-500 mb-3">{t("hint")}</p>
 
         <div
@@ -107,7 +98,6 @@ export default function ImportProductsModal({ onImport, onClose }: ImportProduct
           </button>
         </div>
       </div>
-    </div>,
-    document.body
+    </ModalShell>
   );
 }

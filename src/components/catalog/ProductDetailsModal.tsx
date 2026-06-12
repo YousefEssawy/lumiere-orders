@@ -5,30 +5,11 @@ import { useTranslations } from "next-intl";
 import { useUserDirectory } from "@/hooks/useUserDirectory";
 import { EMPTY_DISPLAY, formatDateTime } from "@/lib/appGlobals";
 import type { Product } from "@/lib/types";
+import AuditTimeline from "@/components/ui/AuditTimeline";
 
 interface ProductDetailsModalProps {
   product: Product;
   onClose: () => void;
-}
-
-/** نقطة في تايملاين بيانات السجل */
-function AuditNode({
-  icon, label, who, when, last = false,
-}: { icon: string; label: string; who: string; when: string; last?: boolean }) {
-  if (who === EMPTY_DISPLAY && when === EMPTY_DISPLAY) return null;
-  return (
-    <li className="relative flex gap-3 pb-4 last:pb-0">
-      {!last && <span className="absolute start-[11px] top-7 bottom-0 w-px bg-ink-100" aria-hidden />}
-      <span className="relative z-10 inline-flex items-center justify-center w-6 h-6 rounded-full bg-canvas border border-line shrink-0">
-        <span className="icon !text-[13px] text-ink-500" aria-hidden>{icon}</span>
-      </span>
-      <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs text-ink-500 min-w-0 pt-1">
-        <span>{label}</span>
-        <b className="text-ink-700">{who}</b>
-        <span className="text-ink-300" dir="ltr">{when}</span>
-      </span>
-    </li>
-  );
 }
 
 /** عرض كامل لتفاصيل المنتج — نفس روح بوليصة الأوردر */
@@ -164,22 +145,12 @@ export default function ProductDetailsModal({ product: p, onClose }: ProductDeta
 
         {/* بيانات السجل — تايملاين هادي */}
         <div className="px-6 py-4 bg-soft border-t border-dashed border-line">
-          <ul>
-            <AuditNode
-              icon="add_circle"
-              label={tDetails("createdBy")}
-              who={resolveUser(p.createdBy) || EMPTY_DISPLAY}
-              when={formatDateTime(p.createdAt)}
-              last={!p.updatedAt}
-            />
-            <AuditNode
-              icon="edit"
-              label={tDetails("updatedBy")}
-              who={resolveUser(p.updatedBy) || EMPTY_DISPLAY}
-              when={formatDateTime(p.updatedAt)}
-              last
-            />
-          </ul>
+          <AuditTimeline
+            nodes={[
+              { icon: "add_circle", label: tDetails("createdBy"), who: resolveUser(p.createdBy) || EMPTY_DISPLAY, when: formatDateTime(p.createdAt) },
+              { icon: "edit", label: tDetails("updatedBy"), who: resolveUser(p.updatedBy) || EMPTY_DISPLAY, when: formatDateTime(p.updatedAt) },
+            ]}
+          />
         </div>
       </div>
     </div>,

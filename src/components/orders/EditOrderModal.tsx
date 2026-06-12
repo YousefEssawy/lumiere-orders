@@ -1,9 +1,9 @@
 "use client";
 import { useState, type FormEvent } from "react";
-import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { normPhone, type Order, type OrderSource } from "@/lib/wassalha";
 import OrderFields, { ALL_SOURCES, type OrderFormState } from "@/components/orders/OrderFields";
+import ModalShell from "@/components/ui/ModalShell";
 
 interface EditOrderModalProps {
   order: Order;
@@ -46,19 +46,9 @@ export default function EditOrderModal({ order, onSave, onClose }: EditOrderModa
     });
   }
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
-      onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}
-    >
-      <form onSubmit={submit} className="card w-full max-w-2xl shadow-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="text-base font-bold flex items-center gap-2 mb-2">
-          <span className="icon text-accent" aria-hidden>edit</span>
-          {t("editTitle")}
-        </h2>
-
+  return (
+    <ModalShell icon="edit" title={t("editTitle")} onClose={onClose} locked={busy} widthClass="max-w-2xl">
+      <form onSubmit={submit}>
         <OrderFields
           value={f}
           onChange={(k, v) => setF((o) => ({ ...o, [k]: v }))}
@@ -74,7 +64,6 @@ export default function EditOrderModal({ order, onSave, onClose }: EditOrderModa
           </button>
         </div>
       </form>
-    </div>,
-    document.body
+    </ModalShell>
   );
 }

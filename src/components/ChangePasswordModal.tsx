@@ -1,6 +1,5 @@
 "use client";
 import { useState, type FormEvent } from "react";
-import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import {
   EmailAuthProvider,
@@ -9,6 +8,7 @@ import {
   type AuthError,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import ModalShell from "@/components/ui/ModalShell";
 
 const WRONG_PASS_CODES = ["auth/invalid-credential", "auth/wrong-password"];
 const MIN_PASSWORD_LENGTH = 6;
@@ -54,19 +54,9 @@ export default function ChangePasswordModal({ onChanged, onClose }: ChangePasswo
     }
   }
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
-      onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}
-    >
-      <form onSubmit={submit} className="card w-full max-w-lg shadow-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="text-base font-bold flex items-center gap-2 mb-2">
-          <span className="icon text-accent" aria-hidden>key</span>
-          {t("changePassword")}
-        </h2>
-
+  return (
+    <ModalShell icon="key" title={t("changePassword")} onClose={onClose} locked={busy}>
+      <form onSubmit={submit}>
         <label className="form-label">{t("current")} <span className="req">*</span></label>
         <input type="password" className="form-input" value={current} onChange={(e) => setCurrent(e.target.value)} required dir="ltr" autoComplete="current-password" />
 
@@ -87,7 +77,6 @@ export default function ChangePasswordModal({ onChanged, onClose }: ChangePasswo
           </button>
         </div>
       </form>
-    </div>,
-    document.body
+    </ModalShell>
   );
 }
