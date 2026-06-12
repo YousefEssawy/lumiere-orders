@@ -70,33 +70,43 @@ NEXT_PUBLIC_FIREBASE_APP_ID
 ```
 lumiere-orders/
 ├─ .github/workflows/
-│  ├─ deploy.yml          # push على production → build + deploy لـ Pages
-│  └─ ci.yml              # push/PR على development|testing → فحص (lint, typecheck, build)
+│  ├─ deploy.yml             # push على production → build + deploy لـ Pages
+│  └─ ci.yml                 # push/PR على development|testing → فحص (lint, typecheck, build)
+├─ public/assets/            # اللوجو وأصول البراند
 ├─ src/
 │  ├─ app/
-│  │  ├─ layout.tsx       # الـ root layout (RTL, خط Cairo)
-│  │  ├─ page.tsx         # الداشبورد (محمي باللوجن)
-│  │  └─ globals.css      # هوية لوميير
+│  │  ├─ layout.tsx          # فونتات (League Spartan/Quicksand/Cairo) + Providers
+│  │  ├─ globals.css         # Design tokens من هوية البراند (CSS variables) + Tailwind
+│  │  ├─ page.tsx            # الأوردرات
+│  │  ├─ users/page.tsx      # إدارة المستخدمين (أدمن)
+│  │  ├─ logs/page.tsx       # سجل النشاط (أدمن)
+│  │  └─ help/page.tsx       # شرح النظام
 │  ├─ components/
-│  │  ├─ Login.tsx
-│  │  ├─ OrderForm.tsx
-│  │  ├─ SllrImport.tsx
-│  │  ├─ OrdersTable.tsx
-│  │  └─ Toast.tsx
-│  ├─ hooks/
-│  │  ├─ useAuth.ts
-│  │  └─ useOrders.ts
-│  └─ lib/
-│     ├─ firebase.ts      # تهيئة Firebase من env
-│     └─ wassalha.ts      # تحويل المدن/الأرقام، استيراد سلر، تصدير وصلها
-├─ .env.example
-├─ .gitignore
-├─ firestore.rules
-├─ next.config.mjs
-├─ package.json
-├─ tsconfig.json
-└─ README.md
+│  │  ├─ layout/             # AppShell (الحارس) + TopNavBar + SideNavBar
+│  │  ├─ orders/             # OrderForm, SllrImport, OrdersTable
+│  │  ├─ users/              # CreateUserModal
+│  │  ├─ ui/                 # PageHero ومكونات عامة
+│  │  ├─ IntlProvider.tsx    # i18n client-side (localStorage + dir mirroring)
+│  │  ├─ ToastProvider.tsx   # useToast()
+│  │  ├─ LanguageToggle.tsx
+│  │  └─ Login.tsx
+│  ├─ hooks/                 # useAuth (مع البروفايل/الدور), useOrders, useUsers, useLogs
+│  ├─ lib/
+│  │  ├─ firebase.ts         # تهيئة Firebase من env
+│  │  ├─ wassalha.ts         # تحويل المدن/الأرقام، استيراد سلر، تصدير وصلها
+│  │  ├─ adminUsers.ts       # إنشاء مستخدمين عبر secondary app + تفعيل/تعطيل
+│  │  ├─ logger.ts           # تسجيل النشاط (append-only)
+│  │  ├─ appRoutes.ts        # كل المسارات — مفيش مسار hardcoded
+│  │  ├─ types.ts            # UserProfile, LogEntry, أسماء الـ collections
+│  │  ├─ format.ts           # تنسيق التواريخ
+│  │  └─ i18n.ts             # إعدادات اللغة
+│  └─ messages/              # en.json + ar.json — كل نصوص الواجهة
+├─ tailwind.config.ts        # خريطة التوكنز (بيقرأ من globals.css variables)
+├─ firestore.rules           # الأدوار + التفعيل + اللوجز append-only
+└─ ...
 ```
+
+> **إدارة المستخدمين بدون سيرفر:** الإنشاء بيتم من المتصفح عبر Firebase app ثانوي مؤقت (مش بيمس جلسة الأدمن). التعطيل = فلاج `active` في Firestore والـ rules بتمنع المتعطل من كل حاجة. الحذف النهائي للحساب من Firebase Console بس (محتاج Admin SDK). الأدمن المؤسس (bootstrap) معرّف بالـ UID جوه `firestore.rules`.
 
 ---
 

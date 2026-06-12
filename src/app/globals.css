@@ -1,67 +1,207 @@
-:root{
-  --ink:#1a1a1a; --muted:#6b6b6b; --line:#e6e2da; --bg:#faf8f4; --card:#ffffff;
-  --gold:#b89651; --gold-dark:#9a7d3f; --green:#1f8a5b; --danger:#c0392b; --soft:#f3efe7;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Lumière Design Tokens — المصدر الوحيد لهوية البراند في الكود.
+   مشتق من: 05-Brand-Identity/Lumiere_Brand_Identity_v2.md
+   أي لون/ظل/راديوس في التطبيق لازم يرجع لهنا.
+   ============================================================ */
+:root {
+  /* Core palette */
+  --brand-black: #0f0f0f; /* Jet Black */
+  --cream: #f6efe4;       /* Warm Cream */
+
+  /* Perfume accent palette */
+  --burgundy: #6b1e24;       /* Deep Burgundy */
+  --burgundy-deep: #50161b;  /* Hover/pressed */
+
+  /* Semantic accent — اللون المميز للتطبيق كله. عايز تغيره؟ هنا بس. */
+  --accent: var(--burgundy);
+  --accent-deep: var(--burgundy-deep);
+
+  /* Ink scale (text) */
+  --ink-900: #0f0f0f;
+  --ink-700: #2c2a26;
+  --ink-500: #6b6657;
+  --ink-300: #a39c8a;
+  --ink-100: #e9e4d8;
+
+  /* Surfaces */
+  --bg-page: #faf7f1;
+  --bg-canvas: #ffffff;
+  --bg-soft: #f6efe4;
+  --line: #e7e0d2;
+
+  /* Semantic */
+  --success: #1f8a5b;
+  --warning: #d98a00;
+  --danger: #b5342e;   /* Sale Red — للأفعال الخطيرة */
+
+  /* Shadows — دفء خفيف بدل الرمادي البارد */
+  --shadow-xs: 0 1px 2px rgba(15, 15, 15, 0.05);
+  --shadow-sm: 0 2px 6px rgba(60, 25, 28, 0.07), 0 1px 2px rgba(15, 15, 15, 0.04);
+  --shadow-md: 0 8px 24px rgba(60, 25, 28, 0.1), 0 2px 6px rgba(15, 15, 15, 0.05);
+  --shadow-lg: 0 16px 40px rgba(60, 25, 28, 0.14), 0 4px 10px rgba(15, 15, 15, 0.06);
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;padding-bottom:60px}
-header{background:var(--ink);color:#fff;padding:18px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-header .logo{font-size:24px;font-weight:800;letter-spacing:1px}
-header .logo span{color:var(--gold)}
-header .tag{font-size:13px;color:#cfc8ba;border-right:1px solid #444;padding-right:16px}
-header .spacer{flex:1}
-header .who{font-size:13px;color:#cfc8ba}
-header .logout{background:#2c2c2c;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-family:inherit;font-size:13px;cursor:pointer}
-header .logout:hover{background:#3a3a3a}
-.wrap{max-width:1200px;margin:0 auto;padding:24px 20px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-@media(max-width:880px){.grid{grid-template-columns:1fr}}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
-.card h2{font-size:18px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
-.card .sub{font-size:13px;color:var(--muted);margin-bottom:18px}
-label{display:block;font-size:13px;font-weight:600;margin:12px 0 5px}
-label .req{color:var(--danger)}
-input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:14px;background:#fff}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
-textarea{resize:vertical;min-height:60px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border:none;border-radius:10px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;transition:.15s}
-.btn-gold{background:var(--gold);color:#fff;width:100%;margin-top:16px}
-.btn-gold:hover{background:var(--gold-dark)}
-.btn-gold:disabled{opacity:.6;cursor:default}
-.btn-green{background:var(--green);color:#fff}
-.btn-green:hover{filter:brightness(.93)}
-.btn-ghost{background:var(--soft);color:var(--ink)}
-.btn-ghost:hover{background:#e8e2d6}
-.btn-danger{background:none;color:var(--danger);padding:6px 10px;font-size:13px}
-.drop{border:2px dashed var(--line);border-radius:12px;padding:26px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s}
-.drop:hover,.drop.over{border-color:var(--gold);background:var(--soft);color:var(--ink)}
-.drop b{color:var(--gold)}
-.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:26px 0 14px}
-.bar .stats{font-size:14px;color:var(--muted)}
-.bar .stats b{color:var(--ink);font-size:18px}
-.bar .actions{display:flex;gap:10px}
-.tablewrap{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:auto}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:840px}
-th,td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
-th{background:var(--soft);font-weight:700;font-size:12px;color:var(--muted);position:sticky;top:0}
-td.wrap-cell{white-space:normal;max-width:230px}
-tr:hover td{background:#fcfbf8}
-.pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700}
-.pill.sllr{background:#e8f0fb;color:#2a5db0}
-.pill.wa{background:#e3f6ea;color:#1f8a5b}
-.pill.ig{background:#fbeaf2;color:#b0306f}
-.empty{text-align:center;padding:50px 20px;color:var(--muted)}
-.empty .big{font-size:40px;margin-bottom:10px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:13px 24px;border-radius:30px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99}
-.toast.show{opacity:1}
-.hint{font-size:12px;color:var(--muted);margin-top:4px}
-.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:30px}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:38px 34px;width:100%;max-width:380px;box-shadow:0 8px 30px rgba(0,0,0,.06);text-align:center}
-.login-box .logo{font-size:30px;font-weight:800;letter-spacing:1px;margin-bottom:6px}
-.login-box .logo span{color:var(--gold)}
-.login-box .lsub{color:var(--muted);font-size:13px;margin-bottom:24px}
-.login-box label{text-align:right}
-.login-box .err{color:var(--danger);font-size:13px;margin-top:12px;min-height:18px}
-.center-msg{min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px}
-.setup-warn{background:#fff4e5;border:1px solid #f0c987;color:#8a5a00;border-radius:10px;padding:14px;font-size:13px;margin:14px 0;text-align:right;line-height:1.7}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg-page);
+    color: var(--ink-900);
+    font-family: var(--font-quicksand), var(--font-cairo), ui-sans-serif, system-ui;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* العربي: Cairo أولاً وسطر أوسع */
+  html[lang="ar"] body {
+    font-family: var(--font-cairo), var(--font-quicksand), ui-sans-serif, system-ui;
+    line-height: 1.8;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-league), var(--font-cairo), ui-sans-serif;
+    letter-spacing: 0.01em;
+  }
+  html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3 {
+    font-family: var(--font-cairo), var(--font-league), ui-sans-serif;
+    letter-spacing: 0;
+  }
+}
+
+@layer components {
+  /* ---------- Surfaces ---------- */
+  .card {
+    @apply bg-canvas border border-line rounded-md shadow-sm p-6;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-4 py-2.5
+      text-sm font-bold cursor-pointer transition-colors duration-200 ease-standard
+      disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn text-white;
+    background: var(--accent);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--accent-deep);
+  }
+  .btn-dark {
+    @apply btn text-white;
+    background: var(--brand-black);
+  }
+  .btn-dark:hover:not(:disabled) {
+    background: var(--ink-700);
+  }
+  .btn-ghost {
+    @apply btn;
+    background: var(--bg-soft);
+    color: var(--ink-900);
+  }
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--ink-100);
+  }
+  .btn-danger {
+    @apply btn text-white;
+    background: var(--danger);
+  }
+  .btn-danger:hover:not(:disabled) {
+    background: var(--burgundy);
+  }
+  .btn-danger-soft {
+    @apply btn;
+    background: transparent;
+    color: var(--danger);
+    padding: 6px 10px;
+  }
+  .btn-danger-soft:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--danger) 8%, transparent);
+  }
+
+  /* ---------- Forms ---------- */
+  .form-label {
+    @apply block text-[13px] font-semibold mt-3 mb-1.5 text-ink-700;
+  }
+  .form-input {
+    @apply w-full rounded-sm border border-line bg-canvas px-3 py-2.5 text-sm
+      transition-colors duration-150;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+  .req {
+    color: var(--danger);
+  }
+
+  /* ---------- Table ---------- */
+  .table-wrap {
+    @apply bg-canvas border border-line rounded-md overflow-auto shadow-xs;
+  }
+  .data-table {
+    @apply w-full border-collapse text-[13px];
+  }
+  .data-table th {
+    @apply bg-soft text-ink-500 font-bold text-xs px-3 py-2.5 border-b border-line
+      whitespace-nowrap text-start sticky top-0;
+  }
+  .data-table td {
+    @apply px-3 py-2.5 border-b border-line whitespace-nowrap text-start;
+  }
+  .data-table tr:hover td {
+    background: color-mix(in srgb, var(--cream) 35%, transparent);
+  }
+  .data-table td.cell-wrap {
+    @apply whitespace-normal max-w-[230px];
+  }
+
+  /* ---------- Pills / badges ---------- */
+  .pill {
+    @apply inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold;
+  }
+
+  /* ---------- Nav ---------- */
+  .nav-link {
+    @apply flex items-center gap-3 rounded-sm px-4 py-2.5 text-sm font-semibold
+      text-ink-500 transition-colors duration-200 ease-standard;
+  }
+  .nav-link:hover {
+    @apply text-ink-900 bg-soft;
+  }
+  .nav-link-active {
+    @apply text-white;
+    background: var(--brand-black);
+    box-shadow: var(--shadow-sm);
+  }
+  .nav-link-active:hover {
+    @apply text-white;
+    background: var(--brand-black);
+  }
+
+  /* ---------- Icons (Material Symbols) ---------- */
+  .icon {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  }
+}
