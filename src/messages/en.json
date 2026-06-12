@@ -177,16 +177,22 @@
     "loadError": "Could not load the activity log. Make sure the latest firestore.rules file is published in Firebase Console → Firestore → Rules.",
     "items": "{n} orders",
     "actions": {
-      "order.add": "Added order",
-      "order.delete": "Deleted order",
-      "orders.import": "Imported from Sllr",
-      "orders.export": "Exported Wassalha file",
-      "orders.clear": "Cleared all orders",
-      "user.create": "Created user",
-      "user.update": "Updated user",
-      "user.activate": "Activated user",
-      "user.deactivate": "Deactivated user",
-      "user.password": "Changed their password"
+      "order": {
+        "add": "Added order",
+        "delete": "Deleted order"
+      },
+      "orders": {
+        "import": "Imported from Sllr",
+        "export": "Exported Wassalha file",
+        "clear": "Cleared all orders"
+      },
+      "user": {
+        "create": "Created user",
+        "update": "Updated user",
+        "activate": "Activated user",
+        "deactivate": "Deactivated user",
+        "password": "Changed their password"
+      }
     }
   },
   "help": {
