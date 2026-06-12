@@ -175,6 +175,7 @@
     "filterUser": "كل المستخدمين",
     "filterAction": "كل العمليات",
     "loadError": "تعذّر تحميل سجل النشاط. اتأكد إن آخر نسخة من firestore.rules منشورة في Firebase Console ← Firestore ← Rules.",
+    "items": "{n} أوردر",
     "actions": {
       "order.add": "أضاف أوردر",
       "order.delete": "حذف أوردر",

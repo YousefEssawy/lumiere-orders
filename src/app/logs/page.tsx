@@ -2,13 +2,23 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useLogs } from "@/hooks/useLogs";
-import { LOG_ACTIONS, type LogAction } from "@/lib/types";
-import { formatDateTime } from "@/lib/format";
+import { LOG_ACTIONS, type LogAction, type LogEntry } from "@/lib/types";
+import { EMPTY_DISPLAY, formatDateTime } from "@/lib/format";
 import AppShell from "@/components/layout/AppShell";
 import { useAppLocale } from "@/components/IntlProvider";
 import PageHero from "@/components/ui/PageHero";
 
 const ALL = "all";
+
+/** التفاصيل المعروضة: نص + عدد، أو "n أوردر" مترجمة للعمليات الجماعية */
+function detailText(
+  l: LogEntry,
+  t: (key: string, values?: Record<string, string | number | Date>) => string
+): string {
+  if (l.detail) return l.count !== undefined ? `${l.detail} (${l.count})` : l.detail;
+  if (l.count !== undefined) return t("items", { n: l.count });
+  return EMPTY_DISPLAY;
+}
 
 function LogsPage() {
   const t = useTranslations("logs");
@@ -73,10 +83,7 @@ function LogsPage() {
                       {t(`actions.${l.action as LogAction}`)}
                     </span>
                   </td>
-                  <td className="cell-wrap">
-                    {l.detail}
-                    {l.count !== undefined ? ` (${l.count})` : ""}
-                  </td>
+                  <td className="cell-wrap">{detailText(l, t)}</td>
                 </tr>
               ))}
             </tbody>
