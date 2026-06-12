@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cairo, League_Spartan, Quicksand } from "next/font/google";
 import IntlProvider from "@/components/IntlProvider";
 import ToastProvider from "@/components/ToastProvider";
+import ConfirmProvider from "@/components/ConfirmProvider";
 import logo from "@/assets/logo.jpg";
 import "../../design_system/colors_and_type.css";
 import "./globals.css";
@@ -50,7 +51,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <IntlProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <ConfirmProvider>{children}</ConfirmProvider>
+          </ToastProvider>
         </IntlProvider>
       </body>
     </html>

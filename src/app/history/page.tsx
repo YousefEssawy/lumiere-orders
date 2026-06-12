@@ -12,6 +12,7 @@ import { exportWassalha, type OrderSource } from "@/lib/wassalha";
 import { STATUS_CLASS } from "@/lib/statusStyles";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
+import { useConfirm } from "@/components/ConfirmProvider";
 import PageHero from "@/components/ui/PageHero";
 import EmptyState from "@/components/ui/EmptyState";
 import EditOrderModal from "@/components/orders/EditOrderModal";
@@ -41,6 +42,7 @@ function ShipmentsPage() {
   const { archived, error, deleteArchived, clearArchive, setStatus, updateArchived } = useArchive(true);
   const resolveUser = useUserDirectory();
   const flash = useToast();
+  const confirm = useConfirm();
   const [statusFilter, setStatusFilter] = useState<string>(ALL);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [editOrder, setEditOrder] = useState<ArchivedOrder | null>(null);
@@ -73,11 +75,11 @@ function ShipmentsPage() {
   }
 
   /** ذكي: المحدد لو فيه تحديد، وإلا كل المعروض حسب الفلتر */
-  function handleExport() {
+  async function handleExport() {
     const targets = selectedInView.length ? selectedInView : filtered;
     if (!targets.length) { flash(t("exportEmpty")); return; }
     const bad = targets.filter((o) => !o.city);
-    if (bad.length && !window.confirm(t("confirmExportBadCity", { n: bad.length }))) return;
+    if (bad.length && !(await confirm({ title: t("export"), message: t("confirmExportBadCity", { n: bad.length }) }))) return;
     exportWassalha(targets);
     flash(t("toast.exported", { n: targets.length }));
     logAction(actor, "orders.export", "", targets.length);
@@ -109,7 +111,7 @@ function ShipmentsPage() {
 
   async function handleDelete(o: ArchivedOrder) {
     if (!o.id) return;
-    if (!window.confirm(t("confirmDelete", { name: o.name }))) return;
+    if (!(await confirm({ title: tCommon("delete"), message: t("confirmDelete", { name: o.name }) }))) return;
     try {
       await deleteArchived(o.id);
       flash(t("toast.deleted"));
@@ -121,7 +123,7 @@ function ShipmentsPage() {
 
   async function handleClear() {
     if (!archived.length) return;
-    if (!window.confirm(t("confirmClear", { n: archived.length }))) return;
+    if (!(await confirm({ title: t("clearAll"), message: t("confirmClear", { n: archived.length }) }))) return;
     try {
       await clearArchive(archived);
       flash(t("toast.cleared"));
@@ -134,7 +136,7 @@ function ShipmentsPage() {
   /** حذف نهائي للمحدد بس */
   async function handleDeleteSelected() {
     if (!selectedInView.length) return;
-    if (!window.confirm(t("confirmDeleteSelected", { n: selectedInView.length }))) return;
+    if (!(await confirm({ title: t("deleteSelected", { n: selectedInView.length }), message: t("confirmDeleteSelected", { n: selectedInView.length }) }))) return;
     try {
       await clearArchive(selectedInView);
       flash(t("toast.bulkDeleted", { n: selectedInView.length }));

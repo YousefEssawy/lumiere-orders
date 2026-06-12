@@ -11,6 +11,7 @@ import type { ProductsParseResult } from "@/lib/productsImport";
 import { exportProductsSheet } from "@/lib/productsExport";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
+import { useConfirm } from "@/components/ConfirmProvider";
 import PageHero from "@/components/ui/PageHero";
 import EmptyState from "@/components/ui/EmptyState";
 import Toggle from "@/components/ui/Toggle";
@@ -27,6 +28,7 @@ function ProductsPage() {
   const { products, error, saveProduct, deleteProduct, deleteProducts, importProducts } = useProducts(true);
   const { categories, addCategory } = useCategories(true);
   const flash = useToast();
+  const confirm = useConfirm();
   const actor = { uid: profile.uid, email: profile.email };
 
   const [search, setSearch] = useState("");
@@ -60,7 +62,7 @@ function ProductsPage() {
 
   async function handleDelete(p: Product) {
     if (!p.id) return;
-    if (!window.confirm(t("confirmDelete", { name: p.name }))) return;
+    if (!(await confirm({ title: tCommon("delete"), message: t("confirmDelete", { name: p.name }) }))) return;
     try {
       await deleteProduct(p.id);
       flash(t("toast.deleted"));
@@ -109,7 +111,7 @@ function ProductsPage() {
   async function handleDeleteSelected() {
     const ids = selectedInView.map((p) => p.id!) ;
     if (!ids.length) return;
-    if (!window.confirm(t("confirmDeleteSelected", { n: ids.length }))) return;
+    if (!(await confirm({ title: t("deleteSelected", { n: ids.length }), message: t("confirmDeleteSelected", { n: ids.length }) }))) return;
     try {
       await deleteProducts(ids);
       flash(t("toast.bulkDeleted", { n: ids.length }));
@@ -122,7 +124,7 @@ function ProductsPage() {
 
   async function handleDeleteAll() {
     if (!products.length) return;
-    if (!window.confirm(t("confirmDeleteAll", { n: products.length }))) return;
+    if (!(await confirm({ title: t("deleteAll"), message: t("confirmDeleteAll", { n: products.length }) }))) return;
     try {
       await deleteProducts(products.map((p) => p.id!).filter(Boolean));
       flash(t("toast.bulkDeleted", { n: products.length }));
