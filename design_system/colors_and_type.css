@@ -1,0 +1,214 @@
+/* ============================================================
+   Lumière Design System — Colors & Type
+   Brand: Soft-premium fragrance house. Cairo, EG.
+   Voice: Premium but approachable, Arabic-first, bilingual (AR + EN).
+   Source identity: Lumiere_Brand_Identity_v3_Soft_Premium.
+   Structure adapted from the Devopsolution design system.
+   ============================================================ */
+
+/* -------- Webfonts --------
+   Fonts are loaded by the Next.js app via next/font (Google Fonts):
+   League Spartan (EN display) → --font-league
+   Quicksand     (EN body)    → --font-quicksand
+   Cairo         (AR)         → --font-cairo
+   No @font-face here — the variables are injected on <html>. */
+
+/* ============================================================
+   COLOR TOKENS
+   ============================================================ */
+:root {
+  /* --- Brand core — Jet Black wordmark on soft white --- */
+  --brand-primary:        #0F0F0F;   /* Jet Black — wordmark, buttons, headlines, active nav */
+  --brand-primary-700:    #2C2A26;   /* hover / pressed surfaces                              */
+  --brand-primary-500:    #3A3733;   /* body emphasis on light bg                             */
+  --brand-primary-300:    #8A857C;   /* secondary text on light bg                            */
+  --brand-primary-100:    #E5E1D8;   /* tinted surfaces, dividers                             */
+  --brand-primary-050:    #F3F0E9;   /* faint warm wash                                       */
+
+  /* --- Soft holographic / beauty accents (v3) — subtle, never loud --- */
+  --pastel-pink:          #FADADD;
+  --peach:                #FFCBA4;
+  --butter:               #FFF4C8;
+  --mint:                 #D4F1E0;
+  --sky:                  #CCE3F4;
+  --lavender:             #E6D8F3;
+
+  /* Functional accent — lavender family. The -700 stop is a derived,
+     deeper lavender for focus rings / interactive tints (the raw pastel
+     is too light to carry interaction states). */
+  --brand-accent:         #E6D8F3;
+  --brand-accent-700:     #B9A3D6;
+  --brand-accent-100:     #F2EBF9;
+  --brand-accent-050:     #F9F5FC;
+
+  /* --- Perfume warmth (v3: use lightly — tiny dividers, glow) --- */
+  --warm-gold:            #C8923D;
+  --warm-gold-300:        #E8B864;
+
+  /* Compatibility aliases (preview cards use the Devopsolution names) */
+  --brand-accent-500:     var(--brand-accent-700);
+  --brand-accent-300:     var(--brand-accent);
+  --brand-accent-200:     var(--brand-accent-100);
+  --brand-spark:          var(--warm-gold);
+  --brand-spark-300:      var(--warm-gold-300);
+  --brand-spark-100:      var(--butter);
+
+  /* --- Neutrals (warm, cream-tinted — never cool gray) --- */
+  --ink-deep: #1A1814;  /* deepest warm black — footer surface                  */
+  --ink-900: #0F0F0F;   /* max contrast headlines on white                      */
+  --ink-700: #3A3733;   /* body on light                                        */
+  --ink-500: #6F6A62;   /* secondary text                                       */
+  --ink-400: #8C867C;   /* muted / metadata                                     */
+  --ink-300: #A8A299;   /* placeholder, disabled label                          */
+  --ink-200: #D6CFC2;   /* hairlines, dividers on color                         */
+  --ink-100: #E9E4D8;   /* dividers on white                                    */
+  --ink-050: #F6F3EC;   /* page bg secondary                                    */
+  --ink-000: #FFFFFF;
+
+  /* --- Semantic --- */
+  --success: #1F8A5B;
+  --success-bg: #E5F5EE;
+  --warning: #D98A00;
+  --warning-bg: #FBF1DC;
+  --danger:  #B5342E;   /* Sale Red — urgency, very sparingly */
+  --danger-bg:  #FBE5E5;
+  --info:    var(--brand-accent-700);
+  --info-bg: var(--brand-accent-100);
+
+  /* --- Surfaces / page (v3 primary palette) --- */
+  --bg-page:        #FBFAF7;        /* Soft White                                */
+  --bg-page-deep:   #F6EFE4;        /* Warm Cream — lower sections               */
+  --bg-canvas:      #FFFFFF;        /* Pure White — cards                        */
+  --bg-soft:        #F6EFE4;        /* Warm Cream — soft fills                   */
+  --bg-beige:       #EDE2D2;        /* Soft Beige — pedestals, hairlines         */
+  --bg-inverted:    var(--brand-primary);
+
+  /* --- Glass tokens (glass lives over the pastel page wash) --- */
+  --glass-fill:     rgba(255, 255, 255, 0.55);
+  --glass-fill-strong: rgba(255, 255, 255, 0.72);
+  --glass-stroke:   rgba(255, 255, 255, 0.65);
+  --glass-blur:     18px;
+  --glass-blur-strong: 28px;
+
+  /* --- Brand gradients — soft holographic, the logo's glow --- */
+  --grad-hero:        linear-gradient(135deg, #FADADD 0%, #FFF4C8 35%, #D4F1E0 65%, #CCE3F4 100%);
+  --grad-hero-soft:   linear-gradient(135deg, #F9F5FC 0%, #F2EBF9 60%, #FBFAF7 100%);
+  --grad-glass-light: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.45) 100%);
+  --grad-page:        radial-gradient(1200px 600px at 10% -10%, #E6D8F3 0%, transparent 60%),
+                      radial-gradient(900px 500px at 110% 10%, #CCE3F4 0%, transparent 55%),
+                      linear-gradient(180deg, #FBFAF7 0%, #F6EFE4 100%);
+
+  /* --- Shadows / elevation — warm-tinted, never gray --- */
+  --shadow-xs: 0 1px 2px rgba(58, 55, 51, 0.06);
+  --shadow-sm: 0 2px 6px rgba(58, 55, 51, 0.06), 0 1px 2px rgba(58, 55, 51, 0.04);
+  --shadow-md: 0 8px 24px rgba(58, 55, 51, 0.08), 0 2px 6px rgba(58, 55, 51, 0.05);
+  --shadow-lg: 0 18px 48px rgba(58, 55, 51, 0.12), 0 4px 12px rgba(58, 55, 51, 0.06);
+  --shadow-xl: 0 32px 80px rgba(58, 55, 51, 0.18), 0 8px 24px rgba(58, 55, 51, 0.08);
+  --shadow-glow-accent: 0 18px 60px rgba(185, 163, 214, 0.45);
+  --shadow-inset-hairline: inset 0 0 0 1px rgba(255,255,255,0.5);
+
+  /* --- Borders / radii / spacing --- */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
+  --radius-pill: 999px;
+
+  --hairline: 1px solid var(--ink-100);
+  --hairline-strong: 1px solid var(--ink-200);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* --- Motion --- */
+  --ease-standard: cubic-bezier(.2,.7,.2,1);
+  --ease-out:      cubic-bezier(.16,.84,.32,1);
+  --ease-in:       cubic-bezier(.7,.0,.84,.0);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 380ms;
+
+  /* ============================================================
+     TYPE TOKENS
+     ============================================================ */
+  --font-en: var(--font-quicksand), "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-league), var(--font-quicksand), system-ui, sans-serif;
+  --font-ar: var(--font-cairo), "Tajawal", "Noto Sans Arabic", system-ui, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+
+  /* Display / Heading scale */
+  --fs-display-2xl: 88px;
+  --fs-display-xl:  72px;
+  --fs-display-lg:  56px;
+  --fs-h1: 44px;
+  --fs-h2: 36px;
+  --fs-h3: 28px;
+  --fs-h4: 22px;
+  --fs-h5: 18px;
+  --fs-h6: 16px;
+  --fs-body-lg: 18px;
+  --fs-body:    16px;
+  --fs-body-sm: 14px;
+  --fs-caption: 12px;
+  --fs-eyebrow: 12px;
+
+  --lh-tight: 1.08;
+  --lh-snug:  1.2;
+  --lh-default: 1.5;
+  --lh-relaxed: 1.65;
+  --lh-loose:   1.8; /* Arabic body — needs more breathing room */
+
+  --ls-tight: -0.02em;
+  --ls-snug:  -0.01em;
+  --ls-default: 0;
+  --ls-wide:    0.06em;
+  --ls-eyebrow: 0.18em;
+}
+
+/* ============================================================
+   SEMANTIC TYPE STYLES
+   ============================================================ */
+.t-display-2xl { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-display-2xl); line-height: var(--lh-tight); letter-spacing: var(--ls-tight); color: var(--brand-primary); }
+.t-display-xl  { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-display-xl);  line-height: var(--lh-tight); letter-spacing: var(--ls-tight); color: var(--brand-primary); }
+.t-display-lg  { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-display-lg);  line-height: var(--lh-tight); letter-spacing: var(--ls-tight); color: var(--brand-primary); }
+
+.t-h1 { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-h1); line-height: var(--lh-snug); letter-spacing: var(--ls-tight); color: var(--brand-primary); }
+.t-h2 { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-h2); line-height: var(--lh-snug); letter-spacing: var(--ls-snug);  color: var(--brand-primary); }
+.t-h3 { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-h3); line-height: var(--lh-snug); color: var(--brand-primary); }
+.t-h4 { font-family: var(--font-en); font-weight: 600; font-size: var(--fs-h4); line-height: 1.3; color: var(--ink-900); }
+.t-h5 { font-family: var(--font-en); font-weight: 600; font-size: var(--fs-h5); line-height: 1.35; color: var(--ink-900); }
+.t-h6 { font-family: var(--font-en); font-weight: 600; font-size: var(--fs-h6); line-height: 1.4; color: var(--ink-900); }
+
+.t-body-lg { font-size: var(--fs-body-lg); line-height: var(--lh-relaxed); color: var(--ink-700); }
+.t-body    { font-size: var(--fs-body);    line-height: var(--lh-relaxed); color: var(--ink-700); }
+.t-body-sm { font-size: var(--fs-body-sm); line-height: var(--lh-default); color: var(--ink-500); }
+.t-caption { font-size: var(--fs-caption); line-height: var(--lh-default); color: var(--ink-400); }
+
+.t-eyebrow {
+  font-family: var(--font-en); font-weight: 600; font-size: var(--fs-eyebrow);
+  letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--ink-400);
+}
+
+.t-link { color: var(--ink-900); text-decoration: none; border-bottom: 1px solid currentColor; }
+.t-link:hover { color: var(--brand-accent-700); }
+
+.t-mono { font-family: var(--font-mono); font-size: var(--fs-body-sm); color: var(--ink-700); }
+
+/* Arabic adjustments — Cairo reads tightest with extra leading */
+[dir="rtl"] .t-h1, [dir="rtl"] .t-h2, [dir="rtl"] .t-h3,
+[dir="rtl"] .t-display-lg { font-family: var(--font-ar); font-weight: 700; line-height: 1.3; letter-spacing: 0; }
+[dir="rtl"] .t-body { font-family: var(--font-ar); line-height: var(--lh-loose); }
+[dir="rtl"] .t-eyebrow { font-family: var(--font-ar); letter-spacing: 0; text-transform: none; }
