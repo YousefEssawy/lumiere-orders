@@ -71,6 +71,7 @@
     "ref": "Internal reference",
     "refPh": "Optional — for your own tracking",
     "addBtn": "Add order",
+    "editTitle": "Edit order",
     "importTitle": "Import Sllr file",
     "importSub": "Upload the Sllr export file (.xlsx) — it is parsed and converted automatically",
     "dropText": "Drag the Sllr file here or <b>click to browse</b>",
@@ -105,6 +106,8 @@
     "toast": {
       "added": "Order added ✓",
       "addErr": "Failed to save the order",
+      "updated": "Order updated ✓",
+      "updateErr": "Failed to update the order",
       "imported": "Imported {n} orders from Sllr",
       "importErr": "Import failed",
       "fileEmpty": "The file is empty",
@@ -209,6 +212,7 @@
     "actions": {
       "order": {
         "add": "Added order",
+        "update": "Edited order",
         "delete": "Deleted order"
       },
       "orders": {
