@@ -3,6 +3,19 @@
 export const USER_ROLES = ["admin", "staff"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
+// حالات الأوردر في الهيستوري:
+// preparing (بيتجهز للمندوب — الافتراضي عند الأرشفة) → shipped → delivered،
+// و returned / cancelled للحالات الاستثنائية
+export const ORDER_STATUSES = [
+  "preparing",
+  "shipped",
+  "delivered",
+  "returned",
+  "cancelled",
+] as const;
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+export const DEFAULT_ORDER_STATUS: OrderStatus = "preparing";
+
 export interface UserProfile {
   uid: string;
   email: string;
@@ -22,6 +35,7 @@ export const LOG_ACTIONS = [
   "orders.clear",
   "history.delete",
   "history.clear",
+  "history.status",
   "user.create",
   "user.update",
   "user.activate",

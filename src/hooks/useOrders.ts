@@ -5,7 +5,7 @@ import {
   writeBatch, serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { FIRESTORE_COLLECTIONS } from "@/lib/types";
+import { DEFAULT_ORDER_STATUS, FIRESTORE_COLLECTIONS } from "@/lib/types";
 import type { Order } from "@/lib/wassalha";
 
 const COL = FIRESTORE_COLLECTIONS.orders;
@@ -69,6 +69,7 @@ export function useOrders(enabled: boolean) {
         const { id, ...data } = o;
         batch.set(doc(collection(database, ARCHIVE_COL)), {
           ...data,
+          status: DEFAULT_ORDER_STATUS,
           archivedAt: serverTimestamp(),
           archivedBy,
         });
