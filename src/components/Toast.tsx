@@ -1,0 +1,4 @@
+"use client";
+export default function Toast({ msg }: { msg: string }) {
+  return <div className={"toast" + (msg ? " show" : "")}>{msg}</div>;
+}

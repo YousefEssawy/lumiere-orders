@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // الأوردرات: قراءة وكتابة فقط لأي مستخدم مسجّل دخول
+    // (المستخدمين بتتنشأ يدوياً من Firebase Console، فمحدش بره يقدر يدخل)
+    match /orders/{orderId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // أي حاجة تانية ممنوعة افتراضياً
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
