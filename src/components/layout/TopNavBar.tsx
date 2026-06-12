@@ -1,60 +1,77 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { signOut } from "firebase/auth";
 import { useTranslations } from "next-intl";
 import { auth } from "@/lib/firebase";
+import { AppRoutes } from "@/lib/appRoutes";
 import type { UserProfile } from "@/lib/types";
 import LanguageToggle from "@/components/LanguageToggle";
 
 interface TopNavBarProps {
   profile: UserProfile;
+  /** بيفتح/يقفل السايدبار على كل المقاسات */
   onToggleMenu: () => void;
+  menuOpen: boolean;
 }
 
-export default function TopNavBar({ profile, onToggleMenu }: TopNavBarProps) {
+/**
+ * ناف بار عائم زجاجي مستدير (glass pill) — همبرجر + اللوجو والاسم في البداية،
+ * اللغة والمستخدم والخروج في النهاية. بيمتد بعرض الشاشة بهامش 12px.
+ */
+export default function TopNavBar({ profile, onToggleMenu, menuOpen }: TopNavBarProps) {
   const t = useTranslations();
 
   return (
-    <header className="sticky top-0 z-50 bg-canvas/90 backdrop-blur border-b border-line">
-      <div className="flex items-center gap-3 px-4 py-2.5 md:px-6">
-        <button
-          type="button"
-          className="btn-ghost p-2 md:hidden"
-          onClick={onToggleMenu}
-          aria-label={t("nav.menu")}
-        >
-          <span className="icon" aria-hidden>menu</span>
-        </button>
+    <header className="fixed top-3 inset-x-3 z-50">
+      <div className="glass-card rounded-full h-14 px-2.5 sm:px-4 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <button
+            type="button"
+            onClick={onToggleMenu}
+            aria-label={t("nav.menu")}
+            aria-expanded={menuOpen}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-700 hover:bg-canvas/70 transition-colors shrink-0"
+          >
+            <span className="icon" aria-hidden>{menuOpen ? "menu_open" : "menu"}</span>
+          </button>
 
-        <Image
-          src="/assets/logo.jpg"
-          alt={t("brand.name")}
-          width={36}
-          height={36}
-          className="rounded-full border border-line object-cover"
-          priority
-        />
-        <div className="leading-tight">
-          <div className="font-display font-bold text-lg tracking-wide">
-            LUMI<span className="text-accent">È</span>RE
+          <Link href={AppRoutes.orders} className="flex items-center gap-2.5 shrink-0">
+            <Image
+              src="/assets/logo.jpg"
+              alt={t("brand.name")}
+              width={32}
+              height={32}
+              className="rounded-full border border-line object-cover"
+              priority
+            />
+            <span className="font-display font-bold text-base tracking-wide text-ink-900">
+              LUMIÈRE
+            </span>
+          </Link>
+
+          <div className="hidden lg:flex flex-col ms-2 ps-5 border-s border-line min-w-0">
+            <span className="text-sm font-semibold text-ink-700 leading-none truncate">
+              {t("brand.sub")}
+            </span>
           </div>
-          <div className="text-[11px] text-ink-500 hidden sm:block">{t("brand.sub")}</div>
         </div>
 
-        <div className="flex-1" />
-
-        <LanguageToggle />
-        <div className="text-xs text-ink-500 hidden sm:block" title={profile.email}>
-          {profile.name || profile.email}
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <LanguageToggle />
+          <span className="text-xs text-ink-500 hidden sm:block max-w-[160px] truncate" title={profile.email}>
+            {profile.name || profile.email}
+          </span>
+          <button
+            type="button"
+            onClick={() => auth && signOut(auth)}
+            aria-label={t("nav.logout")}
+            title={t("nav.logout")}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-500 hover:text-danger hover:bg-canvas/70 transition-colors"
+          >
+            <span className="icon" aria-hidden>logout</span>
+          </button>
         </div>
-        <button
-          type="button"
-          className="btn-dark text-xs px-3 py-1.5"
-          onClick={() => auth && signOut(auth)}
-        >
-          <span className="icon text-base" aria-hidden>logout</span>
-          <span className="hidden sm:inline">{t("nav.logout")}</span>
-        </button>
       </div>
     </header>
   );

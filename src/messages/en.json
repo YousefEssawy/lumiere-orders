@@ -19,6 +19,11 @@
     "search": "Search"
   },
   "nav": {
+    "sections": {
+      "operations": "Operations",
+      "administration": "Administration",
+      "support": "Support"
+    },
     "orders": "Orders",
     "users": "Users",
     "logs": "Activity Log",

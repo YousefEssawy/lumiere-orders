@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cairo, League_Spartan, Quicksand } from "next/font/google";
 import IntlProvider from "@/components/IntlProvider";
 import ToastProvider from "@/components/ToastProvider";
+import "../../design_system/colors_and_type.css";
 import "./globals.css";
 
 const cairo = Cairo({

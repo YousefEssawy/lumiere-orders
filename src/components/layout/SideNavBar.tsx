@@ -11,12 +11,32 @@ interface NavItem {
   adminOnly: boolean;
 }
 
+interface NavSection {
+  sectionKey: "operations" | "administration" | "support";
+  items: NavItem[];
+}
+
 // تعريف المنيو في مكان واحد — الصلاحية جزء من التعريف مش شرط متكرر
-const NAV_ITEMS: NavItem[] = [
-  { labelKey: "orders", icon: "package_2", href: AppRoutes.orders, adminOnly: false },
-  { labelKey: "users", icon: "group", href: AppRoutes.users, adminOnly: true },
-  { labelKey: "logs", icon: "history", href: AppRoutes.logs, adminOnly: true },
-  { labelKey: "help", icon: "help", href: AppRoutes.help, adminOnly: false },
+const NAV_SECTIONS: NavSection[] = [
+  {
+    sectionKey: "operations",
+    items: [
+      { labelKey: "orders", icon: "package_2", href: AppRoutes.orders, adminOnly: false },
+    ],
+  },
+  {
+    sectionKey: "administration",
+    items: [
+      { labelKey: "users", icon: "group", href: AppRoutes.users, adminOnly: true },
+      { labelKey: "logs", icon: "history", href: AppRoutes.logs, adminOnly: true },
+    ],
+  },
+  {
+    sectionKey: "support",
+    items: [
+      { labelKey: "help", icon: "help", href: AppRoutes.help, adminOnly: false },
+    ],
+  },
 ];
 
 function isActive(pathname: string, href: AppRoute): boolean {
@@ -26,52 +46,68 @@ function isActive(pathname: string, href: AppRoute): boolean {
 
 interface SideNavBarProps {
   isAdmin: boolean;
+  /** open بيتحكم في الدرج على الموبايل والسايدبار على الديسكتوب */
   open: boolean;
   onClose: () => void;
 }
 
+/**
+ * سايدبار زجاجي عائم بينزلق برا الشاشة لما يتقفل (على كل المقاسات) —
+ * المحتوى الرئيسي بياخد العرض كله. start-0 بيخليه يتبع اتجاه اللغة.
+ */
 export default function SideNavBar({ isAdmin, open, onClose }: SideNavBarProps) {
   const t = useTranslations("nav");
   const pathname = usePathname();
-  const items = NAV_ITEMS.filter((i) => !i.adminOnly || isAdmin);
 
   return (
     <>
+      {/* خلفية معتمة — موبايل بس */}
       {open && (
         <div
-          className="fixed inset-0 z-30 bg-ink-900/40 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-30 md:hidden bg-ink-900/40 backdrop-blur-sm"
           onClick={onClose}
           aria-hidden
         />
       )}
+
       <aside
         className={
-          "fixed top-[57px] bottom-0 start-0 z-40 w-60 transition-transform duration-300 ease-standard " +
-          // الإخفاء بيحصل تحت md بس — على الديسكتوب السايدبار ظاهر دايماً
+          "fixed start-0 top-20 bottom-3 w-64 z-40 transition-transform duration-300 ease-standard " +
           (open
             ? "translate-x-0"
-            : "max-md:ltr:-translate-x-full max-md:rtl:translate-x-full")
+            : "ltr:-translate-x-[calc(100%+0.75rem)] rtl:translate-x-[calc(100%+0.75rem)]")
         }
+        aria-hidden={!open ? "true" : undefined}
       >
-        <nav className="h-full bg-canvas border-e border-line p-3 flex flex-col gap-1">
-          {items.map((item) => {
-            const active = isActive(pathname, item.href);
-            return (
-              <Link
-                key={item.labelKey}
-                href={item.href}
-                onClick={onClose}
-                aria-current={active ? "page" : undefined}
-                className={"nav-link " + (active ? "nav-link-active" : "")}
-              >
-                <span className="icon" aria-hidden>{item.icon}</span>
-                {t(item.labelKey)}
-              </Link>
-            );
-          })}
-          <div className="flex-1" />
-          <div className="text-[11px] text-ink-300 px-4 pb-2">Lumière Orders</div>
-        </nav>
+        <div className="glass-card rounded-2xl mx-3 h-full flex flex-col py-5 overflow-y-auto">
+          <nav className="flex flex-col flex-1 px-3">
+            {NAV_SECTIONS.map((section, sectionIndex) => {
+              const visibleItems = section.items.filter((i) => !i.adminOnly || isAdmin);
+              if (visibleItems.length === 0) return null;
+              return (
+                <div key={section.sectionKey} className={sectionIndex > 0 ? "mt-2" : ""}>
+                  <p className="nav-section">{t(`sections.${section.sectionKey}`)}</p>
+                  {visibleItems.map((item) => {
+                    const active = isActive(pathname, item.href);
+                    return (
+                      <Link
+                        key={item.labelKey}
+                        href={item.href}
+                        aria-current={active ? "page" : undefined}
+                        className={"nav-link " + (active ? "nav-link-active" : "")}
+                      >
+                        <span className="icon" aria-hidden>{item.icon}</span>
+                        {t(item.labelKey)}
+                      </Link>
+                    );
+                  })}
+                </div>
+              );
+            })}
+            <div className="flex-1" />
+            <div className="text-[11px] text-ink-300 px-4 pb-1">Lumière Orders</div>
+          </nav>
+        </div>
       </aside>
     </>
   );
