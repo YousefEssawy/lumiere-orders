@@ -15,6 +15,8 @@ import { useToast } from "@/components/ToastProvider";
 import PageHero from "@/components/ui/PageHero";
 import EmptyState from "@/components/ui/EmptyState";
 import EditOrderModal from "@/components/orders/EditOrderModal";
+import OrderDetailsModal from "@/components/orders/OrderDetailsModal";
+import { truncatedCell } from "@/components/orders/OrdersTable";
 import type { OrderFormState } from "@/components/orders/OrderFields";
 
 const ALL = "all";
@@ -42,6 +44,7 @@ function ShipmentsPage() {
   const [statusFilter, setStatusFilter] = useState<string>(ALL);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [editOrder, setEditOrder] = useState<ArchivedOrder | null>(null);
+  const [viewOrder, setViewOrder] = useState<ArchivedOrder | null>(null);
   const actor = { uid: profile.uid, email: profile.email };
 
   const filtered = statusFilter === ALL
@@ -217,6 +220,14 @@ function ShipmentsPage() {
                       <div className="flex items-center gap-1">
                         <button
                           className="btn-ghost text-[13px] px-2.5 py-1.5"
+                          onClick={() => setViewOrder(o)}
+                          aria-label={tCommon("view")}
+                          title={tCommon("view")}
+                        >
+                          <span className="icon text-base" aria-hidden>visibility</span>
+                        </button>
+                        <button
+                          className="btn-ghost text-[13px] px-2.5 py-1.5"
                           onClick={() => setEditOrder(o)}
                           aria-label={tOrders("editTitle")}
                           title={tOrders("editTitle")}
@@ -258,11 +269,9 @@ function ShipmentsPage() {
                     <td><span className={"pill " + SRC_PILL_CLASS[o.source]}>{tOrders(`sources.${o.source}`)}</span></td>
                     <td>{o.name}</td>
                     <td dir="ltr">{o.phone}</td>
-                    <td className="cell-wrap">{o.address}</td>
+                    <td>{truncatedCell(o.address)}</td>
                     <td>{o.city || EMPTY_DISPLAY}</td>
-                    <td className="cell-wrap">
-                      {String(o.items || "").split("\n").map((line, i) => <div key={i}>{line}</div>)}
-                    </td>
+                    <td>{truncatedCell(String(o.items || "").split("\n").filter(Boolean).join(" · "))}</td>
                     <td>{o.cod}</td>
                     <td className="text-ink-500 text-xs">
                       <span className="block max-w-[140px] truncate" title={resolveUser(o.archivedBy)}>
@@ -277,6 +286,9 @@ function ShipmentsPage() {
         )}
       </div>
 
+      {viewOrder && (
+        <OrderDetailsModal order={viewOrder} onClose={() => setViewOrder(null)} />
+      )}
       {editOrder && (
         <EditOrderModal
           order={editOrder}

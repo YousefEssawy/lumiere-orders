@@ -13,11 +13,21 @@ const SRC_PILL_CLASS: Record<OrderSource, string> = {
 
 interface OrdersTableProps {
   orders: Order[];
+  onView: (o: Order) => void;
   onEdit: (o: Order) => void;
   onDelete: (o: Order) => void;
 }
 
-export default function OrdersTable({ orders, onEdit, onDelete }: OrdersTableProps) {
+/** عنوان/منتجات في سطر واحد مقصوص — التفاصيل الكاملة في مودال العرض */
+export function truncatedCell(value: string, width = "max-w-[260px]") {
+  return (
+    <span className={`block ${width} truncate`} title={value}>
+      {value}
+    </span>
+  );
+}
+
+export default function OrdersTable({ orders, onView, onEdit, onDelete }: OrdersTableProps) {
   const t = useTranslations("orders");
   const tCommon = useTranslations("common");
 
@@ -53,6 +63,14 @@ export default function OrdersTable({ orders, onEdit, onDelete }: OrdersTablePro
                 <div className="flex items-center gap-1">
                   <button
                     className="btn-ghost text-[13px] px-2.5 py-1.5"
+                    onClick={() => onView(o)}
+                    aria-label={tCommon("view")}
+                    title={tCommon("view")}
+                  >
+                    <span className="icon text-base" aria-hidden>visibility</span>
+                  </button>
+                  <button
+                    className="btn-ghost text-[13px] px-2.5 py-1.5"
                     onClick={() => onEdit(o)}
                     aria-label={t("editTitle")}
                     title={t("editTitle")}
@@ -72,13 +90,11 @@ export default function OrdersTable({ orders, onEdit, onDelete }: OrdersTablePro
               <td><span className={"pill " + SRC_PILL_CLASS[o.source]}>{t(`sources.${o.source}`)}</span></td>
               <td>{o.name}</td>
               <td dir="ltr">{o.phone}</td>
-              <td className="cell-wrap">{o.address}</td>
+              <td>{truncatedCell(o.address)}</td>
               <td>
                 {o.city || <span className="text-danger font-bold">{t("table.fixCity")}</span>}
               </td>
-              <td className="cell-wrap">
-                {String(o.items || "").split("\n").map((line, i) => <div key={i}>{line}</div>)}
-              </td>
+              <td>{truncatedCell(String(o.items || "").split("\n").filter(Boolean).join(" · "))}</td>
               <td>{o.cod}</td>
               <td>{o.vol}</td>
               <td>{o.ref || ""}</td>
