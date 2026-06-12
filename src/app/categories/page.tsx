@@ -70,13 +70,13 @@ function CategoriesPage() {
     }
   }
 
-  async function handleSave(name: string) {
+  async function handleSave(name: string, active: boolean) {
     if (editCategory?.id) {
-      await updateCategory(editCategory.id, { name }, profile.uid);
+      await updateCategory(editCategory.id, { name, active }, profile.uid);
       flash(t("toast.updated"));
       logAction(actor, "category.update", name);
     } else {
-      await addCategory(name, profile.uid);
+      await addCategory(name, profile.uid, active);
       flash(t("toast.created"));
       logAction(actor, "category.create", name);
     }

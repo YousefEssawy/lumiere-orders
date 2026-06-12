@@ -34,10 +34,10 @@ export function useCategories(enabled: boolean) {
     );
   }, [enabled]);
 
-  const addCategory = useCallback(async (name: string, byUid: string) => {
+  const addCategory = useCallback(async (name: string, byUid: string, active = true) => {
     if (!db) return;
     const ref = doc(collection(db, COL));
-    await setDoc(ref, { id: ref.id, name: name.trim(), active: true, ...creationAudit(byUid) });
+    await setDoc(ref, { id: ref.id, name: name.trim(), active, ...creationAudit(byUid) });
   }, []);
 
   const updateCategory = useCallback(
