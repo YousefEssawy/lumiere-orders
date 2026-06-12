@@ -47,6 +47,7 @@ export const LOG_ACTIONS = [
   "user.activate",
   "user.deactivate",
   "user.password",
+  "system.migrate",
 ] as const;
 export type LogAction = (typeof LOG_ACTIONS)[number];
 

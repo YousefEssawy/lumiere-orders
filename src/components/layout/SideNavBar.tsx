@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { AppRoutes, type AppRoute } from "@/lib/appRoutes";
 
 interface NavItem {
-  labelKey: "orders" | "history" | "users" | "logs" | "help";
+  labelKey: "orders" | "history" | "users" | "logs" | "migration" | "help";
   icon: string;
   href: AppRoute;
   adminOnly: boolean;
@@ -30,6 +30,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { labelKey: "users", icon: "group", href: AppRoutes.users, adminOnly: true },
       { labelKey: "logs", icon: "history", href: AppRoutes.logs, adminOnly: true },
+      { labelKey: "migration", icon: "build", href: AppRoutes.migration, adminOnly: true },
     ],
   },
   {
