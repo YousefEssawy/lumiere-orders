@@ -21,9 +21,9 @@ function OrdersPage() {
   const [editOrder, setEditOrder] = useState<Order | null>(null);
   const actor = { uid: profile.uid, email: profile.email };
 
-  async function handleAdd(o: Omit<Order, "id" | "createdAt">) {
+  async function handleAdd(o: OrderFormState) {
     try {
-      await addOrder(o);
+      await addOrder(o, profile.email);
       flash(t("toast.added"));
       logAction(actor, "order.add", o.name);
     } catch {
@@ -31,10 +31,10 @@ function OrdersPage() {
     }
   }
 
-  async function handleImport(list: Omit<Order, "id" | "createdAt">[]) {
+  async function handleImport(list: OrderFormState[]) {
     if (!list.length) { flash(t("toast.fileEmpty")); return; }
     try {
-      await importOrders(list);
+      await importOrders(list, profile.email);
       flash(t("toast.imported", { n: list.length }));
       logAction(actor, "orders.import", "", list.length);
     } catch {
@@ -45,7 +45,7 @@ function OrdersPage() {
   async function handleEditSave(changes: OrderFormState) {
     if (!editOrder?.id) return;
     try {
-      await updateOrder(editOrder.id, changes);
+      await updateOrder(editOrder.id, changes, profile.email);
       flash(t("toast.updated"));
       logAction(actor, "order.update", changes.name);
     } catch {
