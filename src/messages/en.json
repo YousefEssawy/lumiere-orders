@@ -25,6 +25,7 @@
       "support": "Support"
     },
     "orders": "Orders",
+    "history": "History",
     "users": "Users",
     "logs": "Activity Log",
     "help": "Help",
@@ -109,13 +110,31 @@
       "fileEmpty": "The file is empty",
       "deleted": "Order deleted",
       "deleteErr": "Failed to delete",
-      "cleared": "All orders cleared",
+      "cleared": "All orders moved to History ✓",
       "clearErr": "Failed to clear",
       "exported": "Exported {n} orders to Wassalha ✓",
       "exportEmpty": "No orders to export"
     },
-    "confirmClear": "Delete ALL orders? This cannot be undone.",
+    "confirmClear": "Move ALL orders to History? The current list will be emptied for a new batch.",
     "confirmExportBadCity": "{n} orders have an invalid governorate (they will export empty). Continue?"
+  },
+  "history": {
+    "title": "Order History",
+    "subtitle": "Orders archived from the preparation page — kept here permanently until you delete them",
+    "total": "Archived orders:",
+    "archivedAt": "Archived",
+    "archivedBy": "By",
+    "empty": "No archived orders yet — use “Clear all” on the Orders page after shipping a batch",
+    "clearAll": "Delete entire history",
+    "confirmDelete": "Permanently delete the order of “{name}” from history?",
+    "confirmClear": "Permanently delete ALL {n} archived orders? This cannot be undone.",
+    "loadError": "Could not load the history. Make sure the latest firestore.rules file is published in Firebase Console → Firestore → Rules.",
+    "toast": {
+      "deleted": "Deleted from history",
+      "deleteErr": "Failed to delete",
+      "cleared": "History cleared",
+      "clearErr": "Failed to clear history"
+    }
   },
   "account": {
     "changePassword": "Change password",
@@ -184,7 +203,11 @@
       "orders": {
         "import": "Imported from Sllr",
         "export": "Exported Wassalha file",
-        "clear": "Cleared all orders"
+        "clear": "Archived all orders to History"
+      },
+      "history": {
+        "delete": "Deleted from history",
+        "clear": "Cleared the history"
       },
       "user": {
         "create": "Created user",
@@ -205,7 +228,7 @@
       "s3": "WhatsApp / Instagram orders: add them with the manual form.",
       "s4": "Review the table — any order flagged with ⚠ needs its governorate fixed.",
       "s5": "Press “Export Wassalha file” to download the shipping sheet, then upload it to Wassalha.",
-      "s6": "After shipping, clear the list to start a fresh batch."
+      "s6": "After shipping, press “Clear all” — the batch moves to the History page (it is not deleted), and the list is empty for the next day."
     },
     "rules": {
       "title": "Fixed conversion rules",

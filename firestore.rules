@@ -51,6 +51,11 @@ service cloud.firestore {
       allow read, write: if isActiveUser();
     }
 
+    // هيستوري الأوردرات — «مسح الكل» بينقل هنا بدل الحذف النهائي
+    match /ordersArchive/{orderId} {
+      allow read, write: if isActiveUser();
+    }
+
     // ============================================================
     // المستخدمين
     // - كل مستخدم يقرأ ملفه (عشان التطبيق يعرف دوره وحالته)

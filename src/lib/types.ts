@@ -20,6 +20,8 @@ export const LOG_ACTIONS = [
   "orders.import",
   "orders.export",
   "orders.clear",
+  "history.delete",
+  "history.clear",
   "user.create",
   "user.update",
   "user.activate",
@@ -42,6 +44,7 @@ export interface LogEntry {
 
 export const FIRESTORE_COLLECTIONS = {
   orders: "orders",
+  ordersArchive: "ordersArchive",
   users: "users",
   logs: "logs",
 } as const;
