@@ -1,16 +1,17 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import {
-  collection, deleteDoc, doc, onSnapshot, orderBy, query, writeBatch,
+  collection, deleteDoc, doc, onSnapshot, orderBy, query, updateDoc, writeBatch,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { FIRESTORE_COLLECTIONS } from "@/lib/types";
+import { FIRESTORE_COLLECTIONS, type OrderStatus } from "@/lib/types";
 import type { Order } from "@/lib/wassalha";
 
 const COL = FIRESTORE_COLLECTIONS.ordersArchive;
 const DELETE_CHUNK = 450;
 
 export interface ArchivedOrder extends Order {
+  status?: OrderStatus;
   archivedAt?: unknown;
   archivedBy?: string;
 }
@@ -47,6 +48,11 @@ export function useArchive(enabled: boolean) {
     await deleteDoc(doc(db, COL, id));
   }, []);
 
+  const setStatus = useCallback(async (id: string, status: OrderStatus) => {
+    if (!db) return;
+    await updateDoc(doc(db, COL, id), { status });
+  }, []);
+
   const clearArchive = useCallback(async (current: ArchivedOrder[]) => {
     if (!db || !current.length) return;
     const database = db;
@@ -58,5 +64,5 @@ export function useArchive(enabled: boolean) {
     }
   }, []);
 
-  return { archived, error, deleteArchived, clearArchive };
+  return { archived, error, deleteArchived, clearArchive, setStatus };
 }

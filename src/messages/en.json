@@ -124,6 +124,15 @@
     "total": "Archived orders:",
     "archivedAt": "Archived",
     "archivedBy": "By",
+    "status": "Status",
+    "filterStatus": "All statuses",
+    "statuses": {
+      "preparing": "Preparing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "returned": "Returned",
+      "cancelled": "Cancelled"
+    },
     "empty": "No archived orders yet — use “Clear all” on the Orders page after shipping a batch",
     "clearAll": "Delete entire history",
     "confirmDelete": "Permanently delete the order of “{name}” from history?",
@@ -133,7 +142,9 @@
       "deleted": "Deleted from history",
       "deleteErr": "Failed to delete",
       "cleared": "History cleared",
-      "clearErr": "Failed to clear history"
+      "clearErr": "Failed to clear history",
+      "statusChanged": "Status changed to “{status}” ✓",
+      "statusErr": "Failed to change status"
     }
   },
   "account": {
@@ -207,7 +218,8 @@
       },
       "history": {
         "delete": "Deleted from history",
-        "clear": "Cleared the history"
+        "clear": "Cleared the history",
+        "status": "Changed order status"
       },
       "user": {
         "create": "Created user",
