@@ -117,11 +117,25 @@
     "confirmClear": "متأكد إنك عايز تمسح كل الأوردرات؟ مش هينفع ترجعها.",
     "confirmExportBadCity": "فيه {n} أوردر محافظتهم مش مظبوطة (هيتصدّروا فاضيين). تكمّل؟"
   },
+  "account": {
+    "changePassword": "تغيير الباسورد",
+    "current": "الباسورد الحالي",
+    "new": "الباسورد الجديد",
+    "confirm": "تأكيد الباسورد الجديد",
+    "mismatch": "الباسوردين مش متطابقين",
+    "wrongPassword": "الباسورد الحالي غلط",
+    "weak": "الباسورد ضعيف (6 حروف على الأقل)",
+    "changed": "تم تغيير الباسورد ✓",
+    "error": "حصل خطأ في تغيير الباسورد"
+  },
   "users": {
     "title": "المستخدمين",
     "subtitle": "أنشئ حسابات لفريقك وتحكم في صلاحياتهم",
     "create": "مستخدم جديد",
     "createTitle": "إنشاء مستخدم",
+    "edit": "تعديل",
+    "editTitle": "تعديل مستخدم",
+    "emailLocked": "الإيميل مش قابل للتغيير",
     "name": "الاسم",
     "namePh": "مثال: أحمد علي",
     "email": "الإيميل",
@@ -160,6 +174,7 @@
     },
     "filterUser": "كل المستخدمين",
     "filterAction": "كل العمليات",
+    "loadError": "تعذّر تحميل سجل النشاط. اتأكد إن آخر نسخة من firestore.rules منشورة في Firebase Console ← Firestore ← Rules.",
     "actions": {
       "order.add": "أضاف أوردر",
       "order.delete": "حذف أوردر",
@@ -167,8 +182,10 @@
       "orders.export": "صدّر ملف وصلها",
       "orders.clear": "مسح كل الأوردرات",
       "user.create": "أنشأ مستخدم",
+      "user.update": "عدّل مستخدم",
       "user.activate": "فعّل مستخدم",
-      "user.deactivate": "عطّل مستخدم"
+      "user.deactivate": "عطّل مستخدم",
+      "user.password": "غيّر الباسورد بتاعه"
     }
   },
   "help": {

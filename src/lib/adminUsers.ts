@@ -58,3 +58,15 @@ export async function setUserActive(uid: string, active: boolean): Promise<void>
   if (!db) throw new Error("firebase-not-configured");
   await updateDoc(doc(db, FIRESTORE_COLLECTIONS.users, uid), { active });
 }
+
+/** تعديل بيانات مستخدم (الاسم والدور — الإيميل ثابت) */
+export async function updateUserProfile(
+  uid: string,
+  changes: { name: string; role: UserRole }
+): Promise<void> {
+  if (!db) throw new Error("firebase-not-configured");
+  await updateDoc(doc(db, FIRESTORE_COLLECTIONS.users, uid), {
+    name: changes.name.trim(),
+    role: changes.role,
+  });
+}

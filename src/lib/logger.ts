@@ -27,7 +27,8 @@ export async function logAction(
       ...(count !== undefined ? { count } : {}),
       createdAt: serverTimestamp(),
     });
-  } catch {
-    // متعمد: اللوج best-effort
+  } catch (e) {
+    // متعمد: فشل اللوج ميكسرش العملية — بس لازم يبان في الكونسول
+    console.warn("[lumiere] log write failed:", action, e);
   }
 }

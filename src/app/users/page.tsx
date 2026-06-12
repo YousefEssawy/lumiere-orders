@@ -9,6 +9,7 @@ import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
 import PageHero from "@/components/ui/PageHero";
 import CreateUserModal from "@/components/users/CreateUserModal";
+import EditUserModal from "@/components/users/EditUserModal";
 
 function UsersPage() {
   const t = useTranslations("users");
@@ -16,6 +17,7 @@ function UsersPage() {
   const users = useUsers(true);
   const flash = useToast();
   const [showCreate, setShowCreate] = useState(false);
+  const [editUser, setEditUser] = useState<UserProfile | null>(null);
   const actor = { uid: profile.uid, email: profile.email };
 
   async function toggleActive(u: UserProfile) {
@@ -34,6 +36,12 @@ function UsersPage() {
     setShowCreate(false);
     flash(t("toast.created", { email }));
     logAction(actor, "user.create", email);
+  }
+
+  function handleEdited(email: string) {
+    setEditUser(null);
+    flash(t("toast.updated"));
+    logAction(actor, "user.update", email);
   }
 
   return (
@@ -80,14 +88,24 @@ function UsersPage() {
                     </span>
                   </td>
                   <td>
-                    {u.uid !== profile.uid && (
+                    <div className="flex items-center gap-1.5">
                       <button
-                        className={u.active ? "btn-danger-soft text-[13px]" : "btn-ghost text-[13px] px-3 py-1.5"}
-                        onClick={() => toggleActive(u)}
+                        className="btn-ghost text-[13px] px-3 py-1.5"
+                        onClick={() => setEditUser(u)}
+                        aria-label={t("edit")}
+                        title={t("edit")}
                       >
-                        {u.active ? t("deactivate") : t("activate")}
+                        <span className="icon text-base" aria-hidden>edit</span>
                       </button>
-                    )}
+                      {u.uid !== profile.uid && (
+                        <button
+                          className={u.active ? "btn-danger-soft text-[13px]" : "btn-ghost text-[13px] px-3 py-1.5"}
+                          onClick={() => toggleActive(u)}
+                        >
+                          {u.active ? t("deactivate") : t("activate")}
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -103,6 +121,13 @@ function UsersPage() {
           adminUid={profile.uid}
           onCreated={handleCreated}
           onClose={() => setShowCreate(false)}
+        />
+      )}
+      {editUser && (
+        <EditUserModal
+          user={editUser}
+          onSaved={() => handleEdited(editUser.email)}
+          onClose={() => setEditUser(null)}
         />
       )}
     </>
