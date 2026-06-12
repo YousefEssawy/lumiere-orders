@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cairo, League_Spartan, Quicksand } from "next/font/google";
 import IntlProvider from "@/components/IntlProvider";
 import ToastProvider from "@/components/ToastProvider";
+import logo from "@/assets/logo.jpg";
 import "../../design_system/colors_and_type.css";
 import "./globals.css";
 
@@ -29,8 +30,8 @@ const quicksand = Quicksand({
 export const metadata: Metadata = {
   title: "Lumière — Orders & Shipping",
   description: "Lumière orders and shipping hub",
-  // الفافيكون من public — لازم الـ basePath يدوي (metadata مبيضفهوش)
-  icons: { icon: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/assets/logo.jpg` },
+  // نفس الـ static import — الـ basePath بييجي جاهز في logo.src
+  icons: { icon: logo.src },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
