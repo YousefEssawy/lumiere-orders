@@ -6,7 +6,8 @@ export const EMPTY_DISPLAY = "—";
 
 export function formatDateTime(value: unknown, locale: Locale): string {
   if (!(value instanceof Timestamp)) return EMPTY_DISPLAY;
-  return new Intl.DateTimeFormat(locale === "ar" ? "ar-EG" : "en-GB", {
+  // nu-latn: أرقام غربية حتى في العربي (قاعدة البراند)
+  return new Intl.DateTimeFormat(locale === "ar" ? "ar-EG-u-nu-latn" : "en-GB", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(value.toDate());

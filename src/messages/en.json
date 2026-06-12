@@ -175,6 +175,7 @@
     "filterUser": "All users",
     "filterAction": "All actions",
     "loadError": "Could not load the activity log. Make sure the latest firestore.rules file is published in Firebase Console → Firestore → Rules.",
+    "items": "{n} orders",
     "actions": {
       "order.add": "Added order",
       "order.delete": "Deleted order",
