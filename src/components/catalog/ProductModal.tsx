@@ -1,9 +1,11 @@
 "use client";
-import { useState, type FormEvent } from "react";
+/* eslint-disable @next/next/no-img-element */
+import { useState, type FormEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import type { Category, Product, ProductVariant } from "@/lib/types";
 import type { ProductInput } from "@/hooks/useProducts";
+import Toggle from "@/components/ui/Toggle";
 
 interface ProductModalProps {
   /** null = إنشاء جديد */
@@ -14,6 +16,15 @@ interface ProductModalProps {
 }
 
 const EMPTY_VARIANT: ProductVariant = { size: "", price: 0, quantity: 0 };
+
+/** عنوان قسم جوه الديالوج */
+function SectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-300 rtl:normal-case rtl:tracking-normal mt-5 mb-1">
+      {children}
+    </div>
+  );
+}
 
 export default function ProductModal({ product, categories, onSave, onClose }: ProductModalProps) {
   const t = useTranslations("products");
@@ -82,133 +93,183 @@ export default function ProductModal({ product, categories, onSave, onClose }: P
       className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}
     >
-      <form onSubmit={submit} className="card w-full max-w-2xl shadow-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="text-base font-bold flex items-center gap-2 mb-2">
-          <span className="icon text-accent" aria-hidden>{isNew ? "add_box" : "edit"}</span>
-          {isNew ? t("createTitle") : t("editTitle")}
-        </h2>
+      <form onSubmit={submit} className="card !p-0 overflow-hidden w-full max-w-2xl shadow-lg max-h-[90vh] overflow-y-auto fade-up">
+        {/* شريط الهوية */}
+        <div className="h-1.5 w-full" style={{ background: "var(--grad-hero)" }} aria-hidden />
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <label className="form-label">{t("code")} <span className="req">*</span></label>
-            <input
-              className="form-input"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              required
-              dir="ltr"
-              placeholder="M21"
-              disabled={!isNew}
-            />
-            {!isNew && <div className="text-xs text-ink-300 mt-1">{t("codeLocked")}</div>}
-          </div>
-          <div>
-            <label className="form-label">{t("category")} <span className="req">*</span></label>
-            <select className="form-input" value={category} onChange={(e) => setCategory(e.target.value)} required>
-              <option value="">{t("categoryPick")}</option>
-              {categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
-            </select>
-          </div>
+        {/* الهيدر: العنوان + التفعيل في مكان واضح */}
+        <div className="flex items-center justify-between gap-3 px-6 pt-5">
+          <h2 className="text-base font-bold flex items-center gap-2.5 min-w-0">
+            <span className="icon-tile !w-9 !h-9">
+              <span className="icon text-ink-900 !text-[20px]" aria-hidden>{isNew ? "add_box" : "edit"}</span>
+            </span>
+            {isNew ? t("createTitle") : t("editTitle")}
+          </h2>
+          <label className="flex items-center gap-2 text-sm text-ink-500 cursor-pointer shrink-0 select-none">
+            {t("active")}
+            <Toggle checked={active} onChange={() => setActive((v) => !v)} label={t("active")} />
+          </label>
         </div>
 
-        <label className="form-label">{t("name")} <span className="req">*</span></label>
-        <input className="form-input" value={name} onChange={(e) => setName(e.target.value)} required dir="ltr" placeholder="Tiger M21" />
-
-        <label className="form-label">{t("nameAr")}</label>
-        <input className="form-input" value={nameAr} onChange={(e) => setNameAr(e.target.value)} placeholder="تايجر M21" />
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <label className="form-label">{t("description")}</label>
-            <textarea className="form-input min-h-[70px]" value={description} onChange={(e) => setDescription(e.target.value)} dir="ltr" placeholder={t("descriptionPh")} />
-          </div>
-          <div>
-            <label className="form-label">{t("descriptionAr")}</label>
-            <textarea className="form-input min-h-[70px]" value={descriptionAr} onChange={(e) => setDescriptionAr(e.target.value)} placeholder={t("descriptionPh")} />
-          </div>
-        </div>
-
-        <label className="form-label">{t("imageUrl")}</label>
-        <input className="form-input" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} dir="ltr" placeholder="https://…" />
-
-        {/* الأحجام */}
-        <div className="flex items-center justify-between mt-4 mb-1">
-          <label className="form-label !m-0">{t("variants")}</label>
-          <button
-            type="button"
-            className="btn-ghost text-xs px-3 py-1.5"
-            onClick={() => setVariants((prev) => [...prev, { ...EMPTY_VARIANT }])}
-          >
-            <span className="icon text-sm" aria-hidden>add</span>
-            {t("addVariant")}
-          </button>
-        </div>
-        <div className="space-y-2">
-          {variants.map((v, i) => (
-            <div key={i} className="flex items-center gap-2">
+        <div className="px-6 pb-6">
+          {/* البيانات الأساسية */}
+          <SectionLabel>{t("sectionBasics")}</SectionLabel>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="form-label">{t("code")} <span className="req">*</span></label>
               <input
-                className="form-input !w-24"
-                value={v.size}
-                onChange={(e) => setVariant(i, { size: e.target.value })}
+                className="form-input"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                required
                 dir="ltr"
-                placeholder="50ml"
-                aria-label={t("size")}
+                placeholder="M21"
+                disabled={!isNew}
               />
-              <input
-                type="number"
-                min="0"
-                className="form-input flex-1"
-                value={v.price}
-                onChange={(e) => setVariant(i, { price: Number(e.target.value) })}
-                placeholder={t("price")}
-                aria-label={t("price")}
-              />
-              <input
-                type="number"
-                min="0"
-                className="form-input flex-1"
-                value={v.originalPrice ?? ""}
-                onChange={(e) => setVariant(i, { originalPrice: Number(e.target.value) || undefined })}
-                placeholder={t("originalPrice")}
-                aria-label={t("originalPrice")}
-                title={t("originalPriceHint")}
-              />
-              <input
-                type="number"
-                className="form-input flex-1"
-                value={v.quantity}
-                onChange={(e) => setVariant(i, { quantity: Number(e.target.value) })}
-                placeholder={t("quantity")}
-                aria-label={t("quantity")}
-              />
-              <button
-                type="button"
-                className="btn-danger-soft px-2 py-1.5 shrink-0"
-                onClick={() => setVariants((prev) => prev.filter((_, idx) => idx !== i))}
-                disabled={variants.length === 1}
-                aria-label={tCommon("delete")}
-              >
-                <span className="icon text-base" aria-hidden>close</span>
-              </button>
+              {!isNew && <div className="text-xs text-ink-300 mt-1">{t("codeLocked")}</div>}
             </div>
-          ))}
-        </div>
-        <div className="text-xs text-ink-300 mt-1">{t("variantsHint")}</div>
+            <div>
+              <label className="form-label">{t("category")} <span className="req">*</span></label>
+              <select className="form-input" value={category} onChange={(e) => setCategory(e.target.value)} required>
+                <option value="">{t("categoryPick")}</option>
+                {categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="form-label">{t("name")} <span className="req">*</span></label>
+              <input className="form-input" value={name} onChange={(e) => setName(e.target.value)} required dir="ltr" placeholder="Tiger M21" />
+            </div>
+            <div>
+              <label className="form-label">{t("nameAr")}</label>
+              <input className="form-input" value={nameAr} onChange={(e) => setNameAr(e.target.value)} placeholder="تايجر M21" />
+            </div>
+          </div>
 
-        <label className="flex items-center gap-2 mt-4 text-sm cursor-pointer">
-          <input type="checkbox" className="w-4 h-4 accent-ink-900" checked={active} onChange={(e) => setActive(e.target.checked)} />
-          {t("active")}
-        </label>
+          {/* الأحجام — بانل بصفوف وعناوين أعمدة */}
+          <SectionLabel>{t("variants")}</SectionLabel>
+          <div className="bg-soft rounded-md px-4 py-3.5">
+            <div className="hidden sm:grid grid-cols-[6rem_1fr_1fr_1fr_2.25rem] gap-2 text-[11px] text-ink-400 font-semibold mb-1.5">
+              <span>{t("size")}</span>
+              <span>{t("price")}</span>
+              <span>{t("originalPrice")}</span>
+              <span>{t("quantity")}</span>
+              <span />
+            </div>
+            <div className="space-y-2">
+              {variants.map((v, i) => (
+                <div key={i} className="grid grid-cols-2 sm:grid-cols-[6rem_1fr_1fr_1fr_2.25rem] gap-2 items-center">
+                  <input
+                    className="form-input"
+                    value={v.size}
+                    onChange={(e) => setVariant(i, { size: e.target.value })}
+                    dir="ltr"
+                    placeholder="50ml"
+                    aria-label={t("size")}
+                  />
+                  <input
+                    type="number"
+                    min="0"
+                    className="form-input"
+                    value={v.price}
+                    onChange={(e) => setVariant(i, { price: Number(e.target.value) })}
+                    placeholder={t("price")}
+                    aria-label={t("price")}
+                  />
+                  <input
+                    type="number"
+                    min="0"
+                    className="form-input"
+                    value={v.originalPrice ?? ""}
+                    onChange={(e) => setVariant(i, { originalPrice: Number(e.target.value) || undefined })}
+                    placeholder={t("originalPrice")}
+                    aria-label={t("originalPrice")}
+                    title={t("originalPriceHint")}
+                  />
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={v.quantity}
+                    onChange={(e) => setVariant(i, { quantity: Number(e.target.value) })}
+                    placeholder={t("quantity")}
+                    aria-label={t("quantity")}
+                  />
+                  <button
+                    type="button"
+                    className="btn-danger-soft px-2 py-1.5 justify-self-end sm:justify-self-auto"
+                    onClick={() => setVariants((prev) => prev.filter((_, idx) => idx !== i))}
+                    disabled={variants.length === 1}
+                    aria-label={tCommon("delete")}
+                  >
+                    <span className="icon text-base" aria-hidden>close</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="btn-ghost text-xs px-3 py-1.5 mt-3 bg-canvas"
+              onClick={() => setVariants((prev) => [...prev, { ...EMPTY_VARIANT }])}
+            >
+              <span className="icon text-sm" aria-hidden>add</span>
+              {t("addVariant")}
+            </button>
+            <div className="text-xs text-ink-400 mt-2">{t("variantsHint")}</div>
+          </div>
 
-        {err && <div className="text-danger text-[13px] mt-3">{err}</div>}
+          {/* الوصف */}
+          <SectionLabel>{t("sectionDescriptions")}</SectionLabel>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <textarea
+              className="form-input min-h-[80px]"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              dir="ltr"
+              placeholder={t("description") + " — " + t("descriptionPh")}
+              aria-label={t("description")}
+            />
+            <textarea
+              className="form-input min-h-[80px]"
+              value={descriptionAr}
+              onChange={(e) => setDescriptionAr(e.target.value)}
+              placeholder={t("descriptionAr") + " — " + t("descriptionPh")}
+              aria-label={t("descriptionAr")}
+            />
+          </div>
 
-        <div className="flex gap-2 mt-5">
-          <button type="submit" className="btn-primary flex-1" disabled={busy}>
-            {busy ? tCommon("loading") : tCommon("save")}
-          </button>
-          <button type="button" className="btn-ghost" onClick={onClose} disabled={busy}>
-            {tCommon("cancel")}
-          </button>
+          {/* الصورة + معاينة حية */}
+          <SectionLabel>{t("imageUrl")}</SectionLabel>
+          <div className="flex items-center gap-3">
+            {imageUrl.trim() ? (
+              <img
+                src={imageUrl.trim()}
+                alt={name || code}
+                className="w-12 h-12 rounded-sm object-cover border border-line shrink-0"
+              />
+            ) : (
+              <span className="inline-flex w-12 h-12 rounded-sm bg-soft items-center justify-center shrink-0">
+                <span className="icon !text-[18px] text-ink-300" aria-hidden>image</span>
+              </span>
+            )}
+            <input
+              className="form-input flex-1"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              dir="ltr"
+              placeholder="https://…"
+              aria-label={t("imageUrl")}
+            />
+          </div>
+
+          {err && <div className="text-danger text-[13px] mt-4">{err}</div>}
+
+          <div className="flex gap-2 mt-6">
+            <button type="submit" className="btn-primary flex-1" disabled={busy}>
+              {busy ? tCommon("loading") : tCommon("save")}
+            </button>
+            <button type="button" className="btn-ghost" onClick={onClose} disabled={busy}>
+              {tCommon("cancel")}
+            </button>
+          </div>
         </div>
       </form>
     </div>,

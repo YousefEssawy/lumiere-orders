@@ -178,6 +178,8 @@
     "create": "New product",
     "createTitle": "Add product",
     "editTitle": "Edit product",
+    "sectionBasics": "Basics",
+    "sectionDescriptions": "Descriptions",
     "importBtn": "Import sheet",
     "exportBtn": "Export sheet",
     "code": "Code",
