@@ -21,6 +21,18 @@ export default function ItemsPicker({ onPick }: ItemsPickerProps) {
     () => products.filter((p) => p.active),
     [products]
   );
+
+  // تقسيم القايمة حسب الفئة (optgroup)
+  const byCategory = useMemo(() => {
+    const map = new Map<string, typeof activeProducts>();
+    for (const p of activeProducts) {
+      const key = p.category || "—";
+      const arr = map.get(key) ?? [];
+      arr.push(p);
+      map.set(key, arr);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [activeProducts]);
   const selected = activeProducts.find((p) => p.id === productId) ?? null;
   const variant = selected?.variants.find((v) => v.size === size) ?? null;
 
@@ -52,8 +64,12 @@ export default function ItemsPicker({ onPick }: ItemsPickerProps) {
           aria-label={t("product")}
         >
           <option value="">{t("productPick")}</option>
-          {activeProducts.map((p) => (
-            <option key={p.id} value={p.id}>{p.code} — {p.name}</option>
+          {byCategory.map(([category, items]) => (
+            <optgroup key={category} label={category}>
+              {items.map((p) => (
+                <option key={p.id} value={p.id}>{p.code} — {p.name}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
         <select

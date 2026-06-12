@@ -44,6 +44,9 @@ function OrdersPage() {
       await importOrders(list, profile.uid);
       flash(t("toast.imported", { n: list.length }));
       logAction(actor, "orders.import", "", list.length);
+      // خصم الستوك لكل سطور الأوردرات المستوردة المطابقة للكتالوج
+      const all = list.map((o) => o.items).join("\n");
+      applyStock(parseItemsConsumption(all, products), -1, profile.uid);
     } catch {
       flash(t("toast.importErr"));
     }
