@@ -178,6 +178,8 @@
     "create": "منتج جديد",
     "createTitle": "إضافة منتج",
     "editTitle": "تعديل منتج",
+    "sectionBasics": "البيانات الأساسية",
+    "sectionDescriptions": "الوصف",
     "importBtn": "استيراد شيت",
     "exportBtn": "تصدير شيت",
     "code": "الكود",
