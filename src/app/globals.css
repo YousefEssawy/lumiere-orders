@@ -154,7 +154,8 @@
       whitespace-nowrap text-start sticky top-0;
   }
   .data-table td {
-    @apply px-3 py-2.5 border-b border-line whitespace-nowrap text-start;
+    /* align-top: لما خلية (زي العنوان) تتلف لأكتر من سطر، الباقي ميعومش في النص */
+    @apply px-3 py-2.5 border-b border-line whitespace-nowrap text-start align-top;
   }
   .data-table tr:hover td {
     background: color-mix(in srgb, var(--cream) 35%, transparent);

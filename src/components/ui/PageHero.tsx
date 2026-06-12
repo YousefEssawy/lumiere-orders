@@ -20,7 +20,12 @@ export default function PageHero({ icon, title, subtitle, trailing }: PageHeroPr
           {subtitle && <p className="text-xs text-ink-500 mt-0.5">{subtitle}</p>}
         </div>
       </div>
-      {trailing && <div className="w-full sm:w-auto flex gap-2">{trailing}</div>}
+      {/* الموبايل: الأزرار تحت بعض بعرض كامل (سطر واحد لكل زرار) — الديسكتوب: جنب بعض */}
+      {trailing && (
+        <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2 [&>button]:w-full sm:[&>button]:w-auto">
+          {trailing}
+        </div>
+      )}
     </section>
   );
 }
