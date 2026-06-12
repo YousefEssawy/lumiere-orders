@@ -28,6 +28,7 @@
     "history": "Shipments",
     "users": "Users",
     "logs": "Activity Log",
+    "migration": "Data Upgrade",
     "help": "Help",
     "logout": "Sign out",
     "language": "العربية",
@@ -151,6 +152,30 @@
       "exported": "Exported {n} orders to Wassalha ✓"
     }
   },
+  "migration": {
+    "title": "Data Upgrade",
+    "subtitle": "One-time tool: bring old records up to the current data conventions",
+    "explain1": "Records created before the latest update are missing some fields. This tool scans orders, shipments and users, then fixes:",
+    "fix1": "Adds the missing id field inside every document.",
+    "fix2": "Converts createdBy / updatedBy / archivedBy values that contain an email into the user's uid.",
+    "logsNote": "The activity log is intentionally immutable, so old log entries are not touched — new entries are already correct.",
+    "scanBtn": "Scan (no changes)",
+    "scanning": "Scanning…",
+    "runBtn": "Apply fixes ({n})",
+    "migrating": "Applying fixes…",
+    "confirmRun": "Apply the fixes to all listed records? This writes to the database.",
+    "dryRunNote": "Scan only — nothing has been changed yet. Press Apply to write the fixes.",
+    "doneNote": "Done — all listed changes have been written.",
+    "toast": { "done": "Data upgrade completed ✓" },
+    "table": {
+      "collection": "Collection",
+      "total": "Records",
+      "missingId": "Missing id",
+      "emailBy": "Email → uid",
+      "unknown": "Unknown email",
+      "updated": "To update"
+    }
+  },
   "account": {
     "changePassword": "Change password",
     "current": "Current password",
@@ -232,6 +257,9 @@
         "activate": "Activated user",
         "deactivate": "Deactivated user",
         "password": "Changed their password"
+      },
+      "system": {
+        "migrate": "Ran the data upgrade"
       }
     }
   },
