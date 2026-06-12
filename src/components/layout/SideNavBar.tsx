@@ -47,10 +47,10 @@ export default function SideNavBar({ isAdmin, open, onClose }: SideNavBarProps) 
       <aside
         className={
           "fixed top-[57px] bottom-0 start-0 z-40 w-60 transition-transform duration-300 ease-standard " +
-          "md:translate-x-0 " +
+          // الإخفاء بيحصل تحت md بس — على الديسكتوب السايدبار ظاهر دايماً
           (open
             ? "translate-x-0"
-            : "ltr:-translate-x-full rtl:translate-x-full")
+            : "max-md:ltr:-translate-x-full max-md:rtl:translate-x-full")
         }
       >
         <nav className="h-full bg-canvas border-e border-line p-3 flex flex-col gap-1">

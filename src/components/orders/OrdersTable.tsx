@@ -2,11 +2,11 @@
 import { useTranslations } from "next-intl";
 import type { Order, OrderSource } from "@/lib/wassalha";
 
-// ألوان البادجات من التوكنز (semantic) — مش hex مباشر
+// ألوان البادجات من باستيلات الهوية (v3) — لمسات خفيفة بنص داكن
 const SRC_PILL_CLASS: Record<OrderSource, string> = {
-  Sllr: "bg-soft text-accent",
-  WhatsApp: "bg-soft text-success",
-  Instagram: "bg-soft text-burgundy",
+  Sllr: "bg-pastel-sky text-ink-700",
+  WhatsApp: "bg-pastel-mint text-ink-700",
+  Instagram: "bg-pastel-pink text-ink-700",
   Other: "bg-soft text-ink-500",
 };
 
