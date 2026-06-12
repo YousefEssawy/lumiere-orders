@@ -1,6 +1,7 @@
 "use client";
 import { useTranslations } from "next-intl";
-import { ORDER_STATUSES, type OrderStatus } from "@/lib/types";
+import { ORDER_STATUSES } from "@/lib/types";
+import { STATUS_CLASS } from "@/lib/statusStyles";
 import AppShell from "@/components/layout/AppShell";
 import PageHero from "@/components/ui/PageHero";
 
@@ -13,14 +14,6 @@ const FLOW_ICONS: Record<(typeof FLOW_STEPS)[number], string> = {
   s5: "flag_circle",
 };
 
-// نفس ألوان الحالات في صفحة الشحنات — الليجند بيطابق الواقع
-const STATUS_CLASS: Record<OrderStatus, string> = {
-  preparing: "bg-pastel-butter text-ink-700",
-  shipped: "bg-pastel-sky text-ink-700",
-  delivered: "bg-pastel-mint text-ink-700",
-  returned: "bg-pastel-peach text-ink-700",
-  cancelled: "bg-soft text-ink-500",
-};
 
 function FlowTimeline() {
   const t = useTranslations("help.flow");

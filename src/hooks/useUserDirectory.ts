@@ -5,11 +5,11 @@ import { db } from "@/lib/firebase";
 import { FIRESTORE_COLLECTIONS } from "@/lib/types";
 
 /**
- * دليل المستخدمين: uid → اسم للعرض.
- * الـ *By في الداتا بيخزن uid، والعرض بيحوله لاسم المستخدم من هنا.
- * fallback: الإيميل ثم الـ uid نفسه (لقيم قديمة أو يوزر اتشال).
+ * دليل المستخدمين: uid أو إيميل → اسم للعرض.
+ * الـ *By في الداتا بيخزن uid (وقيم قديمة فيها إيميل) — العرض بيحول
+ * الاتنين لاسم المستخدم. fallback: القيمة نفسها لو مش معروفة.
  */
-export function useUserDirectory(): (uid?: string) => string {
+export function useUserDirectory(): (value?: string) => string {
   const [map, setMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -20,7 +20,9 @@ export function useUserDirectory(): (uid?: string) => string {
         const next: Record<string, string> = {};
         snap.forEach((d) => {
           const data = d.data() as { name?: string; email?: string };
-          next[d.id] = data.name || data.email || d.id;
+          const display = data.name || data.email || d.id;
+          next[d.id] = display;
+          if (data.email) next[data.email] = display;
         });
         setMap(next);
       },
@@ -29,7 +31,7 @@ export function useUserDirectory(): (uid?: string) => string {
   }, []);
 
   return useCallback(
-    (uid?: string) => (uid ? map[uid] ?? uid : ""),
+    (value?: string) => (value ? map[value] ?? value : ""),
     [map]
   );
 }
