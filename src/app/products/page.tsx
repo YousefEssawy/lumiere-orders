@@ -22,7 +22,7 @@ function ProductsPage() {
   const t = useTranslations("products");
   const tCommon = useTranslations("common");
   const { profile } = useSession();
-  const { products, error, saveProduct, deleteProduct, importProducts } = useProducts(true);
+  const { products, error, saveProduct, deleteProduct, deleteProducts, importProducts } = useProducts(true);
   const { categories, addCategory } = useCategories(true);
   const flash = useToast();
   const actor = { uid: profile.uid, email: profile.email };
@@ -32,6 +32,7 @@ function ProductsPage() {
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -81,6 +82,54 @@ function ProductsPage() {
     }
   }
 
+  const selectedInView = filtered.filter((p) => p.id && selected.has(p.id));
+  const allInViewSelected = filtered.length > 0 && selectedInView.length === filtered.length;
+
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAllInView() {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allInViewSelected) filtered.forEach((p) => p.id && next.delete(p.id));
+      else filtered.forEach((p) => p.id && next.add(p.id));
+      return next;
+    });
+  }
+
+  async function handleDeleteSelected() {
+    const ids = selectedInView.map((p) => p.id!) ;
+    if (!ids.length) return;
+    if (!window.confirm(t("confirmDeleteSelected", { n: ids.length }))) return;
+    try {
+      await deleteProducts(ids);
+      flash(t("toast.bulkDeleted", { n: ids.length }));
+      logAction(actor, "product.delete", "", ids.length);
+      setSelected(new Set());
+    } catch {
+      flash(t("toast.saveErr"));
+    }
+  }
+
+  async function handleDeleteAll() {
+    if (!products.length) return;
+    if (!window.confirm(t("confirmDeleteAll", { n: products.length }))) return;
+    try {
+      await deleteProducts(products.map((p) => p.id!).filter(Boolean));
+      flash(t("toast.bulkDeleted", { n: products.length }));
+      logAction(actor, "product.delete", "", products.length);
+      setSelected(new Set());
+    } catch {
+      flash(t("toast.saveErr"));
+    }
+  }
+
   async function handleImport(result: ProductsParseResult) {
     // الفئات الجديدة من الشيت بتتعمل تلقائياً
     const known = new Set(categories.map((c) => c.name.toLowerCase()));
@@ -105,6 +154,12 @@ function ProductsPage() {
         subtitle={t("subtitle")}
         trailing={
           <>
+            {products.length > 0 && (
+              <button className="btn-ghost !text-danger" onClick={handleDeleteAll}>
+                <span className="icon text-base" aria-hidden>delete_forever</span>
+                {t("deleteAll")}
+              </button>
+            )}
             <button className="btn-ghost" onClick={() => setShowImport(true)}>
               <span className="icon text-base" aria-hidden>upload_file</span>
               {t("importBtn")}
@@ -135,6 +190,12 @@ function ProductsPage() {
           <option value={ALL}>{t("filterCategory")}</option>
           {categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
         </select>
+        {selectedInView.length > 0 && (
+          <button className="btn-danger" onClick={handleDeleteSelected}>
+            <span className="icon text-base" aria-hidden>delete</span>
+            {t("deleteSelected", { n: selectedInView.length })}
+          </button>
+        )}
         <div className="flex-1" />
         <div className="text-sm text-ink-500 self-center">
           {t("total")} <b className="text-ink-900 text-lg">{filtered.length}</b>
@@ -149,6 +210,15 @@ function ProductsPage() {
             <thead>
               <tr>
                 <th></th>
+                <th className="w-10">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 accent-ink-900 cursor-pointer align-middle"
+                    checked={allInViewSelected}
+                    onChange={toggleAllInView}
+                    aria-label={t("total")}
+                  />
+                </th>
                 <th>{t("code")}</th>
                 <th>{t("image")}</th>
                 <th>{t("name")}</th>
@@ -179,6 +249,15 @@ function ProductsPage() {
                         <span className="icon text-base" aria-hidden>delete</span>
                       </button>
                     </div>
+                  </td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 accent-ink-900 cursor-pointer align-middle"
+                      checked={!!p.id && selected.has(p.id)}
+                      onChange={() => p.id && toggleOne(p.id)}
+                      aria-label={p.name}
+                    />
                   </td>
                   <td dir="ltr" className="font-bold">{p.code}</td>
                   <td>

@@ -196,11 +196,16 @@
     "total": "Products:",
     "empty": "No products yet — add manually or import the sheet",
     "confirmDelete": "Delete “{name}” permanently?",
+    "deleteSelected": "Delete selected ({n})",
+    "deleteAll": "Delete all",
+    "confirmDeleteSelected": "Permanently delete {n} selected products?",
+    "confirmDeleteAll": "Permanently delete ALL {n} products? This cannot be undone.",
     "loadError": "Could not load products. Make sure the latest firestore.rules are published.",
     "toast": {
       "created": "Product added ✓",
       "updated": "Product updated ✓",
       "deleted": "Product deleted",
+      "bulkDeleted": "{n} products deleted",
       "saveErr": "Failed to save the product"
     },
     "import": {
@@ -229,11 +234,17 @@
     "active": "Active",
     "empty": "No categories yet",
     "confirmDelete": "Delete the category “{name}”?",
+    "deleteSelected": "Delete selected ({n})",
+    "deleteAll": "Delete all",
+    "confirmDeleteSelected": "Delete {n} categories? (Categories with products are skipped)",
     "loadError": "Could not load categories. Make sure the latest firestore.rules are published.",
     "toast": {
       "created": "Category added ✓",
       "updated": "Category updated ✓",
       "deleted": "Category deleted",
+      "bulkDeleted": "{n} categories deleted",
+      "bulkDeletedSkipped": "{n} deleted · {s} skipped (in use)",
+      "allInUse": "Nothing to delete — all selected categories have products",
       "saveErr": "Failed to save",
       "hasProducts": "Cannot delete — {n} products use this category"
     }
