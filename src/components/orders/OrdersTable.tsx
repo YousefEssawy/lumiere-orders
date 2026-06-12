@@ -1,15 +1,8 @@
 "use client";
 import { useTranslations } from "next-intl";
-import type { Order, OrderSource } from "@/lib/wassalha";
+import type { Order } from "@/lib/wassalha";
+import { SOURCE_CLASS } from "@/lib/statusStyles";
 import EmptyState from "@/components/ui/EmptyState";
-
-// ألوان البادجات من باستيلات الهوية (v3) — لمسات خفيفة بنص داكن
-const SRC_PILL_CLASS: Record<OrderSource, string> = {
-  Sllr: "bg-pastel-sky text-ink-700",
-  WhatsApp: "bg-pastel-mint text-ink-700",
-  Instagram: "bg-pastel-pink text-ink-700",
-  Other: "bg-soft text-ink-500",
-};
 
 interface OrdersTableProps {
   orders: Order[];
@@ -87,7 +80,7 @@ export default function OrdersTable({ orders, onView, onEdit, onDelete }: Orders
                   </button>
                 </div>
               </td>
-              <td><span className={"pill " + SRC_PILL_CLASS[o.source]}>{t(`sources.${o.source}`)}</span></td>
+              <td><span className={"pill " + SOURCE_CLASS[o.source]}>{t(`sources.${o.source}`)}</span></td>
               <td>{o.name}</td>
               <td dir="ltr">{o.phone}</td>
               <td>{truncatedCell(o.address)}</td>

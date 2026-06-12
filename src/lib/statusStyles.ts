@@ -1,5 +1,14 @@
-// ألوان حالات الأوردر وعمليات اللوجز — من باستيلات الهوية. مصدر واحد لكل الصفحات.
+// ألوان حالات الأوردر ومصادره وعمليات اللوجز — من باستيلات الهوية. مصدر واحد لكل الصفحات.
 import type { LogAction, OrderStatus } from "@/lib/types";
+import type { OrderSource } from "@/lib/wassalha";
+
+/** بادجات مصدر الأوردر */
+export const SOURCE_CLASS: Record<OrderSource, string> = {
+  Sllr: "bg-pastel-sky text-ink-700",
+  WhatsApp: "bg-pastel-mint text-ink-700",
+  Instagram: "bg-pastel-pink text-ink-700",
+  Other: "bg-soft text-ink-500",
+};
 
 export const STATUS_CLASS: Record<OrderStatus, string> = {
   preparing: "bg-pastel-butter text-ink-700",
