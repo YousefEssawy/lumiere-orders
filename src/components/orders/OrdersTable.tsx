@@ -1,6 +1,7 @@
 "use client";
 import { useTranslations } from "next-intl";
 import type { Order, OrderSource } from "@/lib/wassalha";
+import EmptyState from "@/components/ui/EmptyState";
 
 // ألوان البادجات من باستيلات الهوية (v3) — لمسات خفيفة بنص داكن
 const SRC_PILL_CLASS: Record<OrderSource, string> = {
@@ -22,17 +23,14 @@ export default function OrdersTable({ orders, onEdit, onDelete }: OrdersTablePro
 
   if (!orders.length) {
     return (
-      <div className="table-wrap">
-        <div className="text-center py-12 px-5 text-ink-500">
-          <span className="icon !text-[40px] text-ink-300" aria-hidden>package_2</span>
-          <div className="mt-2 text-sm">{t("table.empty")}</div>
-        </div>
+      <div className="table-wrap fade-up fade-up-delay-2">
+        <EmptyState icon="package_2" text={t("table.empty")} />
       </div>
     );
   }
 
   return (
-    <div className="table-wrap">
+    <div className="table-wrap fade-up fade-up-delay-2">
       <table className="data-table min-w-[840px]">
         <thead>
           <tr>
