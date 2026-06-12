@@ -52,6 +52,7 @@ export const LOG_ACTIONS = [
   "product.update",
   "product.delete",
   "products.import",
+  "products.export",
   "category.create",
   "category.update",
   "category.delete",
@@ -96,6 +97,8 @@ export interface Category {
 export interface ProductVariant {
   size: string; // "50ml" — ممكن تكون "" لمنتج من غير أحجام
   price: number;
+  /** السعر قبل الخصم (شيت سلر: Original price) */
+  originalPrice?: number;
   quantity: number;
 }
 
@@ -105,8 +108,13 @@ export interface Product {
   code: string; // M21
   name: string; // Tiger M21
   nameAr?: string;
+  /** وصف HTML (شيت سلر) */
+  description?: string;
+  descriptionAr?: string;
   category: string;
   imageUrl?: string;
+  /** اسم الخيار في شيت سلر (Option 1) — افتراضياً Size */
+  optionName?: string;
   active: boolean;
   variants: ProductVariant[];
   createdBy?: string;

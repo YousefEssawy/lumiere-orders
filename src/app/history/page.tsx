@@ -131,6 +131,20 @@ function ShipmentsPage() {
     }
   }
 
+  /** حذف نهائي للمحدد بس */
+  async function handleDeleteSelected() {
+    if (!selectedInView.length) return;
+    if (!window.confirm(t("confirmDeleteSelected", { n: selectedInView.length }))) return;
+    try {
+      await clearArchive(selectedInView);
+      flash(t("toast.bulkDeleted", { n: selectedInView.length }));
+      logAction(actor, "history.delete", "", selectedInView.length);
+      setSelected(new Set());
+    } catch {
+      flash(t("toast.deleteErr"));
+    }
+  }
+
   const exportCount = selectedInView.length || filtered.length;
 
   return (
@@ -146,6 +160,12 @@ function ShipmentsPage() {
                 <span className="icon text-base" aria-hidden>delete_forever</span>
                 {t("clearAll")}
               </button>
+              {selectedInView.length > 0 && (
+                <button className="btn-danger" onClick={handleDeleteSelected}>
+                  <span className="icon text-base" aria-hidden>delete</span>
+                  {t("deleteSelected", { n: selectedInView.length })}
+                </button>
+              )}
               <button className="btn-primary" onClick={handleExport} disabled={!exportCount}>
                 <span className="icon text-base" aria-hidden>download</span>
                 {t("export")}{exportCount ? ` (${exportCount})` : ""}
