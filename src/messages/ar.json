@@ -19,6 +19,11 @@
     "search": "بحث"
   },
   "nav": {
+    "sections": {
+      "operations": "التشغيل",
+      "administration": "الإدارة",
+      "support": "الدعم"
+    },
     "orders": "الأوردرات",
     "users": "المستخدمين",
     "logs": "سجل النشاط",

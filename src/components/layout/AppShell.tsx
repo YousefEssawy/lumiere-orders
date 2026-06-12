@@ -1,5 +1,6 @@
 "use client";
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { useTranslations } from "next-intl";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
@@ -22,6 +23,10 @@ export function useSession(): SessionCtx {
   return ctx;
 }
 
+// الموبايل بس بيفتكر آخر حالة — الديسكتوب بيفتح دايماً عند التحميل
+const SIDENAV_PREF_KEY = "lumiere.sidenav.open";
+const DESKTOP_QUERY = "(min-width: 768px)";
+
 function CenterNotice({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex items-center justify-center p-5 text-ink-500 text-sm">
@@ -39,8 +44,31 @@ interface AppShellProps {
 export default function AppShell({ children, adminOnly = false }: AppShellProps) {
   const t = useTranslations();
   const authState: AuthState = useAuth();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
   const { user, profile, isAdmin } = authState;
+
+  // SSR-safe: مقفول افتراضياً، وبعد الـ hydration الديسكتوب بيفتح
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (window.matchMedia(DESKTOP_QUERY).matches) {
+      setMenuOpen(true);
+    } else {
+      setMenuOpen(window.localStorage.getItem(SIDENAV_PREF_KEY) === "1");
+    }
+  }, []);
+
+  // الموبايل بس بيحفظ الحالة
+  useEffect(() => {
+    if (!window.matchMedia(DESKTOP_QUERY).matches) {
+      window.localStorage.setItem(SIDENAV_PREF_KEY, menuOpen ? "1" : "0");
+    }
+  }, [menuOpen]);
+
+  // قفل الدرج عند تغيير الصفحة — موبايل بس
+  useEffect(() => {
+    if (!window.matchMedia(DESKTOP_QUERY).matches) setMenuOpen(false);
+  }, [pathname]);
 
   if (!isFirebaseConfigured) {
     return (
@@ -83,9 +111,21 @@ export default function AppShell({ children, adminOnly = false }: AppShellProps)
 
   return (
     <Ctx.Provider value={{ profile, isAdmin }}>
-      <TopNavBar profile={profile} onToggleMenu={() => setMenuOpen((v) => !v)} />
+      <TopNavBar
+        profile={profile}
+        onToggleMenu={() => setMenuOpen((v) => !v)}
+        menuOpen={menuOpen}
+      />
       <SideNavBar isAdmin={isAdmin} open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <main className="md:ms-60 p-4 md:p-6 max-w-6xl">{children}</main>
+      {/* ms = margin-inline-start — بيتبع اتجاه اللغة */}
+      <main
+        className={
+          "pt-24 pb-12 px-4 sm:px-6 transition-[margin] duration-300 ease-standard " +
+          (menuOpen ? "md:ms-64" : "md:ms-0")
+        }
+      >
+        <div className="max-w-6xl">{children}</div>
+      </main>
     </Ctx.Provider>
   );
 }
