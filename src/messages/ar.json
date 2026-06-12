@@ -155,11 +155,14 @@
     "empty": "مفيش شحنات لسه — استخدم «نقل للشحنات» في صفحة التجهيز",
     "clearAll": "حذف الهيستوري كله",
     "confirmDelete": "حذف نهائي لأوردر «{name}» من الهيستوري؟",
+    "deleteSelected": "حذف المحدد ({n})",
+    "confirmDeleteSelected": "حذف نهائي لـ {n} شحنة محددة؟ مش هينفع ترجعهم.",
     "confirmClear": "حذف نهائي لكل الأوردرات المؤرشفة ({n})؟ مش هينفع ترجعها.",
     "loadError": "تعذّر تحميل الهيستوري. اتأكد إن آخر نسخة من firestore.rules منشورة في Firebase Console ← Firestore ← Rules.",
     "toast": {
       "deleted": "اتحذف من الهيستوري",
       "deleteErr": "حصل خطأ في الحذف",
+      "bulkDeleted": "اتحذف {n} شحنة",
       "cleared": "اتمسح الهيستوري",
       "clearErr": "حصل خطأ في مسح الهيستوري",
       "statusChanged": "الحالة اتغيرت لـ«{status}» ✓",
@@ -176,10 +179,14 @@
     "createTitle": "إضافة منتج",
     "editTitle": "تعديل منتج",
     "importBtn": "استيراد شيت",
+    "exportBtn": "تصدير شيت",
     "code": "الكود",
     "codeLocked": "الكود مش قابل للتغيير (هو معرف المنتج)",
     "name": "الاسم (EN)",
     "nameAr": "الاسم (عربي)",
+    "description": "الوصف (EN)",
+    "descriptionAr": "الوصف (عربي)",
+    "descriptionPh": "HTML مسموح — بيستخدم على متجر سلر",
     "category": "الفئة",
     "categoryPick": "— اختار —",
     "imageUrl": "رابط الصورة",
@@ -190,6 +197,8 @@
     "variantsRequired": "ضيف حجم واحد على الأقل",
     "size": "الحجم",
     "price": "السعر",
+    "originalPrice": "السعر الأصلي",
+    "originalPriceHint": "بيظهر مشطوب على المتجر لو متحدد",
     "quantity": "الكمية",
     "active": "نشط",
     "searchPh": "ابحث بالكود أو الاسم…",
@@ -207,6 +216,7 @@
       "updated": "تم تحديث المنتج ✓",
       "deleted": "اتحذف المنتج",
       "bulkDeleted": "اتحذف {n} منتج",
+      "exported": "تم تصدير {n} منتج للشيت ✓",
       "saveErr": "حصل خطأ في حفظ المنتج"
     },
     "import": {
@@ -371,7 +381,8 @@
         "delete": "حذف منتج"
       },
       "products": {
-        "import": "استورد شيت المنتجات"
+        "import": "استورد شيت المنتجات",
+        "export": "صدّر شيت المنتجات"
       },
       "category": {
         "create": "أضاف فئة",

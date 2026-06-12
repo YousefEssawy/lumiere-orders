@@ -22,6 +22,8 @@ export default function ProductModal({ product, categories, onSave, onClose }: P
   const [code, setCode] = useState(product?.code ?? "");
   const [name, setName] = useState(product?.name ?? "");
   const [nameAr, setNameAr] = useState(product?.nameAr ?? "");
+  const [description, setDescription] = useState(product?.description ?? "");
+  const [descriptionAr, setDescriptionAr] = useState(product?.descriptionAr ?? "");
   const [category, setCategory] = useState(product?.category ?? "");
   const [imageUrl, setImageUrl] = useState(product?.imageUrl ?? "");
   const [active, setActive] = useState(product?.active ?? true);
@@ -39,7 +41,12 @@ export default function ProductModal({ product, categories, onSave, onClose }: P
     e.preventDefault();
     setErr("");
     const cleanVariants = variants
-      .map((v) => ({ size: v.size.trim(), price: Number(v.price) || 0, quantity: Number(v.quantity) || 0 }))
+      .map((v) => ({
+        size: v.size.trim(),
+        price: Number(v.price) || 0,
+        ...(Number(v.originalPrice) ? { originalPrice: Number(v.originalPrice) } : {}),
+        quantity: Number(v.quantity) || 0,
+      }))
       .filter((v, i) => v.size || variants.length === 1 || i === 0);
     if (!cleanVariants.length) {
       setErr(t("variantsRequired"));
@@ -52,8 +59,11 @@ export default function ProductModal({ product, categories, onSave, onClose }: P
           code: code.trim(),
           name: name.trim(),
           nameAr: nameAr.trim() || undefined,
+          description: description.trim() || undefined,
+          descriptionAr: descriptionAr.trim() || undefined,
           category,
           imageUrl: imageUrl.trim() || undefined,
+          optionName: product?.optionName ?? "Size",
           active,
           variants: cleanVariants,
         },
@@ -72,7 +82,7 @@ export default function ProductModal({ product, categories, onSave, onClose }: P
       className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}
     >
-      <form onSubmit={submit} className="card w-full max-w-lg shadow-lg max-h-[90vh] overflow-y-auto">
+      <form onSubmit={submit} className="card w-full max-w-2xl shadow-lg max-h-[90vh] overflow-y-auto">
         <h2 className="text-base font-bold flex items-center gap-2 mb-2">
           <span className="icon text-accent" aria-hidden>{isNew ? "add_box" : "edit"}</span>
           {isNew ? t("createTitle") : t("editTitle")}
@@ -106,6 +116,17 @@ export default function ProductModal({ product, categories, onSave, onClose }: P
 
         <label className="form-label">{t("nameAr")}</label>
         <input className="form-input" value={nameAr} onChange={(e) => setNameAr(e.target.value)} placeholder="تايجر M21" />
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className="form-label">{t("description")}</label>
+            <textarea className="form-input min-h-[70px]" value={description} onChange={(e) => setDescription(e.target.value)} dir="ltr" placeholder={t("descriptionPh")} />
+          </div>
+          <div>
+            <label className="form-label">{t("descriptionAr")}</label>
+            <textarea className="form-input min-h-[70px]" value={descriptionAr} onChange={(e) => setDescriptionAr(e.target.value)} placeholder={t("descriptionPh")} />
+          </div>
+        </div>
 
         <label className="form-label">{t("imageUrl")}</label>
         <input className="form-input" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} dir="ltr" placeholder="https://…" />
@@ -141,6 +162,16 @@ export default function ProductModal({ product, categories, onSave, onClose }: P
                 onChange={(e) => setVariant(i, { price: Number(e.target.value) })}
                 placeholder={t("price")}
                 aria-label={t("price")}
+              />
+              <input
+                type="number"
+                min="0"
+                className="form-input flex-1"
+                value={v.originalPrice ?? ""}
+                onChange={(e) => setVariant(i, { originalPrice: Number(e.target.value) || undefined })}
+                placeholder={t("originalPrice")}
+                aria-label={t("originalPrice")}
+                title={t("originalPriceHint")}
               />
               <input
                 type="number"

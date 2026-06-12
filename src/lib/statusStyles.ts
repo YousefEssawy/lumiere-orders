@@ -34,6 +34,7 @@ export const ACTION_CLASS: Record<LogAction, string> = {
   "product.update": "bg-pastel-sky text-ink-700",
   "product.delete": "bg-pastel-pink text-danger",
   "products.import": "bg-pastel-butter text-ink-700",
+  "products.export": "bg-pastel-butter text-ink-700",
   "category.create": "bg-pastel-mint text-ink-700",
   "category.update": "bg-pastel-sky text-ink-700",
   "category.delete": "bg-pastel-pink text-danger",

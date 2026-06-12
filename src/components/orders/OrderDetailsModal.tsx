@@ -60,7 +60,7 @@ export default function OrderDetailsModal({ order: o, onClose }: OrderDetailsMod
       className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="card !p-0 overflow-hidden w-full max-w-lg shadow-lg max-h-[90vh] overflow-y-auto fade-up">
+      <div className="card !p-0 overflow-hidden w-full max-w-2xl shadow-lg max-h-[90vh] overflow-y-auto fade-up">
         {/* شريط الهوية الهولوجرافيك */}
         <div className="h-1.5 w-full" style={{ background: "var(--grad-hero)" }} aria-hidden />
 

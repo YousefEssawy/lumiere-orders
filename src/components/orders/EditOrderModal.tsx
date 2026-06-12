@@ -53,7 +53,7 @@ export default function EditOrderModal({ order, onSave, onClose }: EditOrderModa
       className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}
     >
-      <form onSubmit={submit} className="card w-full max-w-lg shadow-lg max-h-[90vh] overflow-y-auto">
+      <form onSubmit={submit} className="card w-full max-w-2xl shadow-lg max-h-[90vh] overflow-y-auto">
         <h2 className="text-base font-bold flex items-center gap-2 mb-2">
           <span className="icon text-accent" aria-hidden>edit</span>
           {t("editTitle")}
