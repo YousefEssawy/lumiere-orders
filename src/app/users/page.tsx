@@ -70,7 +70,7 @@ function UsersPage() {
                   <td>{u.name}</td>
                   <td dir="ltr">{u.email}</td>
                   <td>
-                    <span className={"pill " + (u.role === "admin" ? "bg-soft text-accent" : "bg-soft text-ink-500")}>
+                    <span className={"pill " + (u.role === "admin" ? "bg-pastel-lavender text-ink-700" : "bg-soft text-ink-500")}>
                       {t(`roles.${u.role}`)}
                     </span>
                   </td>

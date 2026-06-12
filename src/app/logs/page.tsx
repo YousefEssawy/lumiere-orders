@@ -62,7 +62,7 @@ function LogsPage() {
                   <td className="text-ink-500">{formatDateTime(l.createdAt, locale)}</td>
                   <td dir="ltr">{l.email}</td>
                   <td>
-                    <span className="pill bg-soft text-accent">
+                    <span className="pill bg-pastel-lavender text-ink-700">
                       {t(`actions.${l.action as LogAction}`)}
                     </span>
                   </td>
