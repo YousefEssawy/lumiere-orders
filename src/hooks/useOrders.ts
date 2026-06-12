@@ -36,9 +36,10 @@ export function useOrders(enabled: boolean) {
 
   const importOrders = useCallback(async (list: Omit<Order, "id" | "createdAt">[]) => {
     if (!db || !list.length) return;
-    const batch = writeBatch(db);
+    const database = db;
+    const batch = writeBatch(database);
     list.forEach((data) => {
-      const ref = doc(collection(db, COL));
+      const ref = doc(collection(database, COL));
       batch.set(ref, { ...data, createdAt: serverTimestamp() });
     });
     await batch.commit();
@@ -51,8 +52,9 @@ export function useOrders(enabled: boolean) {
 
   const clearAll = useCallback(async (current: Order[]) => {
     if (!db || !current.length) return;
-    const batch = writeBatch(db);
-    current.forEach((o) => { if (o.id) batch.delete(doc(db!, COL, o.id)); });
+    const database = db;
+    const batch = writeBatch(database);
+    current.forEach((o) => { if (o.id) batch.delete(doc(database, COL, o.id)); });
     await batch.commit();
   }, []);
 
