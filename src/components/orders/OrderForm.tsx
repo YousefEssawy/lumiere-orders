@@ -37,7 +37,7 @@ export default function OrderForm({ onAdd }: { onAdd: (o: FormState) => void }) 
   return (
     <div className="card">
       <h2 className="text-base font-bold flex items-center gap-2">
-        <span className="icon text-gold" aria-hidden>add_circle</span>
+        <span className="icon text-accent" aria-hidden>add_circle</span>
         {t("addTitle")}
       </h2>
       <div className="text-[13px] text-ink-500 mb-3">{t("addSub")}</div>

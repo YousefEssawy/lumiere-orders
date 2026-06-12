@@ -29,21 +29,21 @@ export default function SllrImport({ onImport }: { onImport: (list: Omit<Order, 
   return (
     <div className="card">
       <h2 className="text-base font-bold flex items-center gap-2">
-        <span className="icon text-gold" aria-hidden>upload_file</span>
+        <span className="icon text-accent" aria-hidden>upload_file</span>
         {t("importTitle")}
       </h2>
       <div className="text-[13px] text-ink-500 mb-3">{t("importSub")}</div>
       <div
         className={
           "border-2 border-dashed rounded-md p-7 text-center cursor-pointer transition-colors duration-150 " +
-          (over ? "border-gold bg-soft text-ink-900" : "border-line text-ink-500 hover:border-gold hover:bg-soft")
+          (over ? "border-accent bg-soft text-ink-900" : "border-line text-ink-500 hover:border-accent hover:bg-soft")
         }
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setOver(true); }}
         onDragLeave={(e) => { e.preventDefault(); setOver(false); }}
         onDrop={(e) => { e.preventDefault(); setOver(false); handle(e.dataTransfer.files[0]); }}
       >
-        <span className="icon !text-[36px] text-gold" aria-hidden>description</span>
+        <span className="icon !text-[36px] text-accent" aria-hidden>description</span>
         <p className="mt-2 text-sm" dangerouslySetInnerHTML={{ __html: t.raw("dropText") }} />
         <p className="text-xs text-ink-300 mt-1">{t("dropHint")}</p>
       </div>

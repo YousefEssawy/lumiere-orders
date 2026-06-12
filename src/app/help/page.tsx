@@ -15,7 +15,7 @@ function HelpSection({ icon, title, items, numbered = false }: HelpSectionProps)
   return (
     <div className="card">
       <h2 className="text-base font-bold flex items-center gap-2 mb-3">
-        <span className="icon text-gold" aria-hidden>{icon}</span>
+        <span className="icon text-accent" aria-hidden>{icon}</span>
         {title}
       </h2>
       <List className={"text-sm text-ink-700 space-y-2 ps-5 " + (numbered ? "list-decimal" : "list-disc")}>

@@ -47,7 +47,7 @@ export default function CreateUserModal({ adminUid, onCreated, onClose }: Create
     >
       <form onSubmit={submit} className="card w-full max-w-sm shadow-lg">
         <h2 className="text-base font-bold flex items-center gap-2 mb-2">
-          <span className="icon text-gold" aria-hidden>person_add</span>
+          <span className="icon text-accent" aria-hidden>person_add</span>
           {t("createTitle")}
         </h2>
 

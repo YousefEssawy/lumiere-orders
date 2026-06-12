@@ -18,10 +18,9 @@ const config: Config = {
         canvas: "var(--bg-canvas)",
         soft: "var(--bg-soft)",
         line: "var(--line)",
-        gold: {
-          DEFAULT: "var(--gold)",
-          light: "var(--gold-light)",
-          deep: "var(--gold-deep)",
+        accent: {
+          DEFAULT: "var(--accent)",
+          deep: "var(--accent-deep)",
         },
         burgundy: "var(--burgundy)",
         cream: "var(--cream)",

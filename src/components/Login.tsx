@@ -45,7 +45,7 @@ export default function Login() {
           />
         </div>
         <div className="font-display font-extrabold text-3xl tracking-wide">
-          LUMI<span className="text-gold">È</span>RE
+          LUMI<span className="text-accent">È</span>RE
         </div>
         <div className="text-ink-500 text-[13px] mt-1 mb-6">{t("brand.sub")}</div>
 

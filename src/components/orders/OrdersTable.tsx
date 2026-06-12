@@ -4,7 +4,7 @@ import type { Order, OrderSource } from "@/lib/wassalha";
 
 // ألوان البادجات من التوكنز (semantic) — مش hex مباشر
 const SRC_PILL_CLASS: Record<OrderSource, string> = {
-  Sllr: "bg-soft text-gold-deep",
+  Sllr: "bg-soft text-accent",
   WhatsApp: "bg-soft text-success",
   Instagram: "bg-soft text-burgundy",
   Other: "bg-soft text-ink-500",

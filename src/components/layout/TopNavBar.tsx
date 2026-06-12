@@ -36,7 +36,7 @@ export default function TopNavBar({ profile, onToggleMenu }: TopNavBarProps) {
         />
         <div className="leading-tight">
           <div className="font-display font-bold text-lg tracking-wide">
-            LUMI<span className="text-gold">È</span>RE
+            LUMI<span className="text-accent">È</span>RE
           </div>
           <div className="text-[11px] text-ink-500 hidden sm:block">{t("brand.sub")}</div>
         </div>
