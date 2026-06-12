@@ -2,6 +2,8 @@
 export const AppRoutes = {
   orders: "/",
   history: "/history/",
+  products: "/products/",
+  categories: "/categories/",
   users: "/users/",
   logs: "/logs/",
   migration: "/migration/",

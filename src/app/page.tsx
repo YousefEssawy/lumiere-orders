@@ -2,8 +2,10 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useOrders } from "@/hooks/useOrders";
+import { useProducts } from "@/hooks/useProducts";
 import type { Order } from "@/lib/wassalha";
 import { logAction } from "@/lib/logger";
+import { applyStock, diffConsumption, parseItemsConsumption } from "@/lib/stock";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
 import PageHero from "@/components/ui/PageHero";
@@ -18,6 +20,7 @@ function OrdersPage() {
   const t = useTranslations("orders");
   const { profile } = useSession();
   const { orders, addOrder, importOrders, updateOrder, deleteOrder, archiveAll } = useOrders(true);
+  const { products } = useProducts(true);
   const flash = useToast();
   const [editOrder, setEditOrder] = useState<Order | null>(null);
   const [viewOrder, setViewOrder] = useState<Order | null>(null);
@@ -28,6 +31,8 @@ function OrdersPage() {
       await addOrder(o, profile.uid);
       flash(t("toast.added"));
       logAction(actor, "order.add", o.name);
+      // خصم الستوك للسطور المطابقة للكتالوج
+      applyStock(parseItemsConsumption(o.items, products), -1, profile.uid);
     } catch {
       flash(t("toast.addErr"));
     }
@@ -50,6 +55,12 @@ function OrdersPage() {
       await updateOrder(editOrder.id, changes, profile.uid);
       flash(t("toast.updated"));
       logAction(actor, "order.update", changes.name);
+      // فرق الاستهلاك بين القديم والجديد بس هو اللي بيتطبق
+      const delta = diffConsumption(
+        parseItemsConsumption(editOrder.items, products),
+        parseItemsConsumption(changes.items, products)
+      );
+      applyStock(delta, -1, profile.uid);
     } catch {
       flash(t("toast.updateErr"));
     }
@@ -62,6 +73,8 @@ function OrdersPage() {
       await deleteOrder(o.id);
       flash(t("toast.deleted"));
       logAction(actor, "order.delete", o.name);
+      // إرجاع الستوك — الأوردر اتلغى قبل الشحن
+      applyStock(parseItemsConsumption(o.items, products), 1, profile.uid);
     } catch {
       flash(t("toast.deleteErr"));
     }
