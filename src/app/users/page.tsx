@@ -65,28 +65,16 @@ function UsersPage() {
           <table className="data-table min-w-[640px]">
             <thead>
               <tr>
+                <th></th>
                 <th>{t("name")}</th>
                 <th>{t("email")}</th>
                 <th>{t("role")}</th>
                 <th>{t("status")}</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => (
                 <tr key={u.uid} className={u.active ? "" : "opacity-60"}>
-                  <td>{u.name}</td>
-                  <td dir="ltr">{u.email}</td>
-                  <td>
-                    <span className={"pill " + (u.role === "admin" ? "bg-pastel-lavender text-ink-700" : "bg-soft text-ink-500")}>
-                      {t(`roles.${u.role}`)}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={"pill " + (u.active ? "bg-soft text-success" : "bg-soft text-danger")}>
-                      {u.active ? t("active") : t("inactive")}
-                    </span>
-                  </td>
                   <td>
                     <div className="flex items-center gap-1.5">
                       <button
@@ -106,6 +94,18 @@ function UsersPage() {
                         </button>
                       )}
                     </div>
+                  </td>
+                  <td>{u.name}</td>
+                  <td dir="ltr">{u.email}</td>
+                  <td>
+                    <span className={"pill " + (u.role === "admin" ? "bg-pastel-lavender text-ink-700" : "bg-soft text-ink-500")}>
+                      {t(`roles.${u.role}`)}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={"pill " + (u.active ? "bg-soft text-success" : "bg-soft text-danger")}>
+                      {u.active ? t("active") : t("inactive")}
+                    </span>
                   </td>
                 </tr>
               ))}

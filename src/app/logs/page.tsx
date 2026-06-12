@@ -2,11 +2,12 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useLogs } from "@/hooks/useLogs";
+import { useUserDirectory } from "@/hooks/useUserDirectory";
 import { LOG_ACTIONS, type LogAction, type LogEntry } from "@/lib/types";
-import { EMPTY_DISPLAY, formatDateTime } from "@/lib/format";
+import { EMPTY_DISPLAY, formatDateTime } from "@/lib/appGlobals";
 import AppShell from "@/components/layout/AppShell";
-import { useAppLocale } from "@/components/IntlProvider";
 import PageHero from "@/components/ui/PageHero";
+import EmptyState from "@/components/ui/EmptyState";
 
 const ALL = "all";
 
@@ -22,19 +23,22 @@ function detailText(
 
 function LogsPage() {
   const t = useTranslations("logs");
-  const { locale } = useAppLocale();
   const { logs, error } = useLogs(true);
+  const resolveUser = useUserDirectory();
   const [userFilter, setUserFilter] = useState<string>(ALL);
   const [actionFilter, setActionFilter] = useState<string>(ALL);
 
-  const emails = useMemo(
-    () => Array.from(new Set(logs.map((l) => l.email))).sort(),
-    [logs]
+  // الفلتر بالـ uid — والعرض بالاسم من دليل المستخدمين
+  const uids = useMemo(
+    () => Array.from(new Set(logs.map((l) => l.uid))).sort((a, b) =>
+      resolveUser(a).localeCompare(resolveUser(b))
+    ),
+    [logs, resolveUser]
   );
 
   const filtered = logs.filter(
     (l) =>
-      (userFilter === ALL || l.email === userFilter) &&
+      (userFilter === ALL || l.uid === userFilter) &&
       (actionFilter === ALL || l.action === actionFilter)
   );
 
@@ -52,7 +56,7 @@ function LogsPage() {
       <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
         <select className="form-input sm:!w-auto" value={userFilter} onChange={(e) => setUserFilter(e.target.value)}>
           <option value={ALL}>{t("filterUser")}</option>
-          {emails.map((e) => <option key={e} value={e}>{e}</option>)}
+          {uids.map((uid) => <option key={uid} value={uid}>{resolveUser(uid)}</option>)}
         </select>
         <select className="form-input sm:!w-auto" value={actionFilter} onChange={(e) => setActionFilter(e.target.value)}>
           <option value={ALL}>{t("filterAction")}</option>
@@ -60,9 +64,9 @@ function LogsPage() {
         </select>
       </div>
 
-      <div className="table-wrap">
+      <div className="table-wrap fade-up fade-up-delay-2">
         {filtered.length === 0 ? (
-          <div className="text-center py-12 px-5 text-ink-500 text-sm">{t("table.empty")}</div>
+          <EmptyState icon="history" text={t("table.empty")} />
         ) : (
           <table className="data-table min-w-[640px]">
             <thead>
@@ -76,8 +80,8 @@ function LogsPage() {
             <tbody>
               {filtered.map((l) => (
                 <tr key={l.id}>
-                  <td className="text-ink-500">{formatDateTime(l.createdAt, locale)}</td>
-                  <td dir="ltr">{l.email}</td>
+                  <td className="text-ink-500" dir="ltr">{formatDateTime(l.createdAt)}</td>
+                  <td title={l.email}>{resolveUser(l.uid)}</td>
                   <td>
                     <span className="pill bg-pastel-lavender text-ink-700">
                       {t(`actions.${l.action as LogAction}`)}

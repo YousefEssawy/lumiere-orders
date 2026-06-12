@@ -59,13 +59,14 @@ service cloud.firestore {
     // ============================================================
     // المستخدمين
     // - كل مستخدم يقرأ ملفه (عشان التطبيق يعرف دوره وحالته)
-    // - الأدمن يقرأ ويكتب الكل
+    // - أي مستخدم نشط يقرأ القائمة (عشان عرض الأسماء بدل الـ uid)
+    // - الأدمن بس يكتب
     // - الأدمن المؤسس يقدر ينشئ ملفه بنفسه أول مرة (bootstrap)
     // - مفيش حذف نهائي — تعطيل بس
     // ============================================================
     match /users/{uid} {
       allow get: if isSignedIn() && request.auth.uid == uid;
-      allow read: if isAdmin();
+      allow read: if isActiveUser();
       allow create: if validUserDoc()
         && (isAdmin() || (isBootstrapAdmin() && request.auth.uid == uid));
       allow update: if isAdmin() && validUserDoc();

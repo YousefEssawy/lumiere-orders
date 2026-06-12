@@ -39,6 +39,7 @@ export const LOG_ACTIONS = [
   "orders.import",
   "orders.export",
   "orders.clear",
+  "history.update",
   "history.delete",
   "history.clear",
   "history.status",
