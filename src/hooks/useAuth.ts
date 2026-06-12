@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
-import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { FIRESTORE_COLLECTIONS, type UserProfile } from "@/lib/types";
+import { creationAudit } from "@/lib/audit";
 
 export interface AuthState {
   /** undefined = لسه بيحمّل */
@@ -44,12 +45,12 @@ export function useAuth(): AuthState {
         } else {
           // محاولة bootstrap — بتنجح للأدمن المؤسس بس (حسب الـ rules)
           setDoc(ref, {
+            id: user.uid,
             email: user.email ?? "",
             name: user.email?.split("@")[0] ?? "",
             role: "admin",
             active: true,
-            createdAt: serverTimestamp(),
-            createdBy: user.uid,
+            ...creationAudit(user.uid),
           }).catch(() => setProfile(null));
         }
       },

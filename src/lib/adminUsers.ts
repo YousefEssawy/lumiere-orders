@@ -21,7 +21,7 @@ export interface NewUserInput {
  * بيرمي AuthError كود زي auth/email-already-in-use أو auth/weak-password.
  */
 export async function createUser(
-  adminEmail: string,
+  adminUid: string,
   input: NewUserInput
 ): Promise<string> {
   if (!db) throw new Error("firebase-not-configured");
@@ -41,11 +41,12 @@ export async function createUser(
 
     // الملف بيتكتب بصلاحية الأدمن الحالي (الـ db الرئيسي)
     await setDoc(doc(db, FIRESTORE_COLLECTIONS.users, uid), {
+      id: uid,
       email: input.email.trim(),
       name: input.name.trim(),
       role: input.role,
       active: true,
-      ...creationAudit(adminEmail),
+      ...creationAudit(adminUid),
     });
     return uid;
   } finally {
@@ -54,11 +55,11 @@ export async function createUser(
 }
 
 /** تفعيل / تعطيل مستخدم */
-export async function setUserActive(uid: string, active: boolean, byEmail: string): Promise<void> {
+export async function setUserActive(uid: string, active: boolean, byUid: string): Promise<void> {
   if (!db) throw new Error("firebase-not-configured");
   await updateDoc(doc(db, FIRESTORE_COLLECTIONS.users, uid), {
     active,
-    ...updateAudit(byEmail),
+    ...updateAudit(byUid),
   });
 }
 
@@ -66,12 +67,12 @@ export async function setUserActive(uid: string, active: boolean, byEmail: strin
 export async function updateUserProfile(
   uid: string,
   changes: { name: string; role: UserRole },
-  byEmail: string
+  byUid: string
 ): Promise<void> {
   if (!db) throw new Error("firebase-not-configured");
   await updateDoc(doc(db, FIRESTORE_COLLECTIONS.users, uid), {
     name: changes.name.trim(),
     role: changes.role,
-    ...updateAudit(byEmail),
+    ...updateAudit(byUid),
   });
 }

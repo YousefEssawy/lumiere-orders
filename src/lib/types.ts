@@ -18,11 +18,13 @@ export const DEFAULT_ORDER_STATUS: OrderStatus = "preparing";
 
 export interface UserProfile {
   uid: string;
+  /** نفس الـ uid — متخزن جوه الـ document (كل ريكورد له id) */
+  id?: string;
   email: string;
   name: string;
   role: UserRole;
   active: boolean;
-  // Audit entity (راجع lib/audit.ts) — createdBy/updatedBy = إيميل
+  // Audit entity (راجع lib/audit.ts) — createdBy/updatedBy = uid
   createdBy?: string;
   createdAt?: unknown;
   updatedBy?: string;
