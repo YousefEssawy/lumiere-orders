@@ -5,6 +5,8 @@ import { signInWithEmailAndPassword, type AuthError } from "firebase/auth";
 import { useTranslations } from "next-intl";
 import { auth } from "@/lib/firebase";
 import LanguageToggle from "@/components/LanguageToggle";
+// static import — بيضمن basePath صحيح على GitHub Pages
+import logo from "@/assets/logo.jpg";
 
 const INVALID_CODES = ["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found"];
 
@@ -36,7 +38,7 @@ export default function Login() {
       <form onSubmit={submit} className="card w-full max-w-sm text-center shadow-lg !p-9">
         <div className="flex justify-center mb-4">
           <Image
-            src="/assets/logo.jpg"
+            src={logo}
             alt={t("brand.name")}
             width={72}
             height={72}
