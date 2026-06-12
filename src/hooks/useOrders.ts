@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc,
-  writeBatch, serverTimestamp,
+  updateDoc, writeBatch, serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { DEFAULT_ORDER_STATUS, FIRESTORE_COLLECTIONS } from "@/lib/types";
@@ -49,6 +49,11 @@ export function useOrders(enabled: boolean) {
     await batch.commit();
   }, []);
 
+  const updateOrder = useCallback(async (id: string, data: Omit<Order, "id" | "createdAt">) => {
+    if (!db) return;
+    await updateDoc(doc(db, COL, id), { ...data });
+  }, []);
+
   const deleteOrder = useCallback(async (id: string) => {
     if (!db) return;
     await deleteDoc(doc(db, COL, id));
@@ -79,5 +84,5 @@ export function useOrders(enabled: boolean) {
     }
   }, []);
 
-  return { orders, addOrder, importOrders, deleteOrder, archiveAll };
+  return { orders, addOrder, importOrders, updateOrder, deleteOrder, archiveAll };
 }
