@@ -7,7 +7,7 @@ import { EMPTY_DISPLAY, formatDateTime } from "@/lib/format";
 import {
   DEFAULT_ORDER_STATUS, ORDER_STATUSES, type OrderStatus,
 } from "@/lib/types";
-import type { OrderSource } from "@/lib/wassalha";
+import { exportWassalha, type OrderSource } from "@/lib/wassalha";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useAppLocale } from "@/components/IntlProvider";
 import { useToast } from "@/components/ToastProvider";
@@ -15,7 +15,7 @@ import PageHero from "@/components/ui/PageHero";
 
 const ALL = "all";
 
-// نفس باستيلات بادجات المصدر في صفحة الأوردرات
+// نفس باستيلات بادجات المصدر في صفحة التجهيز
 const SRC_PILL_CLASS: Record<OrderSource, string> = {
   Sllr: "bg-pastel-sky text-ink-700",
   WhatsApp: "bg-pastel-mint text-ink-700",
@@ -36,7 +36,7 @@ function statusOf(o: ArchivedOrder): OrderStatus {
   return o.status ?? DEFAULT_ORDER_STATUS;
 }
 
-function HistoryPage() {
+function ShipmentsPage() {
   const t = useTranslations("history");
   const tOrders = useTranslations("orders");
   const tCommon = useTranslations("common");
@@ -45,11 +45,45 @@ function HistoryPage() {
   const { archived, error, deleteArchived, clearArchive, setStatus } = useArchive(true);
   const flash = useToast();
   const [statusFilter, setStatusFilter] = useState<string>(ALL);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const actor = { uid: profile.uid, email: profile.email };
 
   const filtered = statusFilter === ALL
     ? archived
     : archived.filter((o) => statusOf(o) === statusFilter);
+
+  const selectedInView = filtered.filter((o) => o.id && selected.has(o.id));
+  const allInViewSelected = filtered.length > 0 && selectedInView.length === filtered.length;
+
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAllInView() {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allInViewSelected) filtered.forEach((o) => o.id && next.delete(o.id));
+      else filtered.forEach((o) => o.id && next.add(o.id));
+      return next;
+    });
+  }
+
+  /** ذكي: المحدد لو فيه تحديد، وإلا كل المعروض حسب الفلتر */
+  function handleExport() {
+    const targets = selectedInView.length ? selectedInView : filtered;
+    if (!targets.length) { flash(t("exportEmpty")); return; }
+    const bad = targets.filter((o) => !o.city);
+    if (bad.length && !window.confirm(t("confirmExportBadCity", { n: bad.length }))) return;
+    exportWassalha(targets);
+    flash(t("toast.exported", { n: targets.length }));
+    logAction(actor, "orders.export", "", targets.length);
+    setSelected(new Set());
+  }
 
   async function handleStatus(o: ArchivedOrder, status: OrderStatus) {
     if (!o.id || statusOf(o) === status) return;
@@ -86,18 +120,26 @@ function HistoryPage() {
     }
   }
 
+  const exportCount = selectedInView.length || filtered.length;
+
   return (
     <>
       <PageHero
-        icon="archive"
+        icon="local_shipping"
         title={t("title")}
         subtitle={t("subtitle")}
         trailing={
           archived.length ? (
-            <button className="btn-danger" onClick={handleClear}>
-              <span className="icon text-base" aria-hidden>delete_forever</span>
-              {t("clearAll")}
-            </button>
+            <>
+              <button className="btn-ghost !text-danger" onClick={handleClear}>
+                <span className="icon text-base" aria-hidden>delete_forever</span>
+                {t("clearAll")}
+              </button>
+              <button className="btn-primary" onClick={handleExport} disabled={!exportCount}>
+                <span className="icon text-base" aria-hidden>download</span>
+                {t("export")}{exportCount ? ` (${exportCount})` : ""}
+              </button>
+            </>
           ) : undefined
         }
       />
@@ -112,6 +154,9 @@ function HistoryPage() {
       <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-3 mb-3.5">
         <div className="text-sm text-ink-500">
           {t("total")} <b className="text-ink-900 text-lg">{filtered.length}</b>
+          {selectedInView.length ? (
+            <span className="ms-2 text-ink-900 font-semibold">· {t("selected", { n: selectedInView.length })}</span>
+          ) : null}
         </div>
         <div className="flex-1" />
         <select
@@ -129,13 +174,22 @@ function HistoryPage() {
       <div className="table-wrap">
         {filtered.length === 0 ? (
           <div className="text-center py-12 px-5 text-ink-500">
-            <span className="icon !text-[40px] text-ink-300" aria-hidden>archive</span>
+            <span className="icon !text-[40px] text-ink-300" aria-hidden>local_shipping</span>
             <div className="mt-2 text-sm">{t("empty")}</div>
           </div>
         ) : (
-          <table className="data-table min-w-[1040px]">
+          <table className="data-table min-w-[1080px]">
             <thead>
               <tr>
+                <th className="w-10">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 accent-ink-900 cursor-pointer align-middle"
+                    checked={allInViewSelected}
+                    onChange={toggleAllInView}
+                    aria-label={t("selected", { n: filtered.length })}
+                  />
+                </th>
                 <th>{t("status")}</th>
                 <th>{t("archivedAt")}</th>
                 <th>{tOrders("table.source")}</th>
@@ -154,6 +208,15 @@ function HistoryPage() {
                 const status = statusOf(o);
                 return (
                   <tr key={o.id}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 accent-ink-900 cursor-pointer align-middle"
+                        checked={!!o.id && selected.has(o.id)}
+                        onChange={() => o.id && toggleOne(o.id)}
+                        aria-label={o.name}
+                      />
+                    </td>
                     <td>
                       <select
                         className={"pill border-0 cursor-pointer appearance-none pe-2 " + STATUS_CLASS[status]}
@@ -201,7 +264,7 @@ function HistoryPage() {
 export default function Page() {
   return (
     <AppShell>
-      <HistoryPage />
+      <ShipmentsPage />
     </AppShell>
   );
 }
