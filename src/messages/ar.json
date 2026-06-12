@@ -177,16 +177,22 @@
     "loadError": "تعذّر تحميل سجل النشاط. اتأكد إن آخر نسخة من firestore.rules منشورة في Firebase Console ← Firestore ← Rules.",
     "items": "{n} أوردر",
     "actions": {
-      "order.add": "أضاف أوردر",
-      "order.delete": "حذف أوردر",
-      "orders.import": "استورد من سلر",
-      "orders.export": "صدّر ملف وصلها",
-      "orders.clear": "مسح كل الأوردرات",
-      "user.create": "أنشأ مستخدم",
-      "user.update": "عدّل مستخدم",
-      "user.activate": "فعّل مستخدم",
-      "user.deactivate": "عطّل مستخدم",
-      "user.password": "غيّر الباسورد بتاعه"
+      "order": {
+        "add": "أضاف أوردر",
+        "delete": "حذف أوردر"
+      },
+      "orders": {
+        "import": "استورد من سلر",
+        "export": "صدّر ملف وصلها",
+        "clear": "مسح كل الأوردرات"
+      },
+      "user": {
+        "create": "أنشأ مستخدم",
+        "update": "عدّل مستخدم",
+        "activate": "فعّل مستخدم",
+        "deactivate": "عطّل مستخدم",
+        "password": "غيّر الباسورد بتاعه"
+      }
     }
   },
   "help": {
