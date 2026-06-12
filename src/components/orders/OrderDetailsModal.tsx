@@ -4,42 +4,15 @@ import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { useUserDirectory } from "@/hooks/useUserDirectory";
 import { EMPTY_DISPLAY, formatDateTime } from "@/lib/appGlobals";
-import { STATUS_CLASS } from "@/lib/statusStyles";
+import { SOURCE_CLASS, STATUS_CLASS } from "@/lib/statusStyles";
 import { DEFAULT_ORDER_STATUS, ORDER_STATUSES } from "@/lib/types";
-import type { OrderSource } from "@/lib/wassalha";
 import type { ArchivedOrder } from "@/hooks/useArchive";
-
-const SRC_PILL_CLASS: Record<OrderSource, string> = {
-  Sllr: "bg-pastel-sky text-ink-700",
-  WhatsApp: "bg-pastel-mint text-ink-700",
-  Instagram: "bg-pastel-pink text-ink-700",
-  Other: "bg-soft text-ink-500",
-};
+import AuditTimeline from "@/components/ui/AuditTimeline";
 
 interface OrderDetailsModalProps {
   /** Order أو ArchivedOrder — الحقول الإضافية بتظهر لو موجودة */
   order: ArchivedOrder;
   onClose: () => void;
-}
-
-/** نقطة في تايملاين بيانات السجل */
-function AuditNode({
-  icon, label, who, when, last = false,
-}: { icon: string; label: string; who: string; when: string; last?: boolean }) {
-  if (who === EMPTY_DISPLAY && when === EMPTY_DISPLAY) return null;
-  return (
-    <li className="relative flex gap-3 pb-4 last:pb-0">
-      {!last && <span className="absolute start-[11px] top-7 bottom-0 w-px bg-ink-100" aria-hidden />}
-      <span className="relative z-10 inline-flex items-center justify-center w-6 h-6 rounded-full bg-canvas border border-line shrink-0">
-        <span className="icon !text-[13px] text-ink-500" aria-hidden>{icon}</span>
-      </span>
-      <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs text-ink-500 min-w-0 pt-1">
-        <span>{label}</span>
-        <b className="text-ink-700">{who}</b>
-        <span className="text-ink-300" dir="ltr">{when}</span>
-      </span>
-    </li>
-  );
 }
 
 /** عرض كامل لتفاصيل الأوردر — شكل بوليصة شحن */
@@ -86,7 +59,7 @@ export default function OrderDetailsModal({ order: o, onClose }: OrderDetailsMod
             </button>
           </div>
           <div className="flex flex-wrap items-center gap-2 mt-3">
-            <span className={"pill " + SRC_PILL_CLASS[o.source]}>{t(`sources.${o.source}`)}</span>
+            <span className={"pill " + SOURCE_CLASS[o.source]}>{t(`sources.${o.source}`)}</span>
             {status && ORDER_STATUSES.includes(status) && (
               <span className={"pill " + STATUS_CLASS[status]}>{tHistory(`statuses.${status}`)}</span>
             )}
@@ -151,29 +124,13 @@ export default function OrderDetailsModal({ order: o, onClose }: OrderDetailsMod
 
         {/* بيانات السجل — تايملاين هادي */}
         <div className="px-6 py-4 bg-soft border-t border-dashed border-line">
-          <ul>
-            <AuditNode
-              icon="add_circle"
-              label={tDetails("createdBy")}
-              who={resolveUser(o.createdBy) || EMPTY_DISPLAY}
-              when={formatDateTime(o.createdAt)}
-              last={!o.updatedAt && !o.archivedAt}
-            />
-            <AuditNode
-              icon="edit"
-              label={tDetails("updatedBy")}
-              who={resolveUser(o.updatedBy) || EMPTY_DISPLAY}
-              when={formatDateTime(o.updatedAt)}
-              last={!o.archivedAt}
-            />
-            <AuditNode
-              icon="local_shipping"
-              label={tDetails("archivedBy")}
-              who={resolveUser(o.archivedBy) || EMPTY_DISPLAY}
-              when={formatDateTime(o.archivedAt)}
-              last
-            />
-          </ul>
+          <AuditTimeline
+            nodes={[
+              { icon: "add_circle", label: tDetails("createdBy"), who: resolveUser(o.createdBy) || EMPTY_DISPLAY, when: formatDateTime(o.createdAt) },
+              { icon: "edit", label: tDetails("updatedBy"), who: resolveUser(o.updatedBy) || EMPTY_DISPLAY, when: formatDateTime(o.updatedAt) },
+              { icon: "local_shipping", label: tDetails("archivedBy"), who: resolveUser(o.archivedBy) || EMPTY_DISPLAY, when: formatDateTime(o.archivedAt) },
+            ]}
+          />
         </div>
       </div>
     </div>,

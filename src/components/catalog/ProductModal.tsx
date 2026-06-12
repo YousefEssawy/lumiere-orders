@@ -1,11 +1,11 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 import { useState, type FormEvent, type ReactNode } from "react";
-import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import type { Category, Product, ProductVariant } from "@/lib/types";
 import type { ProductInput } from "@/hooks/useProducts";
 import Toggle from "@/components/ui/Toggle";
+import ModalShell from "@/components/ui/ModalShell";
 
 interface ProductModalProps {
   /** null = إنشاء جديد */
@@ -86,32 +86,22 @@ export default function ProductModal({ product, categories, onSave, onClose }: P
     }
   }
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
-      onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}
+  return (
+    <ModalShell
+      icon={isNew ? "add_box" : "edit"}
+      title={isNew ? t("createTitle") : t("editTitle")}
+      onClose={onClose}
+      locked={busy}
+      widthClass="max-w-2xl"
+      trailing={
+        <label className="flex items-center gap-2 text-sm text-ink-500 cursor-pointer shrink-0 select-none">
+          {t("active")}
+          <Toggle checked={active} onChange={() => setActive((v) => !v)} label={t("active")} />
+        </label>
+      }
     >
-      <form onSubmit={submit} className="card !p-0 overflow-hidden w-full max-w-2xl shadow-lg max-h-[90vh] overflow-y-auto fade-up">
-        {/* شريط الهوية */}
-        <div className="h-1.5 w-full" style={{ background: "var(--grad-hero)" }} aria-hidden />
-
-        {/* الهيدر: العنوان + التفعيل في مكان واضح */}
-        <div className="flex items-center justify-between gap-3 px-6 pt-5">
-          <h2 className="text-base font-bold flex items-center gap-2.5 min-w-0">
-            <span className="icon-tile !w-9 !h-9">
-              <span className="icon text-ink-900 !text-[20px]" aria-hidden>{isNew ? "add_box" : "edit"}</span>
-            </span>
-            {isNew ? t("createTitle") : t("editTitle")}
-          </h2>
-          <label className="flex items-center gap-2 text-sm text-ink-500 cursor-pointer shrink-0 select-none">
-            {t("active")}
-            <Toggle checked={active} onChange={() => setActive((v) => !v)} label={t("active")} />
-          </label>
-        </div>
-
-        <div className="px-6 pb-6">
+      <form onSubmit={submit}>
+        <div>
           {/* البيانات الأساسية */}
           <SectionLabel>{t("sectionBasics")}</SectionLabel>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -272,7 +262,6 @@ export default function ProductModal({ product, categories, onSave, onClose }: P
           </div>
         </div>
       </form>
-    </div>,
-    document.body
+    </ModalShell>
   );
 }

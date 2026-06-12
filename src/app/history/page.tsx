@@ -8,8 +8,8 @@ import { EMPTY_DISPLAY, formatDateTime } from "@/lib/appGlobals";
 import {
   DEFAULT_ORDER_STATUS, ORDER_STATUSES, type OrderStatus,
 } from "@/lib/types";
-import { exportWassalha, type OrderSource } from "@/lib/wassalha";
-import { STATUS_CLASS } from "@/lib/statusStyles";
+import { exportWassalha } from "@/lib/wassalha";
+import { SOURCE_CLASS, STATUS_CLASS } from "@/lib/statusStyles";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
 import { useConfirm } from "@/components/ConfirmProvider";
@@ -21,14 +21,6 @@ import { truncatedCell } from "@/components/orders/OrdersTable";
 import type { OrderFormState } from "@/components/orders/OrderFields";
 
 const ALL = "all";
-
-// نفس باستيلات بادجات المصدر في صفحة التجهيز
-const SRC_PILL_CLASS: Record<OrderSource, string> = {
-  Sllr: "bg-pastel-sky text-ink-700",
-  WhatsApp: "bg-pastel-mint text-ink-700",
-  Instagram: "bg-pastel-pink text-ink-700",
-  Other: "bg-soft text-ink-500",
-};
 
 function statusOf(o: ArchivedOrder): OrderStatus {
   return o.status ?? DEFAULT_ORDER_STATUS;
@@ -288,7 +280,7 @@ function ShipmentsPage() {
                       </select>
                     </td>
                     <td className="text-ink-500" dir="ltr">{formatDateTime(o.archivedAt)}</td>
-                    <td><span className={"pill " + SRC_PILL_CLASS[o.source]}>{tOrders(`sources.${o.source}`)}</span></td>
+                    <td><span className={"pill " + SOURCE_CLASS[o.source]}>{tOrders(`sources.${o.source}`)}</span></td>
                     <td>{o.name}</td>
                     <td dir="ltr">{o.phone}</td>
                     <td>{truncatedCell(o.address)}</td>

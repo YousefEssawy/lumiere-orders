@@ -1,10 +1,10 @@
 "use client";
 import { useState, type FormEvent } from "react";
-import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import type { AuthError } from "firebase/auth";
 import { USER_ROLES, type UserRole } from "@/lib/types";
 import { createUser } from "@/lib/adminUsers";
+import ModalShell from "@/components/ui/ModalShell";
 
 interface CreateUserModalProps {
   adminUid: string;
@@ -38,19 +38,9 @@ export default function CreateUserModal({ adminUid, onCreated, onClose }: Create
     }
   }
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
-      onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}
-    >
-      <form onSubmit={submit} className="card w-full max-w-lg shadow-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="text-base font-bold flex items-center gap-2 mb-2">
-          <span className="icon text-accent" aria-hidden>person_add</span>
-          {t("createTitle")}
-        </h2>
-
+  return (
+    <ModalShell icon="person_add" title={t("createTitle")} onClose={onClose} locked={busy}>
+      <form onSubmit={submit}>
         <label className="form-label">{t("name")} <span className="req">*</span></label>
         <input className="form-input" value={name} onChange={(e) => setName(e.target.value)} required placeholder={t("namePh")} />
 
@@ -78,7 +68,6 @@ export default function CreateUserModal({ adminUid, onCreated, onClose }: Create
           </button>
         </div>
       </form>
-    </div>,
-    document.body
+    </ModalShell>
   );
 }

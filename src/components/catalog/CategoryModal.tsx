@@ -1,9 +1,9 @@
 "use client";
 import { useState, type FormEvent } from "react";
-import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import type { Category } from "@/lib/types";
 import Toggle from "@/components/ui/Toggle";
+import ModalShell from "@/components/ui/ModalShell";
 
 interface CategoryModalProps {
   /** null = إنشاء جديدة */
@@ -32,32 +32,21 @@ export default function CategoryModal({ category, onSave, onClose }: CategoryMod
     }
   }
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
-      onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}
+  return (
+    <ModalShell
+      icon={category ? "edit" : "add_box"}
+      title={category ? t("editTitle") : t("createTitle")}
+      onClose={onClose}
+      locked={busy}
+      trailing={
+        <label className="flex items-center gap-2 text-sm text-ink-500 cursor-pointer shrink-0 select-none">
+          {t("active")}
+          <Toggle checked={active} onChange={() => setActive((v) => !v)} label={t("active")} />
+        </label>
+      }
     >
-      <form onSubmit={submit} className="card !p-0 overflow-hidden w-full max-w-lg shadow-lg fade-up">
-        {/* شريط الهوية */}
-        <div className="h-1.5 w-full" style={{ background: "var(--grad-hero)" }} aria-hidden />
-
-        {/* الهيدر: العنوان + التفعيل */}
-        <div className="flex items-center justify-between gap-3 px-6 pt-5">
-          <h2 className="text-base font-bold flex items-center gap-2.5">
-            <span className="icon-tile !w-9 !h-9">
-              <span className="icon text-ink-900 !text-[20px]" aria-hidden>{category ? "edit" : "add_box"}</span>
-            </span>
-            {category ? t("editTitle") : t("createTitle")}
-          </h2>
-          <label className="flex items-center gap-2 text-sm text-ink-500 cursor-pointer shrink-0 select-none">
-            {t("active")}
-            <Toggle checked={active} onChange={() => setActive((v) => !v)} label={t("active")} />
-          </label>
-        </div>
-
-        <div className="px-6 pb-6">
+      <form onSubmit={submit}>
+        <div>
           <label className="form-label">{t("name")} <span className="req">*</span></label>
           <input
             className="form-input"
@@ -80,7 +69,6 @@ export default function CategoryModal({ category, onSave, onClose }: CategoryMod
           </div>
         </div>
       </form>
-    </div>,
-    document.body
+    </ModalShell>
   );
 }
