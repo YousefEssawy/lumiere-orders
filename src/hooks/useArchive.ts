@@ -54,6 +54,15 @@ export function useArchive(enabled: boolean) {
     await updateDoc(doc(db, COL, id), { status, ...updateAudit(byUid) });
   }, []);
 
+  /** تعديل بيانات شحنة (نفس حقول الأوردر — الحالة بتتغير من setStatus) */
+  const updateArchived = useCallback(
+    async (id: string, data: Omit<Order, "id" | "createdAt" | "createdBy" | "updatedAt" | "updatedBy">, byUid: string) => {
+      if (!db) return;
+      await updateDoc(doc(db, COL, id), { ...data, ...updateAudit(byUid) });
+    },
+    []
+  );
+
   const clearArchive = useCallback(async (current: ArchivedOrder[]) => {
     if (!db || !current.length) return;
     const database = db;
@@ -65,5 +74,5 @@ export function useArchive(enabled: boolean) {
     }
   }, []);
 
-  return { archived, error, deleteArchived, clearArchive, setStatus };
+  return { archived, error, deleteArchived, clearArchive, setStatus, updateArchived };
 }

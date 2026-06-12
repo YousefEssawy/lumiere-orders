@@ -34,6 +34,7 @@ export default function OrdersTable({ orders, onEdit, onDelete }: OrdersTablePro
       <table className="data-table min-w-[840px]">
         <thead>
           <tr>
+            <th></th>
             <th>{t("table.source")}</th>
             <th>{t("table.name")}</th>
             <th>{t("table.phone")}</th>
@@ -43,25 +44,11 @@ export default function OrdersTable({ orders, onEdit, onDelete }: OrdersTablePro
             <th>{t("table.cod")}</th>
             <th>{t("table.vol")}</th>
             <th>{t("table.ref")}</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
           {orders.map((o) => (
             <tr key={o.id}>
-              <td><span className={"pill " + SRC_PILL_CLASS[o.source]}>{t(`sources.${o.source}`)}</span></td>
-              <td>{o.name}</td>
-              <td dir="ltr">{o.phone}</td>
-              <td className="cell-wrap">{o.address}</td>
-              <td>
-                {o.city || <span className="text-danger font-bold">{t("table.fixCity")}</span>}
-              </td>
-              <td className="cell-wrap">
-                {String(o.items || "").split("\n").map((line, i) => <div key={i}>{line}</div>)}
-              </td>
-              <td>{o.cod}</td>
-              <td>{o.vol}</td>
-              <td>{o.ref || ""}</td>
               <td>
                 <div className="flex items-center gap-1">
                   <button
@@ -82,6 +69,19 @@ export default function OrdersTable({ orders, onEdit, onDelete }: OrdersTablePro
                   </button>
                 </div>
               </td>
+              <td><span className={"pill " + SRC_PILL_CLASS[o.source]}>{t(`sources.${o.source}`)}</span></td>
+              <td>{o.name}</td>
+              <td dir="ltr">{o.phone}</td>
+              <td className="cell-wrap">{o.address}</td>
+              <td>
+                {o.city || <span className="text-danger font-bold">{t("table.fixCity")}</span>}
+              </td>
+              <td className="cell-wrap">
+                {String(o.items || "").split("\n").map((line, i) => <div key={i}>{line}</div>)}
+              </td>
+              <td>{o.cod}</td>
+              <td>{o.vol}</td>
+              <td>{o.ref || ""}</td>
             </tr>
           ))}
         </tbody>
