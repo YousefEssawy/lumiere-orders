@@ -45,7 +45,7 @@ export default function CreateUserModal({ adminUid, onCreated, onClose }: Create
       className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={(e) => { if (e.target === e.currentTarget && !busy) onClose(); }}
     >
-      <form onSubmit={submit} className="card w-full max-w-sm shadow-lg">
+      <form onSubmit={submit} className="card w-full max-w-sm shadow-lg max-h-[90vh] overflow-y-auto">
         <h2 className="text-base font-bold flex items-center gap-2 mb-2">
           <span className="icon text-accent" aria-hidden>person_add</span>
           {t("createTitle")}
