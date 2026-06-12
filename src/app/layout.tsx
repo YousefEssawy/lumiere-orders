@@ -29,7 +29,8 @@ const quicksand = Quicksand({
 export const metadata: Metadata = {
   title: "Lumière — Orders & Shipping",
   description: "Lumière orders and shipping hub",
-  icons: { icon: "/assets/logo.jpg" },
+  // الفافيكون من public — لازم الـ basePath يدوي (metadata مبيضفهوش)
+  icons: { icon: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/assets/logo.jpg` },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
