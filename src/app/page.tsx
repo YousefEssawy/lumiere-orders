@@ -42,11 +42,17 @@ function OrdersPage() {
     if (!list.length) { flash(t("toast.fileEmpty")); return; }
     try {
       await importOrders(list, profile.uid);
-      flash(t("toast.imported", { n: list.length }));
       logAction(actor, "orders.import", "", list.length);
       // خصم الستوك لكل سطور الأوردرات المستوردة المطابقة للكتالوج
       const all = list.map((o) => o.items).join("\n");
-      applyStock(parseItemsConsumption(all, products), -1, profile.uid);
+      const consumption = parseItemsConsumption(all, products);
+      const totalQty = consumption.reduce((s, l) => s + l.qty, 0);
+      applyStock(consumption, -1, profile.uid);
+      // رسالة واحدة بتوضح الاستيراد + حركة الستوك
+      flash(
+        t("toast.imported", { n: list.length }) +
+        (totalQty ? " · " + t("toast.stockTaken", { q: totalQty }) : "")
+      );
     } catch {
       flash(t("toast.importErr"));
     }

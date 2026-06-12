@@ -123,6 +123,7 @@
       "updated": "Order updated ✓",
       "updateErr": "Failed to update the order",
       "imported": "Imported {n} orders from Sllr",
+      "stockTaken": "{q} pcs deducted from stock",
       "importErr": "Import failed",
       "fileEmpty": "The file is empty",
       "deleted": "Order deleted",
