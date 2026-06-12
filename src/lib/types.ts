@@ -48,6 +48,13 @@ export const LOG_ACTIONS = [
   "user.activate",
   "user.deactivate",
   "user.password",
+  "product.create",
+  "product.update",
+  "product.delete",
+  "products.import",
+  "category.create",
+  "category.update",
+  "category.delete",
   "system.migrate",
 ] as const;
 export type LogAction = (typeof LOG_ACTIONS)[number];
@@ -69,4 +76,41 @@ export const FIRESTORE_COLLECTIONS = {
   ordersArchive: "ordersArchive",
   users: "users",
   logs: "logs",
+  products: "products",
+  categories: "categories",
 } as const;
+
+// ============ الكتالوج ============
+
+export interface Category {
+  id?: string;
+  name: string;
+  active: boolean;
+  createdBy?: string;
+  createdAt?: unknown;
+  updatedBy?: string;
+  updatedAt?: unknown;
+}
+
+/** حجم/خيار للمنتج — سعر وكمية ستوك مستقلين */
+export interface ProductVariant {
+  size: string; // "50ml" — ممكن تكون "" لمنتج من غير أحجام
+  price: number;
+  quantity: number;
+}
+
+/** المنتج — الـ document id هو الكود (M21) عشان الـ upsert من الشيت */
+export interface Product {
+  id?: string;
+  code: string; // M21
+  name: string; // Tiger M21
+  nameAr?: string;
+  category: string;
+  imageUrl?: string;
+  active: boolean;
+  variants: ProductVariant[];
+  createdBy?: string;
+  createdAt?: unknown;
+  updatedBy?: string;
+  updatedAt?: unknown;
+}

@@ -1,6 +1,7 @@
 "use client";
 import { useTranslations } from "next-intl";
 import { WASSALHA_CITIES, type Order, type OrderSource } from "@/lib/wassalha";
+import ItemsPicker from "@/components/orders/ItemsPicker";
 
 export type OrderFormState = Omit<Order, "id" | "createdAt">;
 
@@ -60,7 +61,14 @@ export default function OrderFields({ value: f, onChange, sources = MANUAL_SOURC
         </div>
       </div>
       <label className="form-label">{t("items")} <span className="req">*</span></label>
-      <textarea className="form-input min-h-[60px]" value={f.items} onChange={up("items")} required placeholder={t("itemsPh")} />
+      {/* الاختيار من الكتالوج بيضيف سطر بالصيغة النهائية ويزود الـ COD بالسعر */}
+      <ItemsPicker
+        onPick={(line, totalPrice) => {
+          onChange("items", f.items ? `${f.items}\n${line}` : line);
+          onChange("cod", String((Number(f.cod) || 0) + totalPrice));
+        }}
+      />
+      <textarea className="form-input min-h-[60px] mt-2" value={f.items} onChange={up("items")} required placeholder={t("itemsPh")} />
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <label className="form-label">{t("vol")}</label>
