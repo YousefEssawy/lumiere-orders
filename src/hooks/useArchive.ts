@@ -5,6 +5,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { FIRESTORE_COLLECTIONS, type OrderStatus } from "@/lib/types";
+import { updateAudit } from "@/lib/audit";
 import type { Order } from "@/lib/wassalha";
 
 const COL = FIRESTORE_COLLECTIONS.ordersArchive;
@@ -48,9 +49,9 @@ export function useArchive(enabled: boolean) {
     await deleteDoc(doc(db, COL, id));
   }, []);
 
-  const setStatus = useCallback(async (id: string, status: OrderStatus) => {
+  const setStatus = useCallback(async (id: string, status: OrderStatus, byEmail: string) => {
     if (!db) return;
-    await updateDoc(doc(db, COL, id), { status });
+    await updateDoc(doc(db, COL, id), { status, ...updateAudit(byEmail) });
   }, []);
 
   const clearArchive = useCallback(async (current: ArchivedOrder[]) => {

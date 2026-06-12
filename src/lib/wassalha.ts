@@ -15,7 +15,11 @@ export interface Order {
   vol: string;
   notes: string;
   ref: string;
+  // Audit entity (راجع lib/audit.ts)
+  createdBy?: string;
   createdAt?: unknown;
+  updatedBy?: string;
+  updatedAt?: unknown;
 }
 
 export const WASSALHA_CITIES: string[] = [

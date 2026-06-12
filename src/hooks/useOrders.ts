@@ -2,16 +2,19 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc,
-  updateDoc, writeBatch, serverTimestamp,
+  updateDoc, writeBatch,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { DEFAULT_ORDER_STATUS, FIRESTORE_COLLECTIONS } from "@/lib/types";
+import { archiveAudit, creationAudit, updateAudit } from "@/lib/audit";
 import type { Order } from "@/lib/wassalha";
 
 const COL = FIRESTORE_COLLECTIONS.orders;
 const ARCHIVE_COL = FIRESTORE_COLLECTIONS.ordersArchive;
 // كل أوردر = عمليتين في الأرشفة (إنشاء + حذف)، وحد الـ batch هو 500
 const ARCHIVE_CHUNK = 200;
+
+type OrderData = Omit<Order, "id" | "createdAt" | "createdBy" | "updatedAt" | "updatedBy">;
 
 export function useOrders(enabled: boolean) {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -33,25 +36,25 @@ export function useOrders(enabled: boolean) {
     );
   }, [enabled]);
 
-  const addOrder = useCallback(async (data: Omit<Order, "id" | "createdAt">) => {
+  const addOrder = useCallback(async (data: OrderData, byEmail: string) => {
     if (!db) return;
-    await addDoc(collection(db, COL), { ...data, createdAt: serverTimestamp() });
+    await addDoc(collection(db, COL), { ...data, ...creationAudit(byEmail) });
   }, []);
 
-  const importOrders = useCallback(async (list: Omit<Order, "id" | "createdAt">[]) => {
+  const importOrders = useCallback(async (list: OrderData[], byEmail: string) => {
     if (!db || !list.length) return;
     const database = db;
     const batch = writeBatch(database);
     list.forEach((data) => {
       const ref = doc(collection(database, COL));
-      batch.set(ref, { ...data, createdAt: serverTimestamp() });
+      batch.set(ref, { ...data, ...creationAudit(byEmail) });
     });
     await batch.commit();
   }, []);
 
-  const updateOrder = useCallback(async (id: string, data: Omit<Order, "id" | "createdAt">) => {
+  const updateOrder = useCallback(async (id: string, data: OrderData, byEmail: string) => {
     if (!db) return;
-    await updateDoc(doc(db, COL, id), { ...data });
+    await updateDoc(doc(db, COL, id), { ...data, ...updateAudit(byEmail) });
   }, []);
 
   const deleteOrder = useCallback(async (id: string) => {
@@ -60,10 +63,10 @@ export function useOrders(enabled: boolean) {
   }, []);
 
   /**
-   * «مسح الكل» = أرشفة: بينقل كل الأوردرات لهيستوري ordersArchive
-   * بدل الحذف النهائي، مع تسجيل مين أرشف وإمتى.
+   * «نقل للشحنات»: بينقل كل الأوردرات لـ ordersArchive بحالة افتراضية
+   * «تحت التجهيز»، مع الاحتفاظ بالـ audit الأصلي + بيانات الأرشفة.
    */
-  const archiveAll = useCallback(async (current: Order[], archivedBy: string) => {
+  const archiveAll = useCallback(async (current: Order[], byEmail: string) => {
     if (!db || !current.length) return;
     const database = db;
     for (let i = 0; i < current.length; i += ARCHIVE_CHUNK) {
@@ -75,8 +78,7 @@ export function useOrders(enabled: boolean) {
         batch.set(doc(collection(database, ARCHIVE_COL)), {
           ...data,
           status: DEFAULT_ORDER_STATUS,
-          archivedAt: serverTimestamp(),
-          archivedBy,
+          ...archiveAudit(byEmail),
         });
         batch.delete(doc(database, COL, id));
       });

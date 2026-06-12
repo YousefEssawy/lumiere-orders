@@ -22,8 +22,11 @@ export interface UserProfile {
   name: string;
   role: UserRole;
   active: boolean;
+  // Audit entity (راجع lib/audit.ts) — createdBy/updatedBy = إيميل
+  createdBy?: string;
   createdAt?: unknown;
-  createdBy?: string; // uid اللي أنشأ الحساب
+  updatedBy?: string;
+  updatedAt?: unknown;
 }
 
 // أنواع الأحداث المسجلة في اللوجز — append-only
