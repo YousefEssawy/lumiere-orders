@@ -201,6 +201,7 @@
     "originalPriceHint": "بيظهر مشطوب على المتجر لو متحدد",
     "quantity": "الكمية",
     "active": "نشط",
+    "inactive": "متعطل",
     "searchPh": "ابحث بالكود أو الاسم…",
     "filterCategory": "كل الفئات",
     "total": "المنتجات:",
