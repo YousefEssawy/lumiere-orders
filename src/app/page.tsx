@@ -8,6 +8,7 @@ import { logAction } from "@/lib/logger";
 import { applyStock, diffConsumption, parseItemsConsumption } from "@/lib/stock";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
+import { useConfirm } from "@/components/ConfirmProvider";
 import PageHero from "@/components/ui/PageHero";
 import OrderForm from "@/components/orders/OrderForm";
 import SllrImport from "@/components/orders/SllrImport";
@@ -22,6 +23,7 @@ function OrdersPage() {
   const { orders, addOrder, importOrders, updateOrder, deleteOrder, archiveAll } = useOrders(true);
   const { products } = useProducts(true);
   const flash = useToast();
+  const confirm = useConfirm();
   const [editOrder, setEditOrder] = useState<Order | null>(null);
   const [viewOrder, setViewOrder] = useState<Order | null>(null);
   const actor = { uid: profile.uid, email: profile.email };
@@ -91,7 +93,7 @@ function OrdersPage() {
 
   async function handleMove() {
     if (!orders.length) return;
-    if (!window.confirm(t("confirmClear"))) return;
+    if (!(await confirm({ title: t("moveBtn"), message: t("confirmClear"), danger: false }))) return;
     try {
       await archiveAll(orders, profile.uid);
       flash(t("toast.cleared"));

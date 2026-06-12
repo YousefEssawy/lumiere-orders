@@ -7,6 +7,7 @@ import { logAction } from "@/lib/logger";
 import type { UserProfile } from "@/lib/types";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
+import { useConfirm } from "@/components/ConfirmProvider";
 import PageHero from "@/components/ui/PageHero";
 import CreateUserModal from "@/components/users/CreateUserModal";
 import EditUserModal from "@/components/users/EditUserModal";
@@ -17,13 +18,14 @@ function UsersPage() {
   const { profile } = useSession();
   const users = useUsers(true);
   const flash = useToast();
+  const confirm = useConfirm();
   const [showCreate, setShowCreate] = useState(false);
   const [editUser, setEditUser] = useState<UserProfile | null>(null);
   const actor = { uid: profile.uid, email: profile.email };
 
   async function toggleActive(u: UserProfile) {
     const activating = !u.active;
-    if (!activating && !window.confirm(t("confirmDeactivate", { email: u.email }))) return;
+    if (!activating && !(await confirm({ title: t("deactivate"), message: t("confirmDeactivate", { email: u.email }) }))) return;
     try {
       await setUserActive(u.uid, activating, profile.uid);
       flash(t("toast.updated"));
