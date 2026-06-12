@@ -7,6 +7,8 @@ import { auth } from "@/lib/firebase";
 import { AppRoutes } from "@/lib/appRoutes";
 import type { UserProfile } from "@/lib/types";
 import LanguageToggle from "@/components/LanguageToggle";
+// static import — بيضمن basePath صحيح على GitHub Pages
+import logo from "@/assets/logo.jpg";
 
 interface TopNavBarProps {
   profile: UserProfile;
@@ -38,7 +40,7 @@ export default function TopNavBar({ profile, onToggleMenu, menuOpen }: TopNavBar
 
           <Link href={AppRoutes.orders} className="flex items-center gap-2.5 shrink-0">
             <Image
-              src="/assets/logo.jpg"
+              src={logo}
               alt={t("brand.name")}
               width={32}
               height={32}
