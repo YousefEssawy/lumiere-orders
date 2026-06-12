@@ -89,7 +89,7 @@ function ShipmentsPage() {
   async function handleStatus(o: ArchivedOrder, status: OrderStatus) {
     if (!o.id || statusOf(o) === status) return;
     try {
-      await setStatus(o.id, status, profile.email);
+      await setStatus(o.id, status, profile.uid);
       flash(t("toast.statusChanged", { status: t(`statuses.${status}`) }));
       logAction(actor, "history.status", `${o.name}: ${status}`);
     } catch {
@@ -237,7 +237,11 @@ function ShipmentsPage() {
                       {String(o.items || "").split("\n").map((line, i) => <div key={i}>{line}</div>)}
                     </td>
                     <td>{o.cod}</td>
-                    <td dir="ltr" className="text-ink-500 text-xs">{o.archivedBy || EMPTY_DISPLAY}</td>
+                    <td dir="ltr" className="text-ink-500 text-xs">
+                      <span className="block max-w-[120px] truncate" title={o.archivedBy}>
+                        {o.archivedBy || EMPTY_DISPLAY}
+                      </span>
+                    </td>
                     <td>
                       <button
                         className="btn-danger-soft text-[13px]"

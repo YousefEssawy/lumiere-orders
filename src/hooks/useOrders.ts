@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import {
-  collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc,
+  collection, query, orderBy, onSnapshot, deleteDoc, doc, setDoc,
   updateDoc, writeBatch,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -29,32 +29,34 @@ export function useOrders(enabled: boolean) {
       q,
       (snap) => {
         const arr: Order[] = [];
-        snap.forEach((d) => arr.push({ id: d.id, ...(d.data() as Omit<Order, "id">) }));
+        snap.forEach((d) => arr.push({ ...(d.data() as Order), id: d.id }));
         setOrders(arr);
       },
       () => { /* تجاهل أخطاء الاشتراك */ }
     );
   }, [enabled]);
 
-  const addOrder = useCallback(async (data: OrderData, byEmail: string) => {
+  const addOrder = useCallback(async (data: OrderData, byUid: string) => {
     if (!db) return;
-    await addDoc(collection(db, COL), { ...data, ...creationAudit(byEmail) });
+    // الـ id بيتخزن جوه الـ document نفسه كمان
+    const ref = doc(collection(db, COL));
+    await setDoc(ref, { ...data, id: ref.id, ...creationAudit(byUid) });
   }, []);
 
-  const importOrders = useCallback(async (list: OrderData[], byEmail: string) => {
+  const importOrders = useCallback(async (list: OrderData[], byUid: string) => {
     if (!db || !list.length) return;
     const database = db;
     const batch = writeBatch(database);
     list.forEach((data) => {
       const ref = doc(collection(database, COL));
-      batch.set(ref, { ...data, ...creationAudit(byEmail) });
+      batch.set(ref, { ...data, id: ref.id, ...creationAudit(byUid) });
     });
     await batch.commit();
   }, []);
 
-  const updateOrder = useCallback(async (id: string, data: OrderData, byEmail: string) => {
+  const updateOrder = useCallback(async (id: string, data: OrderData, byUid: string) => {
     if (!db) return;
-    await updateDoc(doc(db, COL, id), { ...data, ...updateAudit(byEmail) });
+    await updateDoc(doc(db, COL, id), { ...data, ...updateAudit(byUid) });
   }, []);
 
   const deleteOrder = useCallback(async (id: string) => {
@@ -66,7 +68,7 @@ export function useOrders(enabled: boolean) {
    * «نقل للشحنات»: بينقل كل الأوردرات لـ ordersArchive بحالة افتراضية
    * «تحت التجهيز»، مع الاحتفاظ بالـ audit الأصلي + بيانات الأرشفة.
    */
-  const archiveAll = useCallback(async (current: Order[], byEmail: string) => {
+  const archiveAll = useCallback(async (current: Order[], byUid: string) => {
     if (!db || !current.length) return;
     const database = db;
     for (let i = 0; i < current.length; i += ARCHIVE_CHUNK) {
@@ -75,10 +77,12 @@ export function useOrders(enabled: boolean) {
       chunk.forEach((o) => {
         if (!o.id) return;
         const { id, ...data } = o;
-        batch.set(doc(collection(database, ARCHIVE_COL)), {
+        const archiveRef = doc(collection(database, ARCHIVE_COL));
+        batch.set(archiveRef, {
           ...data,
+          id: archiveRef.id,
           status: DEFAULT_ORDER_STATUS,
-          ...archiveAudit(byEmail),
+          ...archiveAudit(byUid),
         });
         batch.delete(doc(database, COL, id));
       });

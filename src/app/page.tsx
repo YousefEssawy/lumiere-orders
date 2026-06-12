@@ -23,7 +23,7 @@ function OrdersPage() {
 
   async function handleAdd(o: OrderFormState) {
     try {
-      await addOrder(o, profile.email);
+      await addOrder(o, profile.uid);
       flash(t("toast.added"));
       logAction(actor, "order.add", o.name);
     } catch {
@@ -34,7 +34,7 @@ function OrdersPage() {
   async function handleImport(list: OrderFormState[]) {
     if (!list.length) { flash(t("toast.fileEmpty")); return; }
     try {
-      await importOrders(list, profile.email);
+      await importOrders(list, profile.uid);
       flash(t("toast.imported", { n: list.length }));
       logAction(actor, "orders.import", "", list.length);
     } catch {
@@ -45,7 +45,7 @@ function OrdersPage() {
   async function handleEditSave(changes: OrderFormState) {
     if (!editOrder?.id) return;
     try {
-      await updateOrder(editOrder.id, changes, profile.email);
+      await updateOrder(editOrder.id, changes, profile.uid);
       flash(t("toast.updated"));
       logAction(actor, "order.update", changes.name);
     } catch {
@@ -69,7 +69,7 @@ function OrdersPage() {
     if (!orders.length) return;
     if (!window.confirm(t("confirmClear"))) return;
     try {
-      await archiveAll(orders, profile.email);
+      await archiveAll(orders, profile.uid);
       flash(t("toast.cleared"));
       logAction(actor, "orders.clear", "", orders.length);
     } catch {

@@ -7,12 +7,12 @@ import { updateUserProfile } from "@/lib/adminUsers";
 
 interface EditUserModalProps {
   user: UserProfile;
-  byEmail: string;
+  byUid: string;
   onSaved: () => void;
   onClose: () => void;
 }
 
-export default function EditUserModal({ user, byEmail, onSaved, onClose }: EditUserModalProps) {
+export default function EditUserModal({ user, byUid, onSaved, onClose }: EditUserModalProps) {
   const t = useTranslations("users");
   const tCommon = useTranslations("common");
   const [name, setName] = useState(user.name);
@@ -25,7 +25,7 @@ export default function EditUserModal({ user, byEmail, onSaved, onClose }: EditU
     setErr("");
     setBusy(true);
     try {
-      await updateUserProfile(user.uid, { name, role }, byEmail);
+      await updateUserProfile(user.uid, { name, role }, byUid);
       onSaved();
     } catch {
       setErr(t("toast.updateErr"));
