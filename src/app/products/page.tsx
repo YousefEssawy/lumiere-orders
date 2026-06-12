@@ -8,6 +8,7 @@ import { logAction } from "@/lib/logger";
 import { EMPTY_DISPLAY } from "@/lib/appGlobals";
 import type { Product } from "@/lib/types";
 import type { ProductsParseResult } from "@/lib/productsImport";
+import { exportProductsSheet } from "@/lib/productsExport";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
 import PageHero from "@/components/ui/PageHero";
@@ -130,6 +131,15 @@ function ProductsPage() {
     }
   }
 
+  /** ذكي: المحدد لو فيه تحديد، وإلا كل المعروض حسب الفلتر */
+  function handleExport() {
+    const targets = selectedInView.length ? selectedInView : filtered;
+    if (!targets.length) return;
+    exportProductsSheet(targets);
+    flash(t("toast.exported", { n: targets.length }));
+    logAction(actor, "products.export", "", targets.length);
+  }
+
   async function handleImport(result: ProductsParseResult) {
     // الفئات الجديدة من الشيت بتتعمل تلقائياً
     const known = new Set(categories.map((c) => c.name.toLowerCase()));
@@ -164,6 +174,12 @@ function ProductsPage() {
               <span className="icon text-base" aria-hidden>upload_file</span>
               {t("importBtn")}
             </button>
+            {products.length > 0 && (
+              <button className="btn-ghost" onClick={handleExport}>
+                <span className="icon text-base" aria-hidden>download</span>
+                {t("exportBtn")}{selectedInView.length ? ` (${selectedInView.length})` : ""}
+              </button>
+            )}
             <button className="btn-primary" onClick={() => setShowCreate(true)}>
               <span className="icon text-base" aria-hidden>add_box</span>
               {t("create")}

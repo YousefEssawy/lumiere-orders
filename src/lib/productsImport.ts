@@ -53,8 +53,11 @@ export function parseProductsSheet(arrayBuffer: ArrayBuffer): ProductsParseResul
         code,
         name,
         nameAr: val(row, "اسم المنتج بالعربي") || undefined,
+        description: val(row, "Description") || undefined,
+        descriptionAr: val(row, "وصف المنتج بالعربي") || undefined,
         category,
         imageUrl: val(row, "Image URL") || undefined,
+        optionName: val(row, "Option 1") || "Size",
         active: activeRaw === "" || activeRaw === "1" || activeRaw === "true",
         variants: [],
       };
@@ -83,9 +86,11 @@ export function parseProductsSheet(arrayBuffer: ArrayBuffer): ProductsParseResul
 }
 
 function rowVariant(row: Record<string, unknown>, size: string): ProductVariant {
+  const originalPrice = num(row, "Original price", 0);
   return {
     size,
     price: num(row, "Price", 0),
+    ...(originalPrice ? { originalPrice } : {}),
     quantity: num(row, "Quantity", 0),
   };
 }

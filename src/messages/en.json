@@ -155,11 +155,14 @@
     "empty": "No shipments yet — use “Move to Shipments” on the Preparation page",
     "clearAll": "Delete entire history",
     "confirmDelete": "Permanently delete the order of “{name}” from history?",
+    "deleteSelected": "Delete selected ({n})",
+    "confirmDeleteSelected": "Permanently delete {n} selected shipments? This cannot be undone.",
     "confirmClear": "Permanently delete ALL {n} archived orders? This cannot be undone.",
     "loadError": "Could not load the history. Make sure the latest firestore.rules file is published in Firebase Console → Firestore → Rules.",
     "toast": {
       "deleted": "Deleted from history",
       "deleteErr": "Failed to delete",
+      "bulkDeleted": "{n} shipments deleted",
       "cleared": "History cleared",
       "clearErr": "Failed to clear history",
       "statusChanged": "Status changed to “{status}” ✓",
@@ -176,10 +179,14 @@
     "createTitle": "Add product",
     "editTitle": "Edit product",
     "importBtn": "Import sheet",
+    "exportBtn": "Export sheet",
     "code": "Code",
     "codeLocked": "The code cannot be changed (it is the product id)",
     "name": "Name (EN)",
     "nameAr": "Name (AR)",
+    "description": "Description (EN)",
+    "descriptionAr": "Description (AR)",
+    "descriptionPh": "HTML allowed — used on the Sllr store",
     "category": "Category",
     "categoryPick": "— Pick —",
     "imageUrl": "Image URL",
@@ -190,6 +197,8 @@
     "variantsRequired": "Add at least one size",
     "size": "Size",
     "price": "Price",
+    "originalPrice": "Original price",
+    "originalPriceHint": "Shown crossed-out on the store when set",
     "quantity": "Quantity",
     "active": "Active",
     "searchPh": "Search by code or name…",
@@ -207,6 +216,7 @@
       "updated": "Product updated ✓",
       "deleted": "Product deleted",
       "bulkDeleted": "{n} products deleted",
+      "exported": "Exported {n} products to the sheet ✓",
       "saveErr": "Failed to save the product"
     },
     "import": {
@@ -371,7 +381,8 @@
         "delete": "Deleted product"
       },
       "products": {
-        "import": "Imported products sheet"
+        "import": "Imported products sheet",
+        "export": "Exported products sheet"
       },
       "category": {
         "create": "Added category",
