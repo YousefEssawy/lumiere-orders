@@ -83,7 +83,7 @@ function OrdersPage() {
   return (
     <>
       <PageHero icon="package_2" title={t("title")} subtitle={t("subtitle")} />
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2 fade-up fade-up-delay-1">
         <OrderForm onAdd={handleAdd} />
         <SllrImport onImport={handleImport} />
       </div>

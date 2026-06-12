@@ -48,6 +48,21 @@
     font-family: var(--font-cairo), var(--font-league), ui-sans-serif;
     letter-spacing: 0;
   }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up { animation: none; }
+  }
 }
 
 @layer components {
@@ -176,6 +191,21 @@
   .nav-section {
     @apply px-4 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.16em]
       text-ink-300 select-none rtl:normal-case rtl:tracking-normal;
+  }
+
+  /* ---------- دخول ناعم للصفحات (staggered) ---------- */
+  .fade-up {
+    animation: fade-up 0.45s var(--ease-out) both;
+  }
+  .fade-up-delay-1 { animation-delay: 70ms; }
+  .fade-up-delay-2 { animation-delay: 140ms; }
+  .fade-up-delay-3 { animation-delay: 210ms; }
+
+  /* أيقونة الصفحة جوه بلاطة باستيل هولوجرافيك خفيفة */
+  .icon-tile {
+    @apply inline-flex items-center justify-center w-11 h-11 rounded-md shrink-0;
+    background: var(--grad-hero);
+    box-shadow: var(--shadow-xs), var(--shadow-inset-hairline);
   }
 
   /* ---------- Icons (Material Symbols) ---------- */

@@ -12,6 +12,7 @@ import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useAppLocale } from "@/components/IntlProvider";
 import { useToast } from "@/components/ToastProvider";
 import PageHero from "@/components/ui/PageHero";
+import EmptyState from "@/components/ui/EmptyState";
 
 const ALL = "all";
 
@@ -171,12 +172,9 @@ function ShipmentsPage() {
         </select>
       </div>
 
-      <div className="table-wrap">
+      <div className="table-wrap fade-up fade-up-delay-2">
         {filtered.length === 0 ? (
-          <div className="text-center py-12 px-5 text-ink-500">
-            <span className="icon !text-[40px] text-ink-300" aria-hidden>local_shipping</span>
-            <div className="mt-2 text-sm">{t("empty")}</div>
-          </div>
+          <EmptyState icon="local_shipping" text={t("empty")} />
         ) : (
           <table className="data-table min-w-[1080px]">
             <thead>

@@ -1,26 +1,103 @@
 "use client";
 import { useTranslations } from "next-intl";
+import { ORDER_STATUSES, type OrderStatus } from "@/lib/types";
 import AppShell from "@/components/layout/AppShell";
 import PageHero from "@/components/ui/PageHero";
+
+const FLOW_STEPS = ["s1", "s2", "s3", "s4", "s5"] as const;
+const FLOW_ICONS: Record<(typeof FLOW_STEPS)[number], string> = {
+  s1: "inbox",
+  s2: "edit_note",
+  s3: "local_shipping",
+  s4: "download",
+  s5: "flag_circle",
+};
+
+// نفس ألوان الحالات في صفحة الشحنات — الليجند بيطابق الواقع
+const STATUS_CLASS: Record<OrderStatus, string> = {
+  preparing: "bg-pastel-butter text-ink-700",
+  shipped: "bg-pastel-sky text-ink-700",
+  delivered: "bg-pastel-mint text-ink-700",
+  returned: "bg-pastel-peach text-ink-700",
+  cancelled: "bg-soft text-ink-500",
+};
+
+function FlowTimeline() {
+  const t = useTranslations("help.flow");
+  return (
+    <div className="card fade-up fade-up-delay-1">
+      <h2 className="text-base font-bold flex items-center gap-2 mb-5">
+        <span className="icon text-accent" aria-hidden>conveyor_belt</span>
+        {t("title")}
+      </h2>
+      <ol className="relative">
+        {FLOW_STEPS.map((step, i) => (
+          <li key={step} className="relative flex gap-4 pb-7 last:pb-0">
+            {/* الخط الواصل — بيتقطع عند آخر خطوة */}
+            {i < FLOW_STEPS.length - 1 && (
+              <span
+                className="absolute start-[19px] top-10 bottom-0 w-px"
+                style={{ background: "var(--grad-hero)" }}
+                aria-hidden
+              />
+            )}
+            <span className="relative z-10 inline-flex items-center justify-center w-10 h-10 rounded-full bg-ink-900 text-white shrink-0 shadow-sm">
+              <span className="icon !text-[20px]" aria-hidden>{FLOW_ICONS[step]}</span>
+            </span>
+            <div className="pt-0.5 min-w-0">
+              <div className="text-sm font-bold text-ink-900">
+                <span className="text-ink-300 me-1.5">{i + 1}.</span>
+                {t(`steps.${step}.title`)}
+              </div>
+              <p className="text-[13px] text-ink-500 mt-1 leading-relaxed">
+                {t(`steps.${step}.body`)}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function StatusLegend() {
+  const t = useTranslations("help.statuses");
+  const tStatuses = useTranslations("history.statuses");
+  return (
+    <div className="card fade-up fade-up-delay-2">
+      <h2 className="text-base font-bold flex items-center gap-2 mb-4">
+        <span className="icon text-accent" aria-hidden>label</span>
+        {t("title")}
+      </h2>
+      <ul className="space-y-3.5">
+        {ORDER_STATUSES.map((s) => (
+          <li key={s} className="flex items-start gap-3">
+            <span className={"pill shrink-0 mt-0.5 " + STATUS_CLASS[s]}>{tStatuses(s)}</span>
+            <span className="text-[13px] text-ink-500 leading-relaxed">{t(s)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 interface HelpSectionProps {
   icon: string;
   title: string;
   items: string[];
-  numbered?: boolean;
+  delayClass?: string;
 }
 
-function HelpSection({ icon, title, items, numbered = false }: HelpSectionProps) {
-  const List = numbered ? "ol" : "ul";
+function HelpSection({ icon, title, items, delayClass = "" }: HelpSectionProps) {
   return (
-    <div className="card">
+    <div className={`card fade-up ${delayClass}`}>
       <h2 className="text-base font-bold flex items-center gap-2 mb-3">
         <span className="icon text-accent" aria-hidden>{icon}</span>
         {title}
       </h2>
-      <List className={"text-sm text-ink-700 space-y-2 ps-5 " + (numbered ? "list-decimal" : "list-disc")}>
+      <ul className="text-[13px] text-ink-500 leading-relaxed space-y-2.5 list-disc ps-5 marker:text-ink-300">
         {items.map((item, i) => <li key={i}>{item}</li>)}
-      </List>
+      </ul>
     </div>
   );
 }
@@ -31,31 +108,36 @@ function HelpPage() {
   return (
     <>
       <PageHero icon="help" title={t("title")} subtitle={t("subtitle")} />
-      <div className="grid gap-5 lg:grid-cols-2">
-        <HelpSection
-          icon="conveyor_belt"
-          title={t("flow.title")}
-          numbered
-          items={[t("flow.s1"), t("flow.s2"), t("flow.s3"), t("flow.s4"), t("flow.s5"), t("flow.s6")]}
-        />
-        <HelpSection
-          icon="rule"
-          title={t("rules.title")}
-          items={[t("rules.r1"), t("rules.r2"), t("rules.r3"), t("rules.r4"), t("rules.r5"), t("rules.r6")]}
-        />
+      <div className="grid gap-5 lg:grid-cols-2 items-start">
+        <FlowTimeline />
+        <div className="grid gap-5">
+          <StatusLegend />
+          <HelpSection
+            icon="rule"
+            title={t("rules.title")}
+            delayClass="fade-up-delay-3"
+            items={[t("rules.r1"), t("rules.r2"), t("rules.r3"), t("rules.r4"), t("rules.r5"), t("rules.r6")]}
+          />
+        </div>
         <HelpSection
           icon="admin_panel_settings"
           title={t("rolesSection.title")}
+          delayClass="fade-up-delay-2"
           items={[t("rolesSection.admin"), t("rolesSection.staff")]}
         />
         <HelpSection
           icon="group"
           title={t("usersSection.title")}
-          items={[t("usersSection.u1"), t("usersSection.u2"), t("usersSection.u3"), t("usersSection.u4")]}
+          delayClass="fade-up-delay-3"
+          items={[
+            t("usersSection.u1"), t("usersSection.u2"), t("usersSection.u3"),
+            t("usersSection.u4"), t("usersSection.u5"),
+          ]}
         />
         <HelpSection
           icon="language"
           title={t("langSection.title")}
+          delayClass="fade-up-delay-3"
           items={[t("langSection.l1")]}
         />
       </div>
