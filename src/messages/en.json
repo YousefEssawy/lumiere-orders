@@ -405,7 +405,7 @@
       "steps": {
         "s1": {
           "title": "Collect the orders",
-          "body": "On the Preparation page: drop the Sllr export file in the import box (everything converts automatically), and add WhatsApp / Instagram orders with the manual form."
+          "body": "On the Preparation page: drop the Sllr export file in the import box (everything converts automatically), and add WhatsApp / Instagram orders with the manual form — pick items from the catalog so the line format and COD fill themselves."
         },
         "s2": {
           "title": "Review & edit",
@@ -441,6 +441,14 @@
       "r4": "Governorates are converted to Wassalha names (e.g. Sohag → SOUHAGE).",
       "r5": "COD equals the order amount for Cash on Delivery, otherwise 0.",
       "r6": "Merchant_Name = Lumiere, Warehouse_Name = Home."
+    },
+    "catalogSection": {
+      "title": "Catalog & stock",
+      "c1": "The Products page holds the perfume catalog: every product has sizes, each with its own price and stock quantity.",
+      "c2": "Import / export the products sheet in the exact Sllr (v22) format — the export is ready to upload to the store, and exports only the selected products when a selection exists.",
+      "c3": "When entering an order, pick product → size → quantity from the catalog: the line is written in the final Wassalha format and the price is added to the COD automatically.",
+      "c4": "Stock is deducted automatically when orders are added or imported (Sllr lines are matched by the product code, Arabic names included), restored if an order is deleted before moving, and out-of-stock shows in red.",
+      "c5": "Categories group the products and the picker dropdown is grouped by them."
     },
     "rolesSection": {
       "title": "Roles & permissions",
