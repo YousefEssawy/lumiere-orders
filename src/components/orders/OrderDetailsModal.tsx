@@ -22,18 +22,27 @@ interface OrderDetailsModalProps {
   onClose: () => void;
 }
 
-function Field({ label, children, full = false }: { label: string; children: ReactNode; full?: boolean }) {
+/** نقطة في تايملاين بيانات السجل */
+function AuditNode({
+  icon, label, who, when, last = false,
+}: { icon: string; label: string; who: string; when: string; last?: boolean }) {
+  if (who === EMPTY_DISPLAY && when === EMPTY_DISPLAY) return null;
   return (
-    <div className={full ? "sm:col-span-2" : ""}>
-      <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-300 rtl:normal-case rtl:tracking-normal">
-        {label}
-      </div>
-      <div className="text-sm text-ink-900 mt-0.5 break-words">{children}</div>
-    </div>
+    <li className="relative flex gap-3 pb-4 last:pb-0">
+      {!last && <span className="absolute start-[11px] top-7 bottom-0 w-px bg-ink-100" aria-hidden />}
+      <span className="relative z-10 inline-flex items-center justify-center w-6 h-6 rounded-full bg-canvas border border-line shrink-0">
+        <span className="icon !text-[13px] text-ink-500" aria-hidden>{icon}</span>
+      </span>
+      <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs text-ink-500 min-w-0 pt-1">
+        <span>{label}</span>
+        <b className="text-ink-700">{who}</b>
+        <span className="text-ink-300" dir="ltr">{when}</span>
+      </span>
+    </li>
   );
 }
 
-/** عرض كامل لتفاصيل الأوردر — للقراءة بس */
+/** عرض كامل لتفاصيل الأوردر — شكل بوليصة شحن */
 export default function OrderDetailsModal({ order: o, onClose }: OrderDetailsModalProps) {
   const t = useTranslations("orders");
   const tHistory = useTranslations("history");
@@ -42,6 +51,7 @@ export default function OrderDetailsModal({ order: o, onClose }: OrderDetailsMod
   const resolveUser = useUserDirectory();
 
   const status = o.status ?? (o.archivedAt ? DEFAULT_ORDER_STATUS : undefined);
+  const items = String(o.items || "").split("\n").filter(Boolean);
 
   return createPortal(
     <div
@@ -50,62 +60,120 @@ export default function OrderDetailsModal({ order: o, onClose }: OrderDetailsMod
       className="fixed inset-0 z-[200] bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="card w-full max-w-lg shadow-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <h2 className="text-base font-bold flex items-center gap-2">
-            <span className="icon text-accent" aria-hidden>receipt_long</span>
-            {tDetails("title")}
-          </h2>
-          <button
-            type="button"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-ink-500 hover:bg-soft transition-colors"
-            onClick={onClose}
-            aria-label={tCommon("close")}
-          >
-            <span className="icon" aria-hidden>close</span>
-          </button>
-        </div>
+      <div className="card !p-0 overflow-hidden w-full max-w-lg shadow-lg max-h-[90vh] overflow-y-auto fade-up">
+        {/* شريط الهوية الهولوجرافيك */}
+        <div className="h-1.5 w-full" style={{ background: "var(--grad-hero)" }} aria-hidden />
 
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span className={"pill " + SRC_PILL_CLASS[o.source]}>{t(`sources.${o.source}`)}</span>
-          {status && ORDER_STATUSES.includes(status) && (
-            <span className={"pill " + STATUS_CLASS[status]}>{tHistory(`statuses.${status}`)}</span>
-          )}
-        </div>
-
-        <div className="grid sm:grid-cols-2 gap-x-5 gap-y-3.5">
-          <Field label={t("name")}>{o.name || EMPTY_DISPLAY}</Field>
-          <Field label={t("phone")}><span dir="ltr">{o.phone || EMPTY_DISPLAY}</span></Field>
-          <Field label={t("address")} full>{o.address || EMPTY_DISPLAY}</Field>
-          <Field label={t("city")}>{o.city || EMPTY_DISPLAY}</Field>
-          <Field label={t("cod")}>{o.cod || 0}</Field>
-          <Field label={t("items")} full>
-            {String(o.items || "").split("\n").filter(Boolean).map((line, i) => (
-              <div key={i}>{line}</div>
-            ))}
-          </Field>
-          <Field label={t("vol")}>{o.vol || EMPTY_DISPLAY}</Field>
-          <Field label={t("ref")}><span dir="ltr">{o.ref || EMPTY_DISPLAY}</span></Field>
-          {o.notes ? <Field label={t("notes")} full>{o.notes}</Field> : null}
-        </div>
-
-        {/* بيانات السجل (audit) */}
-        <div className="mt-5 pt-4 border-t border-line">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-300 rtl:normal-case rtl:tracking-normal mb-2.5">
-            {tDetails("audit")}
+        {/* الهيدر: العميل هو البطل */}
+        <div className="px-6 pt-5 pb-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-300 rtl:normal-case rtl:tracking-normal">
+                {tDetails("title")}
+              </div>
+              <h2 className="font-display font-bold text-2xl text-ink-900 mt-1 truncate">
+                {o.name || EMPTY_DISPLAY}
+              </h2>
+              <div className="text-sm text-ink-500 mt-0.5" dir="ltr">{o.phone || EMPTY_DISPLAY}</div>
+            </div>
+            <button
+              type="button"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-ink-500 hover:bg-soft transition-colors shrink-0"
+              onClick={onClose}
+              aria-label={tCommon("close")}
+            >
+              <span className="icon" aria-hidden>close</span>
+            </button>
           </div>
-          <div className="grid sm:grid-cols-2 gap-x-5 gap-y-2 text-xs text-ink-500">
-            <div>{tDetails("createdBy")}: <b className="text-ink-700">{resolveUser(o.createdBy) || EMPTY_DISPLAY}</b></div>
-            <div dir="ltr">{formatDateTime(o.createdAt)}</div>
-            <div>{tDetails("updatedBy")}: <b className="text-ink-700">{resolveUser(o.updatedBy) || EMPTY_DISPLAY}</b></div>
-            <div dir="ltr">{formatDateTime(o.updatedAt)}</div>
-            {o.archivedAt ? (
-              <>
-                <div>{tDetails("archivedBy")}: <b className="text-ink-700">{resolveUser(o.archivedBy) || EMPTY_DISPLAY}</b></div>
-                <div dir="ltr">{formatDateTime(o.archivedAt)}</div>
-              </>
-            ) : null}
+          <div className="flex flex-wrap items-center gap-2 mt-3">
+            <span className={"pill " + SRC_PILL_CLASS[o.source]}>{t(`sources.${o.source}`)}</span>
+            {status && ORDER_STATUSES.includes(status) && (
+              <span className={"pill " + STATUS_CLASS[status]}>{tHistory(`statuses.${status}`)}</span>
+            )}
           </div>
+        </div>
+
+        <div className="px-6 pb-5 space-y-4">
+          {/* العنوان */}
+          <div className="flex items-start gap-2.5">
+            <span className="icon !text-[18px] text-ink-300 mt-0.5 shrink-0" aria-hidden>location_on</span>
+            <div className="min-w-0">
+              <div className="text-sm text-ink-700 leading-relaxed break-words">
+                {o.address || EMPTY_DISPLAY}
+              </div>
+              <span className="pill bg-soft text-ink-500 mt-1.5 inline-block" dir="ltr">
+                {o.city || EMPTY_DISPLAY}
+              </span>
+            </div>
+          </div>
+
+          {/* المنتجات — بلوك إيصال */}
+          <div className="bg-soft rounded-md px-4 py-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-400 rtl:normal-case rtl:tracking-normal">
+                {t("items")}
+              </span>
+              <span className="text-[11px] text-ink-400">{items.length}</span>
+            </div>
+            <ul>
+              {items.length ? items.map((line, i) => (
+                <li key={i} className="py-1.5 text-sm text-ink-900 border-b border-dashed border-ink-100 last:border-0">
+                  {line}
+                </li>
+              )) : <li className="py-1.5 text-sm text-ink-300">{EMPTY_DISPLAY}</li>}
+            </ul>
+          </div>
+
+          {/* الإجمالي — COD بارز زي إجمالي الإيصال */}
+          <div className="flex items-end justify-between border-t border-dashed border-line pt-3.5">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-400 rtl:normal-case rtl:tracking-normal pb-1.5">
+              {t("cod")}
+            </span>
+            <span className="font-display font-extrabold text-3xl text-ink-900 leading-none" dir="ltr">
+              {o.cod || 0}
+            </span>
+          </div>
+
+          {/* ميتا صغيرة */}
+          <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-xs text-ink-500">
+            <span>{t("vol")}: <b className="text-ink-700">{o.vol || EMPTY_DISPLAY}</b></span>
+            <span>{t("ref")}: <b className="text-ink-700" dir="ltr">{o.ref || EMPTY_DISPLAY}</b></span>
+          </div>
+
+          {/* ملاحظات الشحن لو موجودة */}
+          {o.notes ? (
+            <div className="flex items-start gap-2 bg-pastel-butter rounded-sm px-3.5 py-2.5 text-[13px] text-ink-700 leading-relaxed">
+              <span className="icon !text-[16px] text-ink-500 mt-0.5 shrink-0" aria-hidden>sticky_note_2</span>
+              <span className="break-words min-w-0">{o.notes}</span>
+            </div>
+          ) : null}
+        </div>
+
+        {/* بيانات السجل — تايملاين هادي */}
+        <div className="px-6 py-4 bg-soft border-t border-dashed border-line">
+          <ul>
+            <AuditNode
+              icon="add_circle"
+              label={tDetails("createdBy")}
+              who={resolveUser(o.createdBy) || EMPTY_DISPLAY}
+              when={formatDateTime(o.createdAt)}
+              last={!o.updatedAt && !o.archivedAt}
+            />
+            <AuditNode
+              icon="edit"
+              label={tDetails("updatedBy")}
+              who={resolveUser(o.updatedBy) || EMPTY_DISPLAY}
+              when={formatDateTime(o.updatedAt)}
+              last={!o.archivedAt}
+            />
+            <AuditNode
+              icon="local_shipping"
+              label={tDetails("archivedBy")}
+              who={resolveUser(o.archivedBy) || EMPTY_DISPLAY}
+              when={formatDateTime(o.archivedAt)}
+              last
+            />
+          </ul>
         </div>
       </div>
     </div>,
