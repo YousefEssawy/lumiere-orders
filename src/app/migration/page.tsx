@@ -54,7 +54,7 @@ function MigrationPage() {
     <>
       <PageHero icon="build" title={t("title")} subtitle={t("subtitle")} />
 
-      <div className="card fade-up fade-up-delay-1 max-w-2xl">
+      <div className="card fade-up fade-up-delay-1">
         <p className="text-[13px] text-ink-500 leading-relaxed">{t("explain1")}</p>
         <ul className="text-[13px] text-ink-500 leading-relaxed list-disc ps-5 mt-2 space-y-1.5 marker:text-ink-300">
           <li>{t("fix1")}</li>
@@ -84,7 +84,7 @@ function MigrationPage() {
       </div>
 
       {result && (
-        <div className="table-wrap fade-up mt-5 max-w-2xl">
+        <div className="table-wrap fade-up mt-5">
           <table className="data-table">
             <thead>
               <tr>
