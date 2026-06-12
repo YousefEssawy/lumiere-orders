@@ -5,9 +5,13 @@ import {
   writeBatch, serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { FIRESTORE_COLLECTIONS } from "@/lib/types";
 import type { Order } from "@/lib/wassalha";
 
-const COL = "orders";
+const COL = FIRESTORE_COLLECTIONS.orders;
+const ARCHIVE_COL = FIRESTORE_COLLECTIONS.ordersArchive;
+// كل أوردر = عمليتين في الأرشفة (إنشاء + حذف)، وحد الـ batch هو 500
+const ARCHIVE_CHUNK = 200;
 
 export function useOrders(enabled: boolean) {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -50,13 +54,29 @@ export function useOrders(enabled: boolean) {
     await deleteDoc(doc(db, COL, id));
   }, []);
 
-  const clearAll = useCallback(async (current: Order[]) => {
+  /**
+   * «مسح الكل» = أرشفة: بينقل كل الأوردرات لهيستوري ordersArchive
+   * بدل الحذف النهائي، مع تسجيل مين أرشف وإمتى.
+   */
+  const archiveAll = useCallback(async (current: Order[], archivedBy: string) => {
     if (!db || !current.length) return;
     const database = db;
-    const batch = writeBatch(database);
-    current.forEach((o) => { if (o.id) batch.delete(doc(database, COL, o.id)); });
-    await batch.commit();
+    for (let i = 0; i < current.length; i += ARCHIVE_CHUNK) {
+      const chunk = current.slice(i, i + ARCHIVE_CHUNK);
+      const batch = writeBatch(database);
+      chunk.forEach((o) => {
+        if (!o.id) return;
+        const { id, ...data } = o;
+        batch.set(doc(collection(database, ARCHIVE_COL)), {
+          ...data,
+          archivedAt: serverTimestamp(),
+          archivedBy,
+        });
+        batch.delete(doc(database, COL, id));
+      });
+      await batch.commit();
+    }
   }, []);
 
-  return { orders, addOrder, importOrders, deleteOrder, clearAll };
+  return { orders, addOrder, importOrders, deleteOrder, archiveAll };
 }
