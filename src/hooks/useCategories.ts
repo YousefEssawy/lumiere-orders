@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import {
-  collection, deleteDoc, doc, onSnapshot, orderBy, query, setDoc, updateDoc,
+  collection, deleteDoc, doc, onSnapshot, orderBy, query, setDoc, updateDoc, writeBatch,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { FIRESTORE_COLLECTIONS, type Category } from "@/lib/types";
@@ -53,5 +53,13 @@ export function useCategories(enabled: boolean) {
     await deleteDoc(doc(db, COL, id));
   }, []);
 
-  return { categories, error, addCategory, updateCategory, deleteCategory };
+  /** حذف جماعي */
+  const deleteCategories = useCallback(async (ids: string[]) => {
+    if (!db || !ids.length) return;
+    const batch = writeBatch(db);
+    ids.forEach((id) => batch.delete(doc(db!, COL, id)));
+    await batch.commit();
+  }, []);
+
+  return { categories, error, addCategory, updateCategory, deleteCategory, deleteCategories };
 }
