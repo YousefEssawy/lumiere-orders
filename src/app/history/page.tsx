@@ -9,6 +9,7 @@ import {
   DEFAULT_ORDER_STATUS, ORDER_STATUSES, type OrderStatus,
 } from "@/lib/types";
 import { exportWassalha, type OrderSource } from "@/lib/wassalha";
+import { STATUS_CLASS } from "@/lib/statusStyles";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
 import PageHero from "@/components/ui/PageHero";
@@ -24,15 +25,6 @@ const SRC_PILL_CLASS: Record<OrderSource, string> = {
   WhatsApp: "bg-pastel-mint text-ink-700",
   Instagram: "bg-pastel-pink text-ink-700",
   Other: "bg-soft text-ink-500",
-};
-
-// لون لكل حالة — من باستيلات الهوية
-const STATUS_CLASS: Record<OrderStatus, string> = {
-  preparing: "bg-pastel-butter text-ink-700",
-  shipped: "bg-pastel-sky text-ink-700",
-  delivered: "bg-pastel-mint text-ink-700",
-  returned: "bg-pastel-peach text-ink-700",
-  cancelled: "bg-soft text-ink-500",
 };
 
 function statusOf(o: ArchivedOrder): OrderStatus {
