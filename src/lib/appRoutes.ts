@@ -6,6 +6,7 @@ export const AppRoutes = {
   categories: "/categories/",
   users: "/users/",
   logs: "/logs/",
+  settings: "/settings/",
   migration: "/migration/",
   help: "/help/",
 } as const;
