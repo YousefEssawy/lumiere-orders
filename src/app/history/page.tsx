@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useArchive, type ArchivedOrder } from "@/hooks/useArchive";
 import { useUserDirectory } from "@/hooks/useUserDirectory";
+import { useWhatsappSettings } from "@/hooks/useWhatsappSettings";
+import { fillTemplate, templateFor, waLink } from "@/lib/whatsapp";
 import { logAction } from "@/lib/logger";
 import { EMPTY_DISPLAY, formatDateTime } from "@/lib/appGlobals";
 import {
@@ -33,6 +35,7 @@ function ShipmentsPage() {
   const { profile } = useSession();
   const { archived, error, deleteArchived, clearArchive, setStatus, updateArchived } = useArchive(true);
   const resolveUser = useUserDirectory();
+  const { templates } = useWhatsappSettings(true);
   const flash = useToast();
   const confirm = useConfirm();
   const [statusFilter, setStatusFilter] = useState<string>(ALL);
@@ -123,6 +126,20 @@ function ShipmentsPage() {
     } catch {
       flash(t("toast.clearErr"));
     }
+  }
+
+  /** يفتح واتساب برقم العميل ورسالة جاهزة حسب حالة الأوردر */
+  function handleWhatsapp(o: ArchivedOrder) {
+    const msg = fillTemplate(templateFor(statusOf(o), templates), o);
+    const link = waLink(o, msg);
+    if (!link) { flash(t("toast.waUnavailable")); return; }
+    window.open(link, "_blank", "noopener,noreferrer");
+    logAction(actor, "whatsapp.send", `${o.name}: ${t(`statuses.${statusOf(o)}`)}`);
+  }
+
+  /** فيه قالب رسالة لحالة الأوردر دي؟ */
+  function hasWhatsapp(o: ArchivedOrder): boolean {
+    return !!waLink(o, fillTemplate(templateFor(statusOf(o), templates), o));
   }
 
   /** حذف نهائي للمحدد بس */
@@ -240,6 +257,16 @@ function ShipmentsPage() {
                         >
                           <span className="icon text-base" aria-hidden>visibility</span>
                         </button>
+                        {hasWhatsapp(o) && (
+                          <button
+                            className="btn-ghost text-[13px] px-2.5 py-1.5 !text-success"
+                            onClick={() => handleWhatsapp(o)}
+                            aria-label={t("whatsapp")}
+                            title={t("whatsapp")}
+                          >
+                            <span className="icon text-base" aria-hidden>chat</span>
+                          </button>
+                        )}
                         <button
                           className="btn-ghost text-[13px] px-2.5 py-1.5"
                           onClick={() => setEditOrder(o)}

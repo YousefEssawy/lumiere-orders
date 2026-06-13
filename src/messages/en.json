@@ -32,6 +32,7 @@
     "categories": "Categories",
     "users": "Users",
     "logs": "Activity Log",
+    "settings": "Settings",
     "migration": "Data Upgrade",
     "help": "Help",
     "logout": "Sign out",
@@ -138,6 +139,7 @@
     "subtitle": "Orders moved from Preparation — export the Wassalha file, track statuses, and keep the history",
     "selected": "{n} selected",
     "export": "Export Wassalha",
+    "whatsapp": "Send WhatsApp message",
     "exportEmpty": "No orders to export",
     "confirmExportBadCity": "{n} orders have an invalid governorate (they will export empty). Continue?",
     "total": "Archived orders:",
@@ -169,7 +171,8 @@
       "statusErr": "Failed to change status",
       "exported": "Exported {n} orders to Wassalha ✓",
       "updated": "Shipment updated ✓",
-      "updateErr": "Failed to update the shipment"
+      "updateErr": "Failed to update the shipment",
+      "waUnavailable": "No WhatsApp message for this status, or the phone is invalid"
     }
   },
   "products": {
@@ -269,6 +272,21 @@
     "createdBy": "Created by",
     "updatedBy": "Last updated by",
     "archivedBy": "Moved to Shipments by"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customer WhatsApp message templates per order status",
+    "waTitle": "WhatsApp templates",
+    "waHint": "Each status has its own message. On the Shipments page, a WhatsApp button opens the chat with the customer and this message pre-filled — you send it yourself. Leave a template empty to hide the button for that status.",
+    "placeholders": "Placeholders",
+    "reset": "Default",
+    "preview": "Preview",
+    "emptyMeansNoButton": "Leave empty = no WhatsApp button for this status",
+    "noMessage": "No message — the WhatsApp button is hidden for this status.",
+    "toast": {
+      "saved": "Templates saved ✓",
+      "saveErr": "Failed to save"
+    }
   },
   "migration": {
     "title": "Data Upgrade",
@@ -391,6 +409,12 @@
         "create": "Added category",
         "update": "Updated category",
         "delete": "Deleted category"
+      },
+      "whatsapp": {
+        "send": "Opened WhatsApp message"
+      },
+      "settings": {
+        "update": "Updated settings"
       },
       "system": {
         "migrate": "Ran the data upgrade"
