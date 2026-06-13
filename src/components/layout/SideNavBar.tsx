@@ -5,14 +5,14 @@ import { useTranslations } from "next-intl";
 import { AppRoutes, type AppRoute } from "@/lib/appRoutes";
 
 interface NavItem {
-  labelKey: "orders" | "history" | "products" | "categories" | "users" | "logs" | "settings" | "migration" | "help";
+  labelKey: "orders" | "history" | "products" | "categories" | "expenses" | "expenseCategories" | "users" | "logs" | "settings" | "migration" | "help";
   icon: string;
   href: AppRoute;
   adminOnly: boolean;
 }
 
 interface NavSection {
-  sectionKey: "operations" | "catalog" | "administration" | "support";
+  sectionKey: "operations" | "catalog" | "finance" | "administration" | "support";
   items: NavItem[];
 }
 
@@ -30,6 +30,13 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { labelKey: "products", icon: "inventory_2", href: AppRoutes.products, adminOnly: false },
       { labelKey: "categories", icon: "category", href: AppRoutes.categories, adminOnly: false },
+    ],
+  },
+  {
+    sectionKey: "finance",
+    items: [
+      { labelKey: "expenses", icon: "payments", href: AppRoutes.expenses, adminOnly: true },
+      { labelKey: "expenseCategories", icon: "sell", href: AppRoutes.expenseCategories, adminOnly: true },
     ],
   },
   {
