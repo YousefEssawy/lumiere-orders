@@ -10,11 +10,11 @@ import type { OrderStatus, WhatsappTemplates } from "@/lib/types";
  */
 export const DEFAULT_WHATSAPP_TEMPLATES: Record<OrderStatus, string> = {
   preparing:
-    "أهلاً {name} 🌿\nطلبك من Lumière بيتجهز دلوقتي:\n{items}\nقيمة التحصيل: {cod} جنيه.\nهنبعتلك تحديث أول ما يتشحن. شكراً لاختيارك لوميير 💛",
+    "أهلاً {name}\nطلبك من Lumière بيتجهز دلوقتي:\n{items}\nقيمة التحصيل: {cod} جنيه.\nهنبعتلك تحديث أول ما يتشحن. شكراً لاختيارك لوميير.",
   shipped:
-    "أهلاً {name} 🚚\nطلبك من Lumière اتشحن وفي الطريق إليك:\n{items}\nالمندوب هيتواصل معاك قريب، والمطلوب عند الاستلام: {cod} جنيه.",
+    "أهلاً {name}\nطلبك من Lumière اتشحن وفي الطريق إليك:\n{items}\nالمندوب هيتواصل معاك قريب، والمطلوب عند الاستلام: {cod} جنيه.",
   delivered:
-    "أهلاً {name} 💛\nيا رب يكون طلبك من Lumière وصلك بالسلامة وعجبك:\n{items}\nلو حابب أي ترشيح أو استفسار إحنا في خدمتك.",
+    "أهلاً {name}\nيا رب يكون طلبك من Lumière وصلك بالسلامة وعجبك:\n{items}\nلو حابب أي ترشيح أو استفسار إحنا في خدمتك.",
   returned: "",
   cancelled: "",
 };
