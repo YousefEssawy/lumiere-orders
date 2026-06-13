@@ -109,6 +109,7 @@ function SettingsPage() {
                 value={value}
                 onChange={(e) => set(status, e.target.value)}
                 placeholder={t("emptyMeansNoButton")}
+                dir="auto"
               />
               {/* معاينة حية */}
               <div className="mt-2.5">
@@ -116,7 +117,7 @@ function SettingsPage() {
                   {t("preview")}
                 </div>
                 {value.trim() ? (
-                  <div className="bg-pastel-mint rounded-md px-3.5 py-2.5 text-[13px] text-ink-700 whitespace-pre-line leading-relaxed">
+                  <div dir="auto" className="bg-pastel-mint rounded-md px-3.5 py-2.5 text-[13px] text-ink-700 whitespace-pre-line leading-relaxed">
                     {preview}
                   </div>
                 ) : (
