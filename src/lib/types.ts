@@ -56,6 +56,13 @@ export const LOG_ACTIONS = [
   "category.create",
   "category.update",
   "category.delete",
+  "expense.create",
+  "expense.update",
+  "expense.delete",
+  "expenses.export",
+  "expenseCategory.create",
+  "expenseCategory.update",
+  "expenseCategory.delete",
   "whatsapp.send",
   "settings.update",
   "system.migrate",
@@ -82,7 +89,42 @@ export const FIRESTORE_COLLECTIONS = {
   products: "products",
   categories: "categories",
   settings: "settings",
+  expenses: "expenses",
+  expenseCategories: "expenseCategories",
 } as const;
+
+// ============ المصروفات ============
+
+/** طرق الدفع للمصروف */
+export const PAYMENT_METHODS = ["cash", "instapay", "bank", "card", "other"] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+
+/** فئة مصروف (مواد خام، تغليف، تسويق...) — قابلة للإضافة والتعديل */
+export interface ExpenseCategory {
+  id?: string;
+  name: string;
+  active: boolean;
+  createdBy?: string;
+  createdAt?: unknown;
+  updatedBy?: string;
+  updatedAt?: unknown;
+}
+
+/** مصروف واحد — date = تاريخ الصرف الفعلي (yyyy-MM-dd) مستقل عن createdAt */
+export interface Expense {
+  id?: string;
+  description: string;
+  category: string;
+  amount: number;
+  date: string; // yyyy-MM-dd
+  vendor?: string;
+  paymentMethod?: PaymentMethod;
+  notes?: string;
+  createdBy?: string;
+  createdAt?: unknown;
+  updatedBy?: string;
+  updatedAt?: unknown;
+}
 
 /** doc id الثابت لإعدادات قوالب الواتساب داخل settings */
 export const WHATSAPP_SETTINGS_DOC = "whatsapp";
