@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useCategories } from "@/hooks/useCategories";
 import { useProducts } from "@/hooks/useProducts";
+import { useRowSelection } from "@/hooks/useRowSelection";
 import { logAction } from "@/lib/logger";
 import type { Category } from "@/lib/types";
 import AppShell, { useSession } from "@/components/layout/AppShell";
@@ -25,7 +26,6 @@ function CategoriesPage() {
 
   const [showCreate, setShowCreate] = useState(false);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const countByCategory = useMemo(() => {
     const map: Record<string, number> = {};
@@ -35,21 +35,14 @@ function CategoriesPage() {
     return map;
   }, [products]);
 
-  const selectedCategories = categories.filter((c) => c.id && selected.has(c.id));
-  const allSelected = categories.length > 0 && selectedCategories.length === categories.length;
-
-  function toggleOne(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-
-  function toggleAll() {
-    setSelected(allSelected ? new Set() : new Set(categories.map((c) => c.id!).filter(Boolean)));
-  }
+  const {
+    selected,
+    selectedItems: selectedCategories,
+    allSelected,
+    toggleOne,
+    toggleAll,
+    clear: clearSelection,
+  } = useRowSelection(categories, (c) => c.id);
 
   /** حذف جماعي — الفئات المستخدمة بتتعدى ويتبلغ عنها */
   async function bulkDelete(targets: Category[]) {
@@ -64,7 +57,7 @@ function CategoriesPage() {
       await deleteCategories(deletable.map((c) => c.id!));
       flash(skipped > 0 ? t("toast.bulkDeletedSkipped", { n: deletable.length, s: skipped }) : t("toast.bulkDeleted", { n: deletable.length }));
       logAction(actor, "category.delete", "", deletable.length);
-      setSelected(new Set());
+      clearSelection();
     } catch {
       flash(t("toast.saveErr"));
     }

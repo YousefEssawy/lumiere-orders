@@ -37,6 +37,10 @@ export default function ImportProductsModal({ onImport, onClose }: ImportProduct
         setParsed(null);
       }
     };
+    reader.onerror = () => {
+      setErr(t("parseErr"));
+      setParsed(null);
+    };
     reader.readAsArrayBuffer(file);
   }
 

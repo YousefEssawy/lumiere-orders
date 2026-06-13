@@ -17,7 +17,7 @@ export default function AuditTimeline({ nodes }: { nodes: AuditNodeData[] }) {
   return (
     <ul>
       {visible.map((n, i) => (
-        <li key={i} className="relative flex gap-3 pb-4 last:pb-0">
+        <li key={`${n.label}-${n.who}-${n.when}`} className="relative flex gap-3 pb-4 last:pb-0">
           {i < visible.length - 1 && (
             <span className="absolute start-[11px] top-7 bottom-0 w-px bg-ink-100" aria-hidden />
           )}

@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useExpenseCategories } from "@/hooks/useExpenseCategories";
 import { useExpenses } from "@/hooks/useExpenses";
+import { useRowSelection } from "@/hooks/useRowSelection";
 import { logAction } from "@/lib/logger";
 import type { ExpenseCategory } from "@/lib/types";
 import AppShell, { useSession } from "@/components/layout/AppShell";
@@ -25,7 +26,6 @@ function ExpenseCategoriesPage() {
 
   const [showCreate, setShowCreate] = useState(false);
   const [editCategory, setEditCategory] = useState<ExpenseCategory | null>(null);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const countByCategory = useMemo(() => {
     const map: Record<string, number> = {};
@@ -33,21 +33,14 @@ function ExpenseCategoriesPage() {
     return map;
   }, [expenses]);
 
-  const selectedCategories = categories.filter((c) => c.id && selected.has(c.id));
-  const allSelected = categories.length > 0 && selectedCategories.length === categories.length;
-
-  function toggleOne(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-
-  function toggleAll() {
-    setSelected(allSelected ? new Set() : new Set(categories.map((c) => c.id!).filter(Boolean)));
-  }
+  const {
+    selected,
+    selectedItems: selectedCategories,
+    allSelected,
+    toggleOne,
+    toggleAll,
+    clear: clearSelection,
+  } = useRowSelection(categories, (c) => c.id);
 
   async function bulkDelete(targets: ExpenseCategory[]) {
     const deletable = targets.filter((c) => (countByCategory[c.name] ?? 0) === 0 && c.id);
@@ -61,7 +54,7 @@ function ExpenseCategoriesPage() {
       await deleteCategories(deletable.map((c) => c.id!));
       flash(skipped > 0 ? t("toast.bulkDeletedSkipped", { n: deletable.length, s: skipped }) : t("toast.bulkDeleted", { n: deletable.length }));
       logAction(actor, "expenseCategory.delete", "", deletable.length);
-      setSelected(new Set());
+      clearSelection();
     } catch {
       flash(t("toast.saveErr"));
     }

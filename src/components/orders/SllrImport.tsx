@@ -23,6 +23,7 @@ export default function SllrImport({ onImport }: { onImport: (list: Omit<Order, 
         setMsg({ ok: false });
       }
     };
+    reader.onerror = () => setMsg({ ok: false });
     reader.readAsArrayBuffer(file);
   }
 

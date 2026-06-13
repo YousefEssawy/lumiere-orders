@@ -57,7 +57,8 @@ export function templateFor(
 
 /** رابط wa.me كامل بالرسالة الجاهزة — أو null لو مفيش رقم/رسالة */
 export function waLink(order: Order, message: string): string | null {
+  // موبايل مصري دولي = 12 رقم (20 + 10) — أقل من كده رقم ناقص فمفيش لينك
   const phone = intlPhone(order.phone);
-  if (phone.length < 11 || !message.trim()) return null;
+  if (phone.length < 12 || !message.trim()) return null;
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }

@@ -28,13 +28,21 @@ function OrdersPage() {
   const [viewOrder, setViewOrder] = useState<Order | null>(null);
   const actor = { uid: profile.uid, email: profile.email };
 
+  // حركة الستوك best-effort (مابتوقفش عملية الأوردر)، بس لو فشل تحديث أي منتج
+  // بننبّه المستخدم إن الستوك ممكن يكون مش مظبوط بدل ما يتداري في الكونسول.
+  function warnIfStockFailed(stockResult: Promise<string[]>) {
+    void stockResult.then((failed) => {
+      if (failed.length) flash(t("toast.stockWarn", { n: failed.length }));
+    });
+  }
+
   async function handleAdd(o: OrderFormState) {
     try {
       await addOrder(o, profile.uid);
       flash(t("toast.added"));
       logAction(actor, "order.add", o.name);
       // خصم الستوك للسطور المطابقة للكتالوج
-      applyStock(parseItemsConsumption(o.items, products), -1, profile.uid);
+      warnIfStockFailed(applyStock(parseItemsConsumption(o.items, products), -1, profile.uid));
     } catch {
       flash(t("toast.addErr"));
     }
@@ -49,7 +57,7 @@ function OrdersPage() {
       const all = list.map((o) => o.items).join("\n");
       const consumption = parseItemsConsumption(all, products);
       const totalQty = consumption.reduce((s, l) => s + l.qty, 0);
-      applyStock(consumption, -1, profile.uid);
+      warnIfStockFailed(applyStock(consumption, -1, profile.uid));
       // رسالة واحدة بتوضح الاستيراد + حركة الستوك
       flash(
         t("toast.imported", { n: list.length }) +
@@ -71,7 +79,7 @@ function OrdersPage() {
         parseItemsConsumption(editOrder.items, products),
         parseItemsConsumption(changes.items, products)
       );
-      applyStock(delta, -1, profile.uid);
+      warnIfStockFailed(applyStock(delta, -1, profile.uid));
     } catch {
       flash(t("toast.updateErr"));
     }
@@ -85,13 +93,13 @@ function OrdersPage() {
       flash(t("toast.deleted"));
       logAction(actor, "order.delete", o.name);
       // إرجاع الستوك — الأوردر اتلغى قبل الشحن
-      applyStock(parseItemsConsumption(o.items, products), 1, profile.uid);
+      warnIfStockFailed(applyStock(parseItemsConsumption(o.items, products), 1, profile.uid));
     } catch {
       flash(t("toast.deleteErr"));
     }
   }
 
-  async function handleMove() {
+  async function handleArchiveAll() {
     if (!orders.length) return;
     if (!(await confirm({ title: t("moveBtn"), message: t("confirmClear"), danger: false }))) return;
     try {
@@ -103,8 +111,8 @@ function OrdersPage() {
     }
   }
 
-  const c = { Sllr: 0, WhatsApp: 0, Instagram: 0, Other: 0 } as Record<string, number>;
-  orders.forEach((o) => { c[o.source] = (c[o.source] || 0) + 1; });
+  const countBySource = { Sllr: 0, WhatsApp: 0, Instagram: 0, Other: 0 } as Record<string, number>;
+  orders.forEach((o) => { countBySource[o.source] = (countBySource[o.source] || 0) + 1; });
 
   return (
     <>
@@ -117,10 +125,10 @@ function OrdersPage() {
         <div className="text-sm text-ink-500">
           {t("total")} <b className="text-ink-900 text-lg">{orders.length}</b>{" "}
           {orders.length ? (
-            <span>{t("bySource", { sllr: c.Sllr, wa: c.WhatsApp, ig: c.Instagram })}</span>
+            <span>{t("bySource", { sllr: countBySource.Sllr, wa: countBySource.WhatsApp, ig: countBySource.Instagram })}</span>
           ) : null}
         </div>
-        <button className="btn-primary w-full sm:w-auto" onClick={handleMove} disabled={!orders.length}>
+        <button className="btn-primary w-full sm:w-auto" onClick={handleArchiveAll} disabled={!orders.length}>
           <span className="icon text-base" aria-hidden>local_shipping</span>
           {t("moveBtn")}
         </button>
