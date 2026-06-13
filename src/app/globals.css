@@ -63,6 +63,34 @@
   @media (prefers-reduced-motion: reduce) {
     .fade-up { animation: none; }
   }
+
+  /* ---------- سكرول بار بهوية النظام (كل العناصر: الصفحة، الديالوجز، الجداول) ---------- */
+  * {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink-200) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--bg-beige);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-300);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
 
 @layer components {
