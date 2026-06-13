@@ -8,6 +8,7 @@ import { FIRESTORE_COLLECTIONS, type Category } from "@/lib/types";
 import { creationAudit, updateAudit } from "@/lib/audit";
 
 const COL = FIRESTORE_COLLECTIONS.categories;
+const DELETE_CHUNK = 450;
 
 export function useCategories(enabled: boolean) {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -53,12 +54,16 @@ export function useCategories(enabled: boolean) {
     await deleteDoc(doc(db, COL, id));
   }, []);
 
-  /** حذف جماعي */
+  /** حذف جماعي — مقسّم على دفعات لحد الـ 500 op في الـ batch الواحد */
   const deleteCategories = useCallback(async (ids: string[]) => {
     if (!db || !ids.length) return;
-    const batch = writeBatch(db);
-    ids.forEach((id) => batch.delete(doc(db!, COL, id)));
-    await batch.commit();
+    const database = db;
+    for (let i = 0; i < ids.length; i += DELETE_CHUNK) {
+      const chunk = ids.slice(i, i + DELETE_CHUNK);
+      const batch = writeBatch(database);
+      chunk.forEach((id) => batch.delete(doc(database, COL, id)));
+      await batch.commit();
+    }
   }, []);
 
   return { categories, error, addCategory, updateCategory, deleteCategory, deleteCategories };

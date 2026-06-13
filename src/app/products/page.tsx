@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useProducts, productDocId, type ProductInput } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
+import { useRowSelection } from "@/hooks/useRowSelection";
 import { logAction } from "@/lib/logger";
 import { EMPTY_DISPLAY } from "@/lib/appGlobals";
 import type { Product } from "@/lib/types";
@@ -37,7 +38,6 @@ function ProductsPage() {
   const [viewProduct, setViewProduct] = useState<Product | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showImport, setShowImport] = useState(false);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -87,26 +87,14 @@ function ProductsPage() {
     }
   }
 
-  const selectedInView = filtered.filter((p) => p.id && selected.has(p.id));
-  const allInViewSelected = filtered.length > 0 && selectedInView.length === filtered.length;
-
-  function toggleOne(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-
-  function toggleAllInView() {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (allInViewSelected) filtered.forEach((p) => p.id && next.delete(p.id));
-      else filtered.forEach((p) => p.id && next.add(p.id));
-      return next;
-    });
-  }
+  const {
+    selected,
+    selectedItems: selectedInView,
+    allSelected: allInViewSelected,
+    toggleOne,
+    toggleAll: toggleAllInView,
+    clear: clearSelection,
+  } = useRowSelection(filtered, (p) => p.id);
 
   async function handleDeleteSelected() {
     const ids = selectedInView.map((p) => p.id!) ;
@@ -116,7 +104,7 @@ function ProductsPage() {
       await deleteProducts(ids);
       flash(t("toast.bulkDeleted", { n: ids.length }));
       logAction(actor, "product.delete", "", ids.length);
-      setSelected(new Set());
+      clearSelection();
     } catch {
       flash(t("toast.saveErr"));
     }
@@ -129,7 +117,7 @@ function ProductsPage() {
       await deleteProducts(products.map((p) => p.id!).filter(Boolean));
       flash(t("toast.bulkDeleted", { n: products.length }));
       logAction(actor, "product.delete", "", products.length);
-      setSelected(new Set());
+      clearSelection();
     } catch {
       flash(t("toast.saveErr"));
     }

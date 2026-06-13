@@ -42,7 +42,12 @@ export default function ConfirmProvider({ children }: { children: ReactNode }) {
 
   const confirm = useCallback<ConfirmFn>((opts) => {
     return new Promise<boolean>((resolve) => {
-      setPending({ ...opts, resolve });
+      // لو فيه طلب مفتوح بالفعل، نقفله كإلغاء قبل ما نستبدله عشان الـ await
+      // بتاعه مايعلّقش للأبد.
+      setPending((prev) => {
+        prev?.resolve(false);
+        return { ...opts, resolve };
+      });
     });
   }, []);
 

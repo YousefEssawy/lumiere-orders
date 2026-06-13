@@ -1,5 +1,6 @@
 // منطق التحويل بين أوردرات سلر وملف وصلها + القواعد الثابتة
 import * as XLSX from "xlsx";
+import { fileDateStamp } from "@/lib/appGlobals";
 
 export type OrderSource = "Sllr" | "WhatsApp" | "Instagram" | "Other";
 
@@ -59,11 +60,15 @@ const CITY_MAP: Record<string, string> = {
   "south sinai":"SOUTH SINAI","جنوب سيناء":"SOUTH SINAI",
 };
 
+// مفاتيح المدن مرتبة من الأطول للأقصر — عشان الـ substring match يفضّل
+// الأكثر تحديداً ومايقعش في false positive من مفتاح قصير (alex/suez/qena).
+const CITY_KEYS_BY_LENGTH = Object.keys(CITY_MAP).sort((a, b) => b.length - a.length);
+
 export function mapCity(raw: unknown): string {
   if (!raw) return "";
   const k = String(raw).trim().toLowerCase();
   if (CITY_MAP[k]) return CITY_MAP[k];
-  for (const key in CITY_MAP) {
+  for (const key of CITY_KEYS_BY_LENGTH) {
     if (k.includes(key)) return CITY_MAP[key];
   }
   const up = String(raw).trim().toUpperCase();

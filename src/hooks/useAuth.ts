@@ -51,7 +51,10 @@ export function useAuth(): AuthState {
             role: "admin",
             active: true,
             ...creationAudit(user.uid),
-          }).catch(() => setProfile(null));
+          }).catch((err) => {
+            console.error("[lumiere] bootstrap profile write failed:", err);
+            setProfile(null);
+          });
         }
       },
       () => setProfile(null)

@@ -16,6 +16,7 @@ export function getStoredLocale(): Locale {
 }
 
 export function setStoredLocale(locale: Locale): void {
+  if (typeof window === "undefined") return;
   window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
 }
 

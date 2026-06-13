@@ -4,6 +4,7 @@
 // صف المنتج وتحته صف لكل حجم.
 import * as XLSX from "xlsx";
 import type { Product } from "@/lib/types";
+import { fileDateStamp } from "@/lib/appGlobals";
 
 // الهيدرز الحرفية من الشيت الأصلي — متتغيرش
 const HEADERS = [
@@ -71,10 +72,5 @@ export function exportProductsSheet(products: Product[]): void {
   const ws = XLSX.utils.aoa_to_sheet([[...HEADERS], ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  XLSX.writeFile(
-    wb,
-    `Lumiere-Products-${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}.xlsx`
-  );
+  XLSX.writeFile(wb, `Lumiere-Products-${fileDateStamp()}.xlsx`);
 }
