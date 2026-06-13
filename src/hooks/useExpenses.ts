@@ -10,6 +10,9 @@ import { creationAudit, updateAudit } from "@/lib/audit";
 const COL = FIRESTORE_COLLECTIONS.expenses;
 const DELETE_CHUNK = 450;
 
+// الحقول الاختيارية: لو اتفضّت عند التعديل لازم تتشال من الـ document
+const OPTIONAL_EXPENSE_FIELDS = ["vendor", "paymentMethod", "notes"] as const;
+
 export type ExpenseInput = Omit<
   Expense, "id" | "createdAt" | "createdBy" | "updatedAt" | "updatedBy"
 >;
@@ -44,10 +47,9 @@ export function useExpenses(enabled: boolean) {
     async (input: ExpenseInput, byUid: string, id?: string) => {
       if (!db) return;
       if (id) {
-        // الحقول الاختيارية اللي اتفضّت لازم تتشال فعلاً من الـ document
-        // (updateDoc بيدمج بس، فالمحذوف بـ deleteField)
+        // updateDoc بيدمج بس — فالحقل الاختياري اللي اتفضّى لازم يتشال بـ deleteField
         const patch: Record<string, unknown> = { ...input, ...updateAudit(byUid) };
-        for (const k of ["vendor", "paymentMethod", "notes"] as const) {
+        for (const k of OPTIONAL_EXPENSE_FIELDS) {
           if (!(k in input)) patch[k] = deleteField();
         }
         await updateDoc(doc(db, COL, id), patch);
