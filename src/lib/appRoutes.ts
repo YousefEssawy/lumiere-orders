@@ -4,6 +4,8 @@ export const AppRoutes = {
   history: "/history/",
   products: "/products/",
   categories: "/categories/",
+  expenses: "/expenses/",
+  expenseCategories: "/expense-categories/",
   users: "/users/",
   logs: "/logs/",
   settings: "/settings/",

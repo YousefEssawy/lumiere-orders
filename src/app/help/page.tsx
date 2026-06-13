@@ -121,6 +121,12 @@ function HelpPage() {
           items={[t("rules.r1"), t("rules.r2"), t("rules.r3"), t("rules.r4"), t("rules.r5"), t("rules.r6")]}
         />
         <HelpSection
+          icon="payments"
+          title={t("expensesSection.title")}
+          delayClass="fade-up-delay-2"
+          items={[t("expensesSection.e1"), t("expensesSection.e2"), t("expensesSection.e3")]}
+        />
+        <HelpSection
           icon="admin_panel_settings"
           title={t("rolesSection.title")}
           delayClass="fade-up-delay-2"

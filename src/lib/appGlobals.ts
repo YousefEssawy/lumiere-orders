@@ -101,3 +101,13 @@ export function formatDateRange(from: DateInput, to: DateInput): string {
   if (t === EMPTY_DISPLAY || t === f) return f;
   return `${f} → ${t}`;
 }
+
+/**
+ * تجميع رقمي ثابت (فواصل آلاف) — locale مثبّت "en-US" فالنتيجة واحدة عبر
+ * كل الأجهزة. للأرقام/المبالغ فقط، مش للتواريخ.
+ */
+export function formatMoney(value: number | string | null | undefined): string {
+  const n = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(n)) return "0";
+  return n.toLocaleString("en-US");
+}

@@ -1,19 +1,19 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import type { Category } from "@/lib/types";
+import type { ExpenseCategory } from "@/lib/types";
 import Toggle from "@/components/ui/Toggle";
 import ModalShell from "@/components/ui/ModalShell";
 
-interface CategoryModalProps {
+interface ExpenseCategoryModalProps {
   /** null = إنشاء جديدة */
-  category: Category | null;
+  category: ExpenseCategory | null;
   onSave: (name: string, active: boolean) => Promise<void> | void;
   onClose: () => void;
 }
 
-export default function CategoryModal({ category, onSave, onClose }: CategoryModalProps) {
-  const t = useTranslations("categories");
+export default function ExpenseCategoryModal({ category, onSave, onClose }: ExpenseCategoryModalProps) {
+  const t = useTranslations("expenseCategories");
   const tCommon = useTranslations("common");
   const [name, setName] = useState(category?.name ?? "");
   const [active, setActive] = useState(category?.active ?? true);

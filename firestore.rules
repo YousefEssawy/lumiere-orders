@@ -71,6 +71,14 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // المصروفات وفئاتها — بيانات مالية حساسة: الأدمن بس (قراءة وكتابة)
+    match /expenses/{expenseId} {
+      allow read, write: if isAdmin();
+    }
+    match /expenseCategories/{categoryId} {
+      allow read, write: if isAdmin();
+    }
+
     // ============================================================
     // المستخدمين
     // - كل مستخدم يقرأ ملفه (عشان التطبيق يعرف دوره وحالته)

@@ -23,6 +23,7 @@
     "sections": {
       "operations": "Operations",
       "catalog": "Catalog",
+      "finance": "Finance",
       "administration": "Administration",
       "support": "Support"
     },
@@ -30,6 +31,8 @@
     "history": "Shipments",
     "products": "Products",
     "categories": "Categories",
+    "expenses": "Expenses",
+    "expenseCategories": "Expense Categories",
     "users": "Users",
     "logs": "Activity Log",
     "settings": "Settings",
@@ -273,6 +276,82 @@
     "updatedBy": "Last updated by",
     "archivedBy": "Moved to Shipments by"
   },
+  "expenses": {
+    "title": "Expenses",
+    "subtitle": "Track what the brand spends — materials, packaging, ads and more",
+    "create": "New expense",
+    "createTitle": "Add expense",
+    "editTitle": "Edit expense",
+    "exportBtn": "Export",
+    "description": "Description",
+    "descriptionPh": "e.g. Fragrance oil — Degla",
+    "category": "Category",
+    "categoryPick": "— Pick —",
+    "amount": "Amount",
+    "amountPh": "0",
+    "amountInvalid": "Enter a valid amount greater than zero",
+    "date": "Date",
+    "vendor": "Vendor",
+    "vendorPh": "e.g. Degla Oils",
+    "paymentMethod": "Payment method",
+    "paymentPick": "— Not set —",
+    "notes": "Notes",
+    "addedBy": "Added by",
+    "egp": "EGP",
+    "totalLabel": "Total (filtered)",
+    "count": "Expenses:",
+    "from": "From",
+    "to": "To",
+    "searchPh": "Search description or vendor…",
+    "filterCategory": "All categories",
+    "deleteSelected": "Delete selected ({n})",
+    "empty": "No expenses yet — add one or adjust the filters",
+    "confirmDelete": "Delete the expense “{name}”?",
+    "confirmDeleteSelected": "Permanently delete {n} selected expenses? This cannot be undone.",
+    "loadError": "Could not load expenses. Make sure the latest firestore.rules are published.",
+    "payment": {
+      "cash": "Cash",
+      "instapay": "InstaPay",
+      "bank": "Bank transfer",
+      "card": "Card",
+      "other": "Other"
+    },
+    "toast": {
+      "created": "Expense added ✓",
+      "updated": "Expense updated ✓",
+      "deleted": "Expense deleted",
+      "bulkDeleted": "{n} expenses deleted",
+      "exported": "Exported {n} expenses ✓",
+      "saveErr": "Failed to save"
+    }
+  },
+  "expenseCategories": {
+    "title": "Expense Categories",
+    "subtitle": "Spend buckets — materials, packaging, marketing, shipping…",
+    "create": "New category",
+    "createTitle": "Add category",
+    "editTitle": "Edit category",
+    "name": "Name",
+    "namePh": "e.g. Raw materials",
+    "expensesCount": "Expenses",
+    "active": "Active",
+    "deleteSelected": "Delete selected ({n})",
+    "deleteAll": "Delete all",
+    "confirmDelete": "Delete the category “{name}”?",
+    "confirmDeleteSelected": "Delete {n} categories? (Categories with expenses are skipped)",
+    "empty": "No categories yet",
+    "loadError": "Could not load categories. Make sure the latest firestore.rules are published.",
+    "toast": {
+      "created": "Category added ✓",
+      "updated": "Category updated ✓",
+      "deleted": "Category deleted",
+      "bulkDeleted": "{n} categories deleted",
+      "bulkDeletedSkipped": "{n} deleted · {s} skipped (in use)",
+      "allInUse": "Nothing to delete — all selected categories have expenses",
+      "saveErr": "Failed to save",
+      "hasExpenses": "Cannot delete — {n} expenses use this category"
+    }
+  },
   "settings": {
     "title": "Settings",
     "subtitle": "Customer WhatsApp message templates per order status",
@@ -410,6 +489,19 @@
         "update": "Updated category",
         "delete": "Deleted category"
       },
+      "expense": {
+        "create": "Added expense",
+        "update": "Updated expense",
+        "delete": "Deleted expense"
+      },
+      "expenses": {
+        "export": "Exported expenses"
+      },
+      "expenseCategory": {
+        "create": "Added expense category",
+        "update": "Updated expense category",
+        "delete": "Deleted expense category"
+      },
       "whatsapp": {
         "send": "Opened WhatsApp message"
       },
@@ -474,10 +566,16 @@
       "c4": "Stock is deducted automatically when orders are added or imported (Sllr lines are matched by the product code, Arabic names included), restored if an order is deleted before moving, and out-of-stock shows in red.",
       "c5": "Categories group the products and the picker dropdown is grouped by them."
     },
+    "expensesSection": {
+      "title": "Expenses & finance",
+      "e1": "Track every brand expense — raw materials, packaging, ads — with amount, date, category, vendor and payment method.",
+      "e2": "Filter by category or date range and see the total of what's shown; export the filtered (or selected) rows to Excel.",
+      "e3": "Expenses are admin-only; manage spend buckets from the Expense Categories page."
+    },
     "rolesSection": {
       "title": "Roles & permissions",
-      "admin": "Admin: everything — orders, user management, activity log.",
-      "staff": "Staff: orders only (add, import, export, delete)."
+      "admin": "Admin: everything — orders, catalog, expenses, user management, activity log.",
+      "staff": "Staff: orders and catalog only (no expenses, users, logs or settings)."
     },
     "usersSection": {
       "title": "Managing users",
