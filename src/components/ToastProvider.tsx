@@ -1,6 +1,6 @@
 "use client";
 import {
-  createContext, useCallback, useContext, useRef, useState, type ReactNode,
+  createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode,
 } from "react";
 
 const TOAST_MS = 2600;
@@ -21,6 +21,9 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setMsg(""), TOAST_MS);
   }, []);
+
+  // تنظيف التايمر المعلّق عند الـ unmount
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
 
   return (
     <Ctx.Provider value={flash}>

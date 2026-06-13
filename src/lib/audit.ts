@@ -3,13 +3,6 @@
 // كل حقول *By بتخزن uid المستخدم (المعرف الثابت — الإيميل موجود في users/logs).
 import { serverTimestamp } from "firebase/firestore";
 
-export interface AuditFields {
-  createdBy?: string; // uid المنشئ
-  createdAt?: unknown;
-  updatedBy?: string; // uid آخر معدّل
-  updatedAt?: unknown;
-}
-
 /** حقول الإنشاء — تتضاف مع أي document جديد */
 export function creationAudit(byUid: string) {
   return {

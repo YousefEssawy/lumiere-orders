@@ -26,12 +26,28 @@ export function useSession(): SessionCtx {
 // الموبايل بس بيفتكر آخر حالة — الديسكتوب بيفتح دايماً عند التحميل
 const SIDENAV_PREF_KEY = "lumiere.sidenav.open";
 const DESKTOP_QUERY = "(min-width: 768px)";
+const isDesktop = () => window.matchMedia(DESKTOP_QUERY).matches;
 
 function CenterNotice({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex items-center justify-center p-5 text-ink-500 text-sm">
       <div className="card max-w-md text-center">{children}</div>
     </div>
+  );
+}
+
+/** إشعار في النص + زرار خروج — لحالات "مفيش بروفايل" و"الحساب موقوف" */
+function NoticeWithLogout({ message }: { message: string }) {
+  const t = useTranslations();
+  return (
+    <CenterNotice>
+      {message}
+      <div className="mt-4">
+        <button className="btn-ghost text-xs" onClick={() => auth && signOut(auth)}>
+          {t("nav.logout")}
+        </button>
+      </div>
+    </CenterNotice>
   );
 }
 
@@ -51,7 +67,7 @@ export default function AppShell({ children, adminOnly = false }: AppShellProps)
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (window.matchMedia(DESKTOP_QUERY).matches) {
+    if (isDesktop()) {
       setMenuOpen(true);
     } else {
       setMenuOpen(window.localStorage.getItem(SIDENAV_PREF_KEY) === "1");
@@ -60,14 +76,14 @@ export default function AppShell({ children, adminOnly = false }: AppShellProps)
 
   // الموبايل بس بيحفظ الحالة
   useEffect(() => {
-    if (!window.matchMedia(DESKTOP_QUERY).matches) {
+    if (!isDesktop()) {
       window.localStorage.setItem(SIDENAV_PREF_KEY, menuOpen ? "1" : "0");
     }
   }, [menuOpen]);
 
   // قفل الدرج عند تغيير الصفحة — موبايل بس
   useEffect(() => {
-    if (!window.matchMedia(DESKTOP_QUERY).matches) setMenuOpen(false);
+    if (!isDesktop()) setMenuOpen(false);
   }, [pathname]);
 
   if (!isFirebaseConfigured) {
@@ -81,30 +97,8 @@ export default function AppShell({ children, adminOnly = false }: AppShellProps)
   if (user === undefined) return <CenterNotice>{t("common.loading")}</CenterNotice>;
   if (user === null) return <Login />;
   if (profile === undefined) return <CenterNotice>{t("common.loading")}</CenterNotice>;
-  if (profile === null) {
-    return (
-      <CenterNotice>
-        {t("auth.noProfile")}
-        <div className="mt-4">
-          <button className="btn-ghost text-xs" onClick={() => auth && signOut(auth)}>
-            {t("nav.logout")}
-          </button>
-        </div>
-      </CenterNotice>
-    );
-  }
-  if (!profile.active) {
-    return (
-      <CenterNotice>
-        {t("auth.inactive")}
-        <div className="mt-4">
-          <button className="btn-ghost text-xs" onClick={() => auth && signOut(auth)}>
-            {t("nav.logout")}
-          </button>
-        </div>
-      </CenterNotice>
-    );
-  }
+  if (profile === null) return <NoticeWithLogout message={t("auth.noProfile")} />;
+  if (!profile.active) return <NoticeWithLogout message={t("auth.inactive")} />;
   if (adminOnly && !isAdmin) {
     return <CenterNotice>{t("auth.forbidden")}</CenterNotice>;
   }

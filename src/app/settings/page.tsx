@@ -37,12 +37,12 @@ function SettingsPage() {
     setDraft(init);
   }, [templates]);
 
-  function set(status: OrderStatus, value: string) {
+  function setTemplate(status: OrderStatus, value: string) {
     setDraft((d) => ({ ...d, [status]: value }));
   }
 
   function resetToDefault(status: OrderStatus) {
-    set(status, DEFAULT_WHATSAPP_TEMPLATES[status]);
+    setTemplate(status, DEFAULT_WHATSAPP_TEMPLATES[status]);
   }
 
   async function save() {
@@ -107,7 +107,7 @@ function SettingsPage() {
               <textarea
                 className="form-input min-h-[110px] leading-relaxed"
                 value={value}
-                onChange={(e) => set(status, e.target.value)}
+                onChange={(e) => setTemplate(status, e.target.value)}
                 placeholder={t("emptyMeansNoButton")}
                 dir="auto"
               />

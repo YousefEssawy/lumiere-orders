@@ -10,14 +10,11 @@
  */
 import { Timestamp } from "firebase/firestore";
 
-export const DATE_ONLY_FORMAT = "yyyy-MM-dd";
-export const TIME_FORMAT = "h:mm a";
-export const DATE_TIME_FORMAT = "yyyy-MM-dd h:mm a";
-
 /** بديل القيم الفاضية/غير الصالحة — نفس شرطة الجداول. */
 export const EMPTY_DISPLAY = "—";
 
-export type DateInput = string | number | Date | Timestamp | unknown;
+// أي قيمة بتتفلتر runtime في extract() — fields سجلّات Firestore بتيجي unknown.
+export type DateInput = unknown;
 
 interface Parts {
   y: number;
@@ -72,34 +69,37 @@ function extract(value: DateInput): Parts | null {
 
 const pad2 = (n: number): string => String(n).padStart(2, "0");
 
-/** `yyyy-MM-dd`، أو `—` للفاضي/غير الصالح. */
-export function formatDate(value: DateInput): string {
-  const p = extract(value);
-  return p ? `${p.y}-${pad2(p.mo)}-${pad2(p.d)}` : EMPTY_DISPLAY;
+function dateFromParts(p: Parts): string {
+  return `${p.y}-${pad2(p.mo)}-${pad2(p.d)}`;
 }
 
-/** `h:mm AM/PM` (12 ساعة ثابت)، أو `—`. */
-export function formatTime(value: DateInput): string {
-  const p = extract(value);
-  if (!p) return EMPTY_DISPLAY;
+function timeFromParts(p: Parts): string {
   const isAm = p.h < 12;
   const h12 = p.h % 12 === 0 ? 12 : p.h % 12;
   return `${h12}:${pad2(p.mi)} ${isAm ? "AM" : "PM"}`;
 }
 
-/** `yyyy-MM-dd h:mm AM/PM`، أو `—`. */
-export function formatDateTime(value: DateInput): string {
+/** `yyyy-MM-dd`، أو `—` للفاضي/غير الصالح. */
+export function formatDate(value: DateInput): string {
   const p = extract(value);
-  return p ? `${formatDate(value)} ${formatTime(value)}` : EMPTY_DISPLAY;
+  return p ? dateFromParts(p) : EMPTY_DISPLAY;
 }
 
-/** نطاق تواريخ `2026-05-18 → 2026-05-22` — بينهار لقيمة واحدة لو متساويين. */
-export function formatDateRange(from: DateInput, to: DateInput): string {
-  const f = formatDate(from);
-  if (f === EMPTY_DISPLAY) return EMPTY_DISPLAY;
-  const t = formatDate(to);
-  if (t === EMPTY_DISPLAY || t === f) return f;
-  return `${f} → ${t}`;
+/** `h:mm AM/PM` (12 ساعة ثابت)، أو `—`. */
+export function formatTime(value: DateInput): string {
+  const p = extract(value);
+  return p ? timeFromParts(p) : EMPTY_DISPLAY;
+}
+
+/** `yyyy-MM-dd h:mm AM/PM`، أو `—`. بيستخرج مرة واحدة. */
+export function formatDateTime(value: DateInput): string {
+  const p = extract(value);
+  return p ? `${dateFromParts(p)} ${timeFromParts(p)}` : EMPTY_DISPLAY;
+}
+
+/** ختم تاريخ لأسماء ملفات التصدير: `dd-MM-yyyy` (افتراضياً النهارده). */
+export function fileDateStamp(d: Date = new Date()): string {
+  return `${pad2(d.getDate())}-${pad2(d.getMonth() + 1)}-${d.getFullYear()}`;
 }
 
 /**

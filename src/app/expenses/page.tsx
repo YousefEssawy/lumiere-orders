@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useExpenseCategories } from "@/hooks/useExpenseCategories";
+import { useRowSelection } from "@/hooks/useRowSelection";
 import { useUserDirectory } from "@/hooks/useUserDirectory";
 import { logAction } from "@/lib/logger";
 import { EMPTY_DISPLAY, formatDate, formatMoney } from "@/lib/appGlobals";
@@ -33,7 +34,6 @@ function ExpensesPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>(ALL);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [showCreate, setShowCreate] = useState(false);
   const [editExpense, setEditExpense] = useState<Expense | null>(null);
 
@@ -56,26 +56,14 @@ function ExpensesPage() {
 
   const total = useMemo(() => filtered.reduce((s, e) => s + (Number(e.amount) || 0), 0), [filtered]);
 
-  const selectedInView = filtered.filter((e) => e.id && selected.has(e.id));
-  const allInViewSelected = filtered.length > 0 && selectedInView.length === filtered.length;
-
-  function toggleOne(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-
-  function toggleAllInView() {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (allInViewSelected) filtered.forEach((e) => e.id && next.delete(e.id));
-      else filtered.forEach((e) => e.id && next.add(e.id));
-      return next;
-    });
-  }
+  const {
+    selected,
+    selectedItems: selectedInView,
+    allSelected: allInViewSelected,
+    toggleOne,
+    toggleAll: toggleAllInView,
+    clear: clearSelection,
+  } = useRowSelection(filtered, (e) => e.id);
 
   async function handleSave(input: ExpenseInput, id?: string) {
     await saveExpense(input, profile.uid, id);
@@ -105,7 +93,7 @@ function ExpensesPage() {
       await deleteExpenses(ids);
       flash(t("toast.bulkDeleted", { n: ids.length }));
       logAction(actor, "expense.delete", "", ids.length);
-      setSelected(new Set());
+      clearSelection();
     } catch {
       flash(t("toast.saveErr"));
     }

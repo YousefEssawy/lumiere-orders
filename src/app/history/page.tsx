@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useArchive, type ArchivedOrder } from "@/hooks/useArchive";
+import { useRowSelection } from "@/hooks/useRowSelection";
 import { useUserDirectory } from "@/hooks/useUserDirectory";
 import { useWhatsappSettings } from "@/hooks/useWhatsappSettings";
 import { fillTemplate, templateFor, waLink } from "@/lib/whatsapp";
@@ -39,7 +40,6 @@ function ShipmentsPage() {
   const flash = useToast();
   const confirm = useConfirm();
   const [statusFilter, setStatusFilter] = useState<string>(ALL);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [editOrder, setEditOrder] = useState<ArchivedOrder | null>(null);
   const [viewOrder, setViewOrder] = useState<ArchivedOrder | null>(null);
   const actor = { uid: profile.uid, email: profile.email };
@@ -48,26 +48,14 @@ function ShipmentsPage() {
     ? archived
     : archived.filter((o) => statusOf(o) === statusFilter);
 
-  const selectedInView = filtered.filter((o) => o.id && selected.has(o.id));
-  const allInViewSelected = filtered.length > 0 && selectedInView.length === filtered.length;
-
-  function toggleOne(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-
-  function toggleAllInView() {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (allInViewSelected) filtered.forEach((o) => o.id && next.delete(o.id));
-      else filtered.forEach((o) => o.id && next.add(o.id));
-      return next;
-    });
-  }
+  const {
+    selected,
+    selectedItems: selectedInView,
+    allSelected: allInViewSelected,
+    toggleOne,
+    toggleAll: toggleAllInView,
+    clear: clearSelection,
+  } = useRowSelection(filtered, (o) => o.id);
 
   /** ذكي: المحدد لو فيه تحديد، وإلا كل المعروض حسب الفلتر */
   async function handleExport() {
@@ -78,7 +66,7 @@ function ShipmentsPage() {
     exportWassalha(targets);
     flash(t("toast.exported", { n: targets.length }));
     logAction(actor, "orders.export", "", targets.length);
-    setSelected(new Set());
+    clearSelection();
   }
 
   async function handleEditSave(changes: OrderFormState) {
@@ -150,7 +138,7 @@ function ShipmentsPage() {
       await clearArchive(selectedInView);
       flash(t("toast.bulkDeleted", { n: selectedInView.length }));
       logAction(actor, "history.delete", "", selectedInView.length);
-      setSelected(new Set());
+      clearSelection();
     } catch {
       flash(t("toast.deleteErr"));
     }
