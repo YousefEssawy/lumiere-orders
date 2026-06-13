@@ -64,6 +64,13 @@ service cloud.firestore {
       allow read, write: if isActiveUser();
     }
 
+    // الإعدادات (قوالب الواتساب): يقرأها أي مستخدم نشط (عشان زرار الواتساب)،
+    // والأدمن بس يكتبها
+    match /settings/{docId} {
+      allow read: if isActiveUser();
+      allow write: if isAdmin();
+    }
+
     // ============================================================
     // المستخدمين
     // - كل مستخدم يقرأ ملفه (عشان التطبيق يعرف دوره وحالته)

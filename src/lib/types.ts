@@ -56,6 +56,8 @@ export const LOG_ACTIONS = [
   "category.create",
   "category.update",
   "category.delete",
+  "whatsapp.send",
+  "settings.update",
   "system.migrate",
 ] as const;
 export type LogAction = (typeof LOG_ACTIONS)[number];
@@ -79,7 +81,24 @@ export const FIRESTORE_COLLECTIONS = {
   logs: "logs",
   products: "products",
   categories: "categories",
+  settings: "settings",
 } as const;
+
+/** doc id الثابت لإعدادات قوالب الواتساب داخل settings */
+export const WHATSAPP_SETTINGS_DOC = "whatsapp";
+
+/**
+ * قوالب رسائل الواتساب لكل حالة — نص فاضي = مفيش زرار واتساب للحالة دي.
+ * البلايس هولدرز المتاحة: {name} {items} {cod}
+ */
+export type WhatsappTemplates = Partial<Record<OrderStatus, string>>;
+
+export interface WhatsappSettings {
+  id?: string;
+  templates: WhatsappTemplates;
+  updatedBy?: string;
+  updatedAt?: unknown;
+}
 
 // ============ الكتالوج ============
 

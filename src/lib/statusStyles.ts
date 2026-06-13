@@ -47,5 +47,7 @@ export const ACTION_CLASS: Record<LogAction, string> = {
   "category.create": "bg-pastel-mint text-ink-700",
   "category.update": "bg-pastel-sky text-ink-700",
   "category.delete": "bg-pastel-pink text-danger",
+  "whatsapp.send": "bg-pastel-mint text-ink-700",
+  "settings.update": "bg-pastel-sky text-ink-700",
   "system.migrate": "bg-soft text-ink-700",
 };
