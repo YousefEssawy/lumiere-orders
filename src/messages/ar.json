@@ -288,6 +288,10 @@
     "descriptionPh": "مثال: زيت عطري — دجلة",
     "category": "الفئة",
     "categoryPick": "— اختر —",
+    "categoryRequired": "اختر فئة",
+    "addCategoryBtn": "جديدة",
+    "addCategoryTitle": "إضافة فئة جديدة",
+    "newCategoryPh": "اسم الفئة الجديدة",
     "amount": "المبلغ",
     "amountPh": "0",
     "amountInvalid": "اكتب مبلغ صحيح أكبر من صفر",
@@ -323,6 +327,8 @@
       "deleted": "اتحذف المصروف",
       "bulkDeleted": "اتحذف {n} مصروف",
       "exported": "تم تصدير {n} مصروف ✓",
+      "catCreated": "تمت إضافة الفئة ✓",
+      "catSaveErr": "تعذّر إضافة الفئة",
       "saveErr": "حصل خطأ في الحفظ"
     }
   },
