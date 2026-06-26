@@ -24,7 +24,7 @@ function ExpensesPage() {
   const tCommon = useTranslations("common");
   const { profile } = useSession();
   const { expenses, error, saveExpense, deleteExpense, deleteExpenses } = useExpenses(true);
-  const { categories } = useExpenseCategories(true);
+  const { categories, addCategory } = useExpenseCategories(true);
   const resolveUser = useUserDirectory();
   const flash = useToast();
   const confirm = useConfirm();
@@ -71,6 +71,12 @@ function ExpensesPage() {
     logAction(actor, id ? "expense.update" : "expense.create", input.description);
     setShowCreate(false);
     setEditExpense(null);
+  }
+
+  async function handleCreateCategory(name: string) {
+    await addCategory(name, profile.uid);
+    flash(t("toast.catCreated"));
+    logAction(actor, "expenseCategory.create", name);
   }
 
   async function handleDelete(e: Expense) {
@@ -260,6 +266,7 @@ function ExpensesPage() {
           expense={editExpense}
           categories={categories}
           onSave={handleSave}
+          onCreateCategory={handleCreateCategory}
           onClose={() => { setShowCreate(false); setEditExpense(null); }}
         />
       )}
