@@ -288,6 +288,10 @@
     "descriptionPh": "e.g. Fragrance oil — Degla",
     "category": "Category",
     "categoryPick": "— Pick —",
+    "categoryRequired": "Pick a category",
+    "addCategoryBtn": "New",
+    "addCategoryTitle": "Add a new category",
+    "newCategoryPh": "New category name",
     "amount": "Amount",
     "amountPh": "0",
     "amountInvalid": "Enter a valid amount greater than zero",
@@ -323,6 +327,8 @@
       "deleted": "Expense deleted",
       "bulkDeleted": "{n} expenses deleted",
       "exported": "Exported {n} expenses ✓",
+      "catCreated": "Category added ✓",
+      "catSaveErr": "Couldn't add the category",
       "saveErr": "Failed to save"
     }
   },
