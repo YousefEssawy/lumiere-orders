@@ -25,7 +25,7 @@ export default function EditUserModal({ user, byUid, onSaved, onClose }: EditUse
     setErr("");
     setBusy(true);
     try {
-      await updateUserProfile(user.uid, { name, role }, byUid);
+      await updateUserProfile(user.uid, { name: name.trim(), role }, byUid);
       onSaved();
     } catch {
       setErr(t("toast.updateErr"));
