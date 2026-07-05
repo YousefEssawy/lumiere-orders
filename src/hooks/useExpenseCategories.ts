@@ -13,10 +13,12 @@ const DELETE_CHUNK = 450;
 export function useExpenseCategories(enabled: boolean) {
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!enabled || !db) {
       setCategories([]);
+      setLoading(false);
       return;
     }
     const q = query(collection(db, COL), orderBy("name"));
@@ -27,10 +29,12 @@ export function useExpenseCategories(enabled: boolean) {
         snap.forEach((d) => arr.push({ ...(d.data() as ExpenseCategory), id: d.id }));
         setCategories(arr);
         setError(null);
+        setLoading(false);
       },
       (err) => {
         console.error("[lumiere] expense categories subscription failed:", err);
         setError(err.message);
+        setLoading(false);
       }
     );
   }, [enabled]);
@@ -66,5 +70,5 @@ export function useExpenseCategories(enabled: boolean) {
     }
   }, []);
 
-  return { categories, error, addCategory, updateCategory, deleteCategory, deleteCategories };
+  return { categories, error, loading, addCategory, updateCategory, deleteCategory, deleteCategories };
 }

@@ -112,9 +112,10 @@ export default function ProductDetailsModal({ product: p, onClose }: ProductDeta
                   </div>
                   <div
                     dir="ltr"
-                    className="text-[13px] text-ink-700 leading-relaxed [&_ul]:list-disc [&_ul]:ps-5 [&_p]:mb-1.5"
-                    dangerouslySetInnerHTML={{ __html: p.description }}
-                  />
+                    className="text-[13px] text-ink-700 leading-relaxed whitespace-pre-wrap"
+                  >
+                    {p.description}
+                  </div>
                 </div>
               )}
               {p.descriptionAr && (
@@ -124,9 +125,10 @@ export default function ProductDetailsModal({ product: p, onClose }: ProductDeta
                   </div>
                   <div
                     dir="rtl"
-                    className="text-[13px] text-ink-700 leading-relaxed [&_ul]:list-disc [&_ul]:ps-5 [&_p]:mb-1.5"
-                    dangerouslySetInnerHTML={{ __html: p.descriptionAr }}
-                  />
+                    className="text-[13px] text-ink-700 leading-relaxed whitespace-pre-wrap"
+                  >
+                    {p.descriptionAr}
+                  </div>
                 </div>
               )}
             </div>

@@ -20,10 +20,12 @@ export type FundInput = Omit<
 export function useFunds(enabled: boolean) {
   const [funds, setFunds] = useState<Fund[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!enabled || !db) {
       setFunds([]);
+      setLoading(false);
       return;
     }
     // الأحدث إضافةً أولاً
@@ -35,10 +37,12 @@ export function useFunds(enabled: boolean) {
         snap.forEach((d) => arr.push({ ...(d.data() as Fund), id: d.id }));
         setFunds(arr);
         setError(null);
+        setLoading(false);
       },
       (err) => {
         console.error("[lumiere] funds subscription failed:", err);
         setError(err.message);
+        setLoading(false);
       }
     );
   }, [enabled]);
@@ -77,5 +81,5 @@ export function useFunds(enabled: boolean) {
     }
   }, []);
 
-  return { funds, error, saveFund, deleteFund, deleteFunds };
+  return { funds, error, loading, saveFund, deleteFund, deleteFunds };
 }

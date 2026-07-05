@@ -18,10 +18,13 @@ type OrderData = Omit<Order, "id" | "createdAt" | "createdBy" | "updatedAt" | "u
 
 export function useOrders(enabled: boolean) {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!enabled || !db) {
       setOrders([]);
+      setLoading(false);
       return;
     }
     const q = query(collection(db, COL), orderBy("createdAt", "desc"));
@@ -31,8 +34,14 @@ export function useOrders(enabled: boolean) {
         const arr: Order[] = [];
         snap.forEach((d) => arr.push({ ...(d.data() as Order), id: d.id }));
         setOrders(arr);
+        setError(null);
+        setLoading(false);
       },
-      () => { /* تجاهل أخطاء الاشتراك */ }
+      (err) => {
+        console.error("[lumiere] orders subscription failed:", err);
+        setError(err.message);
+        setLoading(false);
+      }
     );
   }, [enabled]);
 
@@ -90,5 +99,5 @@ export function useOrders(enabled: boolean) {
     }
   }, []);
 
-  return { orders, addOrder, importOrders, updateOrder, deleteOrder, archiveAll };
+  return { orders, error, loading, addOrder, importOrders, updateOrder, deleteOrder, archiveAll };
 }

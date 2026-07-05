@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useExpenseCategories } from "@/hooks/useExpenseCategories";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useRowSelection } from "@/hooks/useRowSelection";
+import { useCrudActions } from "@/hooks/useCrudActions";
 import { logAction } from "@/lib/logger";
 import type { ExpenseCategory } from "@/lib/types";
 import AppShell, { useSession } from "@/components/layout/AppShell";
@@ -18,7 +19,7 @@ function ExpenseCategoriesPage() {
   const t = useTranslations("expenseCategories");
   const tCommon = useTranslations("common");
   const { profile } = useSession();
-  const { categories, error, addCategory, updateCategory, deleteCategory, deleteCategories } = useExpenseCategories(true);
+  const { categories, error, loading, addCategory, updateCategory, deleteCategory, deleteCategories } = useExpenseCategories(true);
   const { expenses } = useExpenses(true);
   const flash = useToast();
   const confirm = useConfirm();
@@ -42,6 +43,8 @@ function ExpenseCategoriesPage() {
     clear: clearSelection,
   } = useRowSelection(categories, (c) => c.id);
 
+  const { runDelete, runBulkDelete } = useCrudActions({ confirm, flash, actor, clearSelection });
+
   async function bulkDelete(targets: ExpenseCategory[]) {
     const deletable = targets.filter((c) => (countByCategory[c.name] ?? 0) === 0 && c.id);
     const skipped = targets.length - deletable.length;
@@ -49,15 +52,18 @@ function ExpenseCategoriesPage() {
       flash(t("toast.allInUse"));
       return;
     }
-    if (!(await confirm({ title: t("deleteSelected", { n: deletable.length }), message: t("confirmDeleteSelected", { n: deletable.length }) }))) return;
-    try {
-      await deleteCategories(deletable.map((c) => c.id!));
-      flash(skipped > 0 ? t("toast.bulkDeletedSkipped", { n: deletable.length, s: skipped }) : t("toast.bulkDeleted", { n: deletable.length }));
-      logAction(actor, "expenseCategory.delete", "", deletable.length);
-      clearSelection();
-    } catch {
-      flash(t("toast.saveErr"));
-    }
+    const ids = deletable.map((c) => c.id!);
+    await runBulkDelete({
+      count: ids.length,
+      confirmTitle: t("deleteSelected", { n: ids.length }),
+      confirmMessage: t("confirmDeleteSelected", { n: ids.length }),
+      successToast: skipped > 0
+        ? t("toast.bulkDeletedSkipped", { n: ids.length, s: skipped })
+        : t("toast.bulkDeleted", { n: ids.length }),
+      errorToast: t("toast.saveErr"),
+      logActionName: "expenseCategory.delete",
+      onDeleteMany: () => deleteCategories(ids),
+    });
   }
 
   async function handleSave(name: string, active: boolean) {
@@ -87,19 +93,19 @@ function ExpenseCategoriesPage() {
 
   async function handleDelete(c: ExpenseCategory) {
     if (!c.id) return;
-    const count = countByCategory[c.name] ?? 0;
-    if (count > 0) {
-      flash(t("toast.hasExpenses", { n: count }));
-      return;
-    }
-    if (!(await confirm({ title: tCommon("delete"), message: t("confirmDelete", { name: c.name }) }))) return;
-    try {
-      await deleteCategory(c.id);
-      flash(t("toast.deleted"));
-      logAction(actor, "expenseCategory.delete", c.name);
-    } catch {
-      flash(t("toast.saveErr"));
-    }
+    await runDelete({
+      confirmTitle: tCommon("delete"),
+      confirmMessage: t("confirmDelete", { name: c.name }),
+      successToast: t("toast.deleted"),
+      errorToast: t("toast.saveErr"),
+      logActionName: "expenseCategory.delete",
+      logDetail: c.name,
+      guard: () => {
+        const count = countByCategory[c.name] ?? 0;
+        return count > 0 ? t("toast.hasExpenses", { n: count }) : null;
+      },
+      onDelete: () => deleteCategory(c.id!),
+    });
   }
 
   return (
@@ -138,7 +144,9 @@ function ExpenseCategoriesPage() {
       )}
 
       <div className="table-wrap fade-up fade-up-delay-2">
-        {categories.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-14 text-sm text-ink-500">{tCommon("loading")}</div>
+        ) : categories.length === 0 ? (
           <EmptyState icon="sell" text={t("empty")} />
         ) : (
           <table className="data-table">

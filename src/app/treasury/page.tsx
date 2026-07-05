@@ -5,6 +5,7 @@ import { useFunds, type FundInput } from "@/hooks/useFunds";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useRowSelection } from "@/hooks/useRowSelection";
 import { useUserDirectory } from "@/hooks/useUserDirectory";
+import { useCrudActions } from "@/hooks/useCrudActions";
 import { logAction } from "@/lib/logger";
 import { EMPTY_DISPLAY, formatDate, formatMoney } from "@/lib/appGlobals";
 import type { Fund } from "@/lib/types";
@@ -19,7 +20,7 @@ function TreasuryPage() {
   const t = useTranslations("treasury");
   const tCommon = useTranslations("common");
   const { profile } = useSession();
-  const { funds, error, saveFund, deleteFund, deleteFunds } = useFunds(true);
+  const { funds, error, loading, saveFund, deleteFund, deleteFunds } = useFunds(true);
   const { expenses } = useExpenses(true);
   const resolveUser = useUserDirectory();
   const flash = useToast();
@@ -59,30 +60,33 @@ function TreasuryPage() {
     setEditFund(null);
   }
 
+  const { runDelete, runBulkDelete } = useCrudActions({ confirm, flash, actor, clearSelection });
+
   async function handleDelete(f: Fund) {
     if (!f.id) return;
-    if (!(await confirm({ title: tCommon("delete"), message: t("confirmDelete", { amount: formatMoney(f.amount) }) }))) return;
-    try {
-      await deleteFund(f.id);
-      flash(t("toast.deleted"));
-      logAction(actor, "fund.delete", formatMoney(f.amount));
-    } catch {
-      flash(t("toast.saveErr"));
-    }
+    await runDelete({
+      confirmTitle: tCommon("delete"),
+      confirmMessage: t("confirmDelete", { amount: formatMoney(f.amount) }),
+      successToast: t("toast.deleted"),
+      errorToast: t("toast.saveErr"),
+      logActionName: "fund.delete",
+      logDetail: formatMoney(f.amount),
+      onDelete: () => deleteFund(f.id!),
+    });
   }
 
   async function handleDeleteSelected() {
     const ids = selectedFunds.map((f) => f.id!);
     if (!ids.length) return;
-    if (!(await confirm({ title: t("deleteSelected", { n: ids.length }), message: t("confirmDeleteSelected", { n: ids.length }) }))) return;
-    try {
-      await deleteFunds(ids);
-      flash(t("toast.bulkDeleted", { n: ids.length }));
-      logAction(actor, "fund.delete", "", ids.length);
-      clearSelection();
-    } catch {
-      flash(t("toast.saveErr"));
-    }
+    await runBulkDelete({
+      count: ids.length,
+      confirmTitle: t("deleteSelected", { n: ids.length }),
+      confirmMessage: t("confirmDeleteSelected", { n: ids.length }),
+      successToast: t("toast.bulkDeleted", { n: ids.length }),
+      errorToast: t("toast.saveErr"),
+      logActionName: "fund.delete",
+      onDeleteMany: () => deleteFunds(ids),
+    });
   }
 
   return (
@@ -165,7 +169,9 @@ function TreasuryPage() {
       </div>
 
       <div className="table-wrap fade-up fade-up-delay-2">
-        {funds.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-14 text-sm text-ink-500">{tCommon("loading")}</div>
+        ) : funds.length === 0 ? (
           <EmptyState icon="account_balance_wallet" text={t("empty")} />
         ) : (
           <table className="data-table min-w-[720px]">

@@ -20,10 +20,12 @@ export type ExpenseInput = Omit<
 export function useExpenses(enabled: boolean) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!enabled || !db) {
       setExpenses([]);
+      setLoading(false);
       return;
     }
     // الأحدث صرفاً أولاً
@@ -44,10 +46,12 @@ export function useExpenses(enabled: boolean) {
         });
         setExpenses(arr);
         setError(null);
+        setLoading(false);
       },
       (err) => {
         console.error("[lumiere] expenses subscription failed:", err);
         setError(err.message);
+        setLoading(false);
       }
     );
   }, [enabled]);
@@ -92,5 +96,5 @@ export function useExpenses(enabled: boolean) {
     }
   }, []);
 
-  return { expenses, error, saveExpense, setExpensePaid, deleteExpense, deleteExpenses };
+  return { expenses, error, loading, saveExpense, setExpensePaid, deleteExpense, deleteExpenses };
 }

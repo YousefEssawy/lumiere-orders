@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useCategories } from "@/hooks/useCategories";
 import { useProducts } from "@/hooks/useProducts";
 import { useRowSelection } from "@/hooks/useRowSelection";
+import { useCrudActions } from "@/hooks/useCrudActions";
 import { logAction } from "@/lib/logger";
 import type { Category } from "@/lib/types";
 import AppShell, { useSession } from "@/components/layout/AppShell";
@@ -18,7 +19,7 @@ function CategoriesPage() {
   const t = useTranslations("categories");
   const tCommon = useTranslations("common");
   const { profile } = useSession();
-  const { categories, error, addCategory, updateCategory, deleteCategory, deleteCategories } = useCategories(true);
+  const { categories, error, loading, addCategory, updateCategory, deleteCategory, deleteCategories } = useCategories(true);
   const { products } = useProducts(true);
   const flash = useToast();
   const confirm = useConfirm();
@@ -44,6 +45,8 @@ function CategoriesPage() {
     clear: clearSelection,
   } = useRowSelection(categories, (c) => c.id);
 
+  const { runDelete, runBulkDelete } = useCrudActions({ confirm, flash, actor, clearSelection });
+
   /** حذف جماعي — الفئات المستخدمة بتتعدى ويتبلغ عنها */
   async function bulkDelete(targets: Category[]) {
     const deletable = targets.filter((c) => (countByCategory[c.name] ?? 0) === 0 && c.id);
@@ -52,15 +55,18 @@ function CategoriesPage() {
       flash(t("toast.allInUse"));
       return;
     }
-    if (!(await confirm({ title: t("deleteSelected", { n: deletable.length }), message: t("confirmDeleteSelected", { n: deletable.length }) }))) return;
-    try {
-      await deleteCategories(deletable.map((c) => c.id!));
-      flash(skipped > 0 ? t("toast.bulkDeletedSkipped", { n: deletable.length, s: skipped }) : t("toast.bulkDeleted", { n: deletable.length }));
-      logAction(actor, "category.delete", "", deletable.length);
-      clearSelection();
-    } catch {
-      flash(t("toast.saveErr"));
-    }
+    const ids = deletable.map((c) => c.id!);
+    await runBulkDelete({
+      count: ids.length,
+      confirmTitle: t("deleteSelected", { n: ids.length }),
+      confirmMessage: t("confirmDeleteSelected", { n: ids.length }),
+      successToast: skipped > 0
+        ? t("toast.bulkDeletedSkipped", { n: ids.length, s: skipped })
+        : t("toast.bulkDeleted", { n: ids.length }),
+      errorToast: t("toast.saveErr"),
+      logActionName: "category.delete",
+      onDeleteMany: () => deleteCategories(ids),
+    });
   }
 
   async function handleSave(name: string, active: boolean) {
@@ -90,19 +96,19 @@ function CategoriesPage() {
 
   async function handleDelete(c: Category) {
     if (!c.id) return;
-    const count = countByCategory[c.name] ?? 0;
-    if (count > 0) {
-      flash(t("toast.hasProducts", { n: count }));
-      return;
-    }
-    if (!(await confirm({ title: tCommon("delete"), message: t("confirmDelete", { name: c.name }) }))) return;
-    try {
-      await deleteCategory(c.id);
-      flash(t("toast.deleted"));
-      logAction(actor, "category.delete", c.name);
-    } catch {
-      flash(t("toast.saveErr"));
-    }
+    await runDelete({
+      confirmTitle: tCommon("delete"),
+      confirmMessage: t("confirmDelete", { name: c.name }),
+      successToast: t("toast.deleted"),
+      errorToast: t("toast.saveErr"),
+      logActionName: "category.delete",
+      logDetail: c.name,
+      guard: () => {
+        const count = countByCategory[c.name] ?? 0;
+        return count > 0 ? t("toast.hasProducts", { n: count }) : null;
+      },
+      onDelete: () => deleteCategory(c.id!),
+    });
   }
 
   return (
@@ -141,7 +147,9 @@ function CategoriesPage() {
       )}
 
       <div className="table-wrap fade-up fade-up-delay-2">
-        {categories.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-14 text-sm text-ink-500">{tCommon("loading")}</div>
+        ) : categories.length === 0 ? (
           <EmptyState icon="category" text={t("empty")} />
         ) : (
           <table className="data-table">
