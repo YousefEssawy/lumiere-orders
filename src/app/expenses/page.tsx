@@ -59,7 +59,16 @@ function ExpensesPage() {
     });
   }, [expenses, search, categoryFilter, statusFilter, fromDate, toDate]);
 
-  const total = useMemo(() => filtered.reduce((s, e) => s + (Number(e.amount) || 0), 0), [filtered]);
+  const { total, totalPaid, totalDebt } = useMemo(() => {
+    let paid = 0;
+    let debt = 0;
+    for (const e of filtered) {
+      const amt = Number(e.amount) || 0;
+      if (e.paid) paid += amt;
+      else debt += amt;
+    }
+    return { total: paid + debt, totalPaid: paid, totalDebt: debt };
+  }, [filtered]);
 
   const {
     selected,
@@ -173,11 +182,34 @@ function ExpensesPage() {
         </div>
       )}
 
-      {/* بطاقة الإجمالي */}
-      <div className="card fade-up fade-up-delay-1 mb-4 flex flex-wrap items-center justify-between gap-3 !py-4">
-        <div className="text-sm text-ink-500">{t("totalLabel")}</div>
-        <div className="font-display font-extrabold text-2xl text-ink-900" dir="ltr">
-          {formatMoney(total)} <span className="text-sm font-bold text-ink-500">{t("egp")}</span>
+      {/* بطاقات الإجمالي */}
+      <div className="grid gap-3 sm:grid-cols-3 mb-4 fade-up fade-up-delay-1">
+        <div className="card !py-4">
+          <div className="text-sm text-ink-500 flex items-center gap-1.5">
+            <span className="icon !text-[18px]" aria-hidden>payments</span>
+            {t("totalLabel")}
+          </div>
+          <div className="font-display font-extrabold text-2xl text-ink-900 mt-1" dir="ltr">
+            {formatMoney(total)} <span className="text-sm font-bold text-ink-500">{t("egp")}</span>
+          </div>
+        </div>
+        <div className="card !py-4">
+          <div className="text-sm text-ink-500 flex items-center gap-1.5">
+            <span className="icon !text-[18px] text-success" aria-hidden>check_circle</span>
+            {t("totalPaid")}
+          </div>
+          <div className="font-display font-extrabold text-2xl text-ink-900 mt-1" dir="ltr">
+            {formatMoney(totalPaid)} <span className="text-sm font-bold text-ink-500">{t("egp")}</span>
+          </div>
+        </div>
+        <div className="card !py-4">
+          <div className="text-sm text-ink-500 flex items-center gap-1.5">
+            <span className="icon !text-[18px] text-warning" aria-hidden>schedule</span>
+            {t("totalDebt")}
+          </div>
+          <div className="font-display font-extrabold text-2xl text-ink-900 mt-1" dir="ltr">
+            {formatMoney(totalDebt)} <span className="text-sm font-bold text-ink-500">{t("egp")}</span>
+          </div>
         </div>
       </div>
 
