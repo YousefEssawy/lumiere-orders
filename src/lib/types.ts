@@ -59,10 +59,14 @@ export const LOG_ACTIONS = [
   "expense.create",
   "expense.update",
   "expense.delete",
+  "expense.pay",
   "expenses.export",
   "expenseCategory.create",
   "expenseCategory.update",
   "expenseCategory.delete",
+  "fund.create",
+  "fund.update",
+  "fund.delete",
   "whatsapp.send",
   "settings.update",
   "system.migrate",
@@ -91,6 +95,7 @@ export const FIRESTORE_COLLECTIONS = {
   settings: "settings",
   expenses: "expenses",
   expenseCategories: "expenseCategories",
+  funds: "funds",
 } as const;
 
 // ============ المصروفات ============
@@ -119,6 +124,23 @@ export interface Expense {
   date: string; // yyyy-MM-dd
   vendor?: string;
   paymentMethod?: PaymentMethod;
+  notes?: string;
+  /** true = مدفوع، false = دين معلّق. المصاريف القديمة تُعتبر مدفوعة */
+  paid: boolean;
+  /** هل يُخصم من رصيد الخزنة (عند الدفع). المصاريف القديمة لا تُخصم */
+  deductFromBalance: boolean;
+  createdBy?: string;
+  createdAt?: unknown;
+  updatedBy?: string;
+  updatedAt?: unknown;
+}
+
+/** إضافة رصيد للخزنة — date = تاريخ الإضافة (yyyy-MM-dd) */
+export interface Fund {
+  id?: string;
+  amount: number;
+  date: string; // yyyy-MM-dd
+  source?: string;
   notes?: string;
   createdBy?: string;
   createdAt?: unknown;
