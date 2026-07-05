@@ -66,6 +66,7 @@
     "namePh": "e.g. Sara Mohamed",
     "phone": "Mobile number",
     "phonePh": "01xxxxxxxxx",
+    "phoneInvalid": "Enter a valid Egyptian mobile number (e.g. 01xxxxxxxxx)",
     "source": "Source",
     "address": "Full address",
     "addressPh": "Street, area, building, floor, apartment, landmark",

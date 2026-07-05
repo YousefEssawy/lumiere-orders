@@ -177,6 +177,7 @@ export default function ProductModal({ product, categories, onSave, onClose }: P
                   />
                   <input
                     type="number"
+                    min="0"
                     className="form-input"
                     value={v.quantity}
                     onChange={(e) => setVariant(i, { quantity: Number(e.target.value) })}
@@ -241,6 +242,7 @@ export default function ProductModal({ product, categories, onSave, onClose }: P
               </span>
             )}
             <input
+              type="url"
               className="form-input flex-1"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}

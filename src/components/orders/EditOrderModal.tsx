@@ -1,7 +1,7 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { normPhone, type Order, type OrderSource } from "@/lib/wassalha";
+import { isValidEgyptPhone, normPhone, type Order, type OrderSource } from "@/lib/wassalha";
 import OrderFields, { ALL_SOURCES, type OrderFormState } from "@/components/orders/OrderFields";
 import ModalShell from "@/components/ui/ModalShell";
 
@@ -28,14 +28,21 @@ export default function EditOrderModal({ order, onSave, onClose }: EditOrderModa
     ref: order.ref,
   });
   const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
 
   async function submit(e: FormEvent) {
     e.preventDefault();
+    setErr("");
+    const phone = normPhone(f.phone);
+    if (!isValidEgyptPhone(phone)) {
+      setErr(t("phoneInvalid"));
+      return;
+    }
     setBusy(true);
     await onSave({
       source: f.source as OrderSource,
       name: f.name.trim(),
-      phone: normPhone(f.phone),
+      phone,
       address: f.address.trim(),
       city: f.city,
       cod: f.cod,
@@ -54,6 +61,8 @@ export default function EditOrderModal({ order, onSave, onClose }: EditOrderModa
           onChange={(k, v) => setF((o) => ({ ...o, [k]: v }))}
           sources={ALL_SOURCES}
         />
+
+        {err && <div className="text-danger text-[13px] mt-2">{err}</div>}
 
         <div className="flex gap-2 mt-5">
           <button type="submit" className="btn-primary flex-1" disabled={busy}>
