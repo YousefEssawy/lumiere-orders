@@ -85,6 +85,13 @@ export function normPhone(raw: unknown): string {
   return p;
 }
 
+const EG_PHONE_RE = /^01[0125]\d{8}$/;
+
+/** بيتحقق من رقم موبايل مصري بعد التطبيع — لازم يتنادى بعد normPhone() */
+export function isValidEgyptPhone(normalized: string): boolean {
+  return EG_PHONE_RE.test(normalized);
+}
+
 function cleanVal(v: unknown): string {
   const s = String(v == null ? "" : v).trim();
   return !s || s === "." ? "" : s;
