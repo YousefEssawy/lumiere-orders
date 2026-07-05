@@ -5,8 +5,8 @@ import { useTranslations } from "next-intl";
 import { useProducts, productDocId, type ProductInput } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { useRowSelection } from "@/hooks/useRowSelection";
+import { useCrudActions } from "@/hooks/useCrudActions";
 import { logAction } from "@/lib/logger";
-import { EMPTY_DISPLAY } from "@/lib/appGlobals";
 import type { Product } from "@/lib/types";
 import type { ProductsParseResult } from "@/lib/productsImport";
 import { exportProductsSheet } from "@/lib/productsExport";
@@ -15,10 +15,10 @@ import { useToast } from "@/components/ToastProvider";
 import { useConfirm } from "@/components/ConfirmProvider";
 import PageHero from "@/components/ui/PageHero";
 import EmptyState from "@/components/ui/EmptyState";
-import Toggle from "@/components/ui/Toggle";
 import ProductModal from "@/components/catalog/ProductModal";
 import ProductDetailsModal from "@/components/catalog/ProductDetailsModal";
 import ImportProductsModal from "@/components/catalog/ImportProductsModal";
+import ProductRow from "@/components/catalog/ProductRow";
 
 const ALL = "all";
 
@@ -26,7 +26,7 @@ function ProductsPage() {
   const t = useTranslations("products");
   const tCommon = useTranslations("common");
   const { profile } = useSession();
-  const { products, error, saveProduct, deleteProduct, deleteProducts, importProducts } = useProducts(true);
+  const { products, error, loading, saveProduct, deleteProduct, deleteProducts, importProducts } = useProducts(true);
   const { categories, addCategory } = useCategories(true);
   const flash = useToast();
   const confirm = useConfirm();
@@ -60,18 +60,6 @@ function ProductsPage() {
     setEditProduct(null);
   }
 
-  async function handleDelete(p: Product) {
-    if (!p.id) return;
-    if (!(await confirm({ title: tCommon("delete"), message: t("confirmDelete", { name: p.name }) }))) return;
-    try {
-      await deleteProduct(p.id);
-      flash(t("toast.deleted"));
-      logAction(actor, "product.delete", p.name);
-    } catch {
-      flash(t("toast.saveErr"));
-    }
-  }
-
   async function handleToggleActive(p: Product) {
     if (!p.id) return;
     try {
@@ -96,31 +84,47 @@ function ProductsPage() {
     clear: clearSelection,
   } = useRowSelection(filtered, (p) => p.id);
 
+  const { runDelete, runBulkDelete } = useCrudActions({ confirm, flash, actor, clearSelection });
+
+  async function handleDelete(p: Product) {
+    if (!p.id) return;
+    await runDelete({
+      confirmTitle: tCommon("delete"),
+      confirmMessage: t("confirmDelete", { name: p.name }),
+      successToast: t("toast.deleted"),
+      errorToast: t("toast.saveErr"),
+      logActionName: "product.delete",
+      logDetail: p.name,
+      onDelete: () => deleteProduct(p.id!),
+    });
+  }
+
   async function handleDeleteSelected() {
-    const ids = selectedInView.map((p) => p.id!) ;
+    const ids = selectedInView.map((p) => p.id!);
     if (!ids.length) return;
-    if (!(await confirm({ title: t("deleteSelected", { n: ids.length }), message: t("confirmDeleteSelected", { n: ids.length }) }))) return;
-    try {
-      await deleteProducts(ids);
-      flash(t("toast.bulkDeleted", { n: ids.length }));
-      logAction(actor, "product.delete", "", ids.length);
-      clearSelection();
-    } catch {
-      flash(t("toast.saveErr"));
-    }
+    await runBulkDelete({
+      count: ids.length,
+      confirmTitle: t("deleteSelected", { n: ids.length }),
+      confirmMessage: t("confirmDeleteSelected", { n: ids.length }),
+      successToast: t("toast.bulkDeleted", { n: ids.length }),
+      errorToast: t("toast.saveErr"),
+      logActionName: "product.delete",
+      onDeleteMany: () => deleteProducts(ids),
+    });
   }
 
   async function handleDeleteAll() {
     if (!products.length) return;
-    if (!(await confirm({ title: t("deleteAll"), message: t("confirmDeleteAll", { n: products.length }) }))) return;
-    try {
-      await deleteProducts(products.map((p) => p.id!).filter(Boolean));
-      flash(t("toast.bulkDeleted", { n: products.length }));
-      logAction(actor, "product.delete", "", products.length);
-      clearSelection();
-    } catch {
-      flash(t("toast.saveErr"));
-    }
+    const ids = products.map((p) => p.id!);
+    await runBulkDelete({
+      count: ids.length,
+      confirmTitle: t("deleteAll"),
+      confirmMessage: t("confirmDeleteAll", { n: ids.length }),
+      successToast: t("toast.bulkDeleted", { n: ids.length }),
+      errorToast: t("toast.saveErr"),
+      logActionName: "product.delete",
+      onDeleteMany: () => deleteProducts(ids),
+    });
   }
 
   /** ذكي: المحدد لو فيه تحديد، وإلا كل المعروض حسب الفلتر */
@@ -211,7 +215,9 @@ function ProductsPage() {
       </div>
 
       <div className="table-wrap fade-up fade-up-delay-2">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-14 text-sm text-ink-500">{tCommon("loading")}</div>
+        ) : filtered.length === 0 ? (
           <EmptyState icon="inventory_2" text={t("empty")} />
         ) : (
           <table className="data-table min-w-[860px]">
@@ -237,89 +243,16 @@ function ProductsPage() {
             </thead>
             <tbody>
               {filtered.map((p) => (
-                <tr key={p.id} className={p.active ? "" : "opacity-60"}>
-                  <td>
-                    <div className="flex items-center gap-1">
-                      <button
-                        className="btn-ghost text-[13px] px-2.5 py-1.5"
-                        onClick={() => setViewProduct(p)}
-                        aria-label={tCommon("view")}
-                        title={tCommon("view")}
-                      >
-                        <span className="icon text-base" aria-hidden>visibility</span>
-                      </button>
-                      <button
-                        className="btn-ghost text-[13px] px-2.5 py-1.5"
-                        onClick={() => setEditProduct(p)}
-                        aria-label={t("editTitle")}
-                        title={t("editTitle")}
-                      >
-                        <span className="icon text-base" aria-hidden>edit</span>
-                      </button>
-                      <button
-                        className="btn-danger-soft text-[13px]"
-                        onClick={() => handleDelete(p)}
-                        aria-label={tCommon("delete")}
-                        title={tCommon("delete")}
-                      >
-                        <span className="icon text-base" aria-hidden>delete</span>
-                      </button>
-                    </div>
-                  </td>
-                  <td>
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 accent-ink-900 cursor-pointer align-middle"
-                      checked={!!p.id && selected.has(p.id)}
-                      onChange={() => p.id && toggleOne(p.id)}
-                      aria-label={p.name}
-                    />
-                  </td>
-                  <td dir="ltr" className="font-bold">{p.code}</td>
-                  <td>
-                    {p.imageUrl ? (
-                      <img
-                        src={p.imageUrl}
-                        alt={p.name}
-                        className="w-9 h-9 rounded-sm object-cover border border-line"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <span className="inline-flex w-9 h-9 rounded-sm bg-soft items-center justify-center">
-                        <span className="icon !text-[16px] text-ink-300" aria-hidden>image</span>
-                      </span>
-                    )}
-                  </td>
-                  <td>
-                    <div dir="ltr" className="text-start">{p.name}</div>
-                    {p.nameAr && <div className="text-xs text-ink-400">{p.nameAr}</div>}
-                  </td>
-                  <td><span className="pill bg-soft text-ink-500">{p.category || EMPTY_DISPLAY}</span></td>
-                  <td>
-                    <div className="flex flex-wrap gap-1.5 max-w-[260px]">
-                      {p.variants.map((v, i) => (
-                        <span
-                          key={i}
-                          className={
-                            "pill " +
-                            (v.quantity <= 0 ? "bg-pastel-pink text-danger" : "bg-soft text-ink-700")
-                          }
-                          dir="ltr"
-                          title={`${t("price")}: ${v.price} · ${t("quantity")}: ${v.quantity}`}
-                        >
-                          {v.size || "—"} · {v.price} · ×{v.quantity}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td>
-                    <Toggle
-                      checked={p.active}
-                      onChange={() => handleToggleActive(p)}
-                      label={t("active")}
-                    />
-                  </td>
-                </tr>
+                <ProductRow
+                  key={p.id}
+                  product={p}
+                  selected={!!p.id && selected.has(p.id)}
+                  onView={setViewProduct}
+                  onEdit={setEditProduct}
+                  onDelete={handleDelete}
+                  onToggleSelect={toggleOne}
+                  onToggleActive={handleToggleActive}
+                />
               ))}
             </tbody>
           </table>

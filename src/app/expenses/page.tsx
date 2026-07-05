@@ -5,8 +5,9 @@ import { useExpenses } from "@/hooks/useExpenses";
 import { useExpenseCategories } from "@/hooks/useExpenseCategories";
 import { useRowSelection } from "@/hooks/useRowSelection";
 import { useUserDirectory } from "@/hooks/useUserDirectory";
+import { useCrudActions } from "@/hooks/useCrudActions";
 import { logAction } from "@/lib/logger";
-import { EMPTY_DISPLAY, formatDate, formatMoney } from "@/lib/appGlobals";
+import { formatMoney } from "@/lib/appGlobals";
 import { exportExpensesSheet } from "@/lib/expensesExport";
 import { PAYMENT_METHODS, type Expense, type PaymentMethod } from "@/lib/types";
 import AppShell, { useSession } from "@/components/layout/AppShell";
@@ -15,6 +16,7 @@ import { useConfirm } from "@/components/ConfirmProvider";
 import PageHero from "@/components/ui/PageHero";
 import EmptyState from "@/components/ui/EmptyState";
 import ExpenseModal from "@/components/expenses/ExpenseModal";
+import ExpenseRow from "@/components/expenses/ExpenseRow";
 import type { ExpenseInput } from "@/hooks/useExpenses";
 
 const ALL = "all";
@@ -23,7 +25,7 @@ function ExpensesPage() {
   const t = useTranslations("expenses");
   const tCommon = useTranslations("common");
   const { profile } = useSession();
-  const { expenses, error, saveExpense, setExpensePaid, deleteExpense, deleteExpenses } = useExpenses(true);
+  const { expenses, error, loading, saveExpense, setExpensePaid, deleteExpense, deleteExpenses } = useExpenses(true);
   const { categories, addCategory } = useExpenseCategories(true);
   const resolveUser = useUserDirectory();
   const flash = useToast();
@@ -93,30 +95,33 @@ function ExpensesPage() {
     }
   }
 
+  const { runDelete, runBulkDelete } = useCrudActions({ confirm, flash, actor, clearSelection });
+
   async function handleDelete(e: Expense) {
     if (!e.id) return;
-    if (!(await confirm({ title: tCommon("delete"), message: t("confirmDelete", { name: e.description }) }))) return;
-    try {
-      await deleteExpense(e.id);
-      flash(t("toast.deleted"));
-      logAction(actor, "expense.delete", e.description);
-    } catch {
-      flash(t("toast.saveErr"));
-    }
+    await runDelete({
+      confirmTitle: tCommon("delete"),
+      confirmMessage: t("confirmDelete", { name: e.description }),
+      successToast: t("toast.deleted"),
+      errorToast: t("toast.saveErr"),
+      logActionName: "expense.delete",
+      logDetail: e.description,
+      onDelete: () => deleteExpense(e.id!),
+    });
   }
 
   async function handleDeleteSelected() {
     const ids = selectedInView.map((e) => e.id!);
     if (!ids.length) return;
-    if (!(await confirm({ title: t("deleteSelected", { n: ids.length }), message: t("confirmDeleteSelected", { n: ids.length }) }))) return;
-    try {
-      await deleteExpenses(ids);
-      flash(t("toast.bulkDeleted", { n: ids.length }));
-      logAction(actor, "expense.delete", "", ids.length);
-      clearSelection();
-    } catch {
-      flash(t("toast.saveErr"));
-    }
+    await runBulkDelete({
+      count: ids.length,
+      confirmTitle: t("deleteSelected", { n: ids.length }),
+      confirmMessage: t("confirmDeleteSelected", { n: ids.length }),
+      successToast: t("toast.bulkDeleted", { n: ids.length }),
+      errorToast: t("toast.saveErr"),
+      logActionName: "expense.delete",
+      onDeleteMany: () => deleteExpenses(ids),
+    });
   }
 
   /** ذكي: المحدد لو فيه تحديد، وإلا كل المعروض */
@@ -203,7 +208,9 @@ function ExpensesPage() {
       </div>
 
       <div className="table-wrap fade-up fade-up-delay-2">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-14 text-sm text-ink-500">{tCommon("loading")}</div>
+        ) : filtered.length === 0 ? (
           <EmptyState icon="payments" text={t("empty")} />
         ) : (
           <table className="data-table min-w-[980px]">
@@ -231,71 +238,16 @@ function ExpensesPage() {
             </thead>
             <tbody>
               {filtered.map((e) => (
-                <tr key={e.id}>
-                  <td>
-                    <div className="flex items-center gap-1">
-                      {!e.paid && (
-                        <button
-                          className="btn-ghost text-[13px] px-2.5 py-1.5 !text-success"
-                          onClick={() => handleMarkPaid(e)}
-                          aria-label={t("markPaid")}
-                          title={t("markPaid")}
-                        >
-                          <span className="icon text-base" aria-hidden>paid</span>
-                        </button>
-                      )}
-                      <button
-                        className="btn-ghost text-[13px] px-2.5 py-1.5"
-                        onClick={() => setEditExpense(e)}
-                        aria-label={t("editTitle")}
-                        title={t("editTitle")}
-                      >
-                        <span className="icon text-base" aria-hidden>edit</span>
-                      </button>
-                      <button
-                        className="btn-danger-soft text-[13px]"
-                        onClick={() => handleDelete(e)}
-                        aria-label={tCommon("delete")}
-                        title={tCommon("delete")}
-                      >
-                        <span className="icon text-base" aria-hidden>delete</span>
-                      </button>
-                    </div>
-                  </td>
-                  <td>
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 accent-ink-900 cursor-pointer align-middle"
-                      checked={!!e.id && selected.has(e.id)}
-                      onChange={() => e.id && toggleOne(e.id)}
-                      aria-label={e.description}
-                    />
-                  </td>
-                  <td className="text-ink-500" dir="ltr">{formatDate(e.date)}</td>
-                  <td className="font-semibold">
-                    <span className="block max-w-[260px] truncate" title={e.description}>{e.description}</span>
-                    {e.notes && <span className="block max-w-[260px] truncate text-xs font-normal text-ink-400" title={e.notes}>{e.notes}</span>}
-                  </td>
-                  <td><span className="pill bg-pastel-lavender text-ink-700">{e.category || EMPTY_DISPLAY}</span></td>
-                  <td className="font-bold" dir="ltr">{formatMoney(Number(e.amount) || 0)}</td>
-                  <td>
-                    <div className="flex items-center gap-1.5">
-                      <span className={"pill " + (e.paid ? "bg-pastel-mint text-ink-700" : "bg-pastel-butter text-ink-700")}>
-                        {e.paid ? t("statusPaid") : t("statusDebt")}
-                      </span>
-                      {e.deductFromBalance && (
-                        <span className="icon !text-[16px] text-ink-400" aria-hidden title={t("deductFromBalance")}>account_balance_wallet</span>
-                      )}
-                    </div>
-                  </td>
-                  <td>{e.vendor || EMPTY_DISPLAY}</td>
-                  <td>{e.paymentMethod ? <span className="pill bg-soft text-ink-500">{t(`payment.${e.paymentMethod}`)}</span> : EMPTY_DISPLAY}</td>
-                  <td className="text-ink-500 text-xs">
-                    <span className="block max-w-[140px] truncate" title={resolveUser(e.createdBy)}>
-                      {resolveUser(e.createdBy) || EMPTY_DISPLAY}
-                    </span>
-                  </td>
-                </tr>
+                <ExpenseRow
+                  key={e.id}
+                  expense={e}
+                  selected={!!e.id && selected.has(e.id)}
+                  resolvedUser={resolveUser(e.createdBy)}
+                  onMarkPaid={handleMarkPaid}
+                  onEdit={setEditExpense}
+                  onDelete={handleDelete}
+                  onToggleSelect={toggleOne}
+                />
               ))}
             </tbody>
           </table>

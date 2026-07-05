@@ -89,7 +89,8 @@ function LogDetail({ l, resolveUser }: DetailProps) {
 
 function LogsPage() {
   const t = useTranslations("logs");
-  const { logs, error } = useLogs(true);
+  const tCommon = useTranslations("common");
+  const { logs, error, loading } = useLogs(true);
   const resolveUser = useUserDirectory();
   const [userFilter, setUserFilter] = useState<string>(ALL);
   const [actionFilter, setActionFilter] = useState<string>(ALL);
@@ -131,7 +132,9 @@ function LogsPage() {
       </div>
 
       <div className="table-wrap fade-up fade-up-delay-2">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-14 text-sm text-ink-500">{tCommon("loading")}</div>
+        ) : filtered.length === 0 ? (
           <EmptyState icon="history" text={t("table.empty")} />
         ) : (
           <table className="data-table min-w-[640px]">

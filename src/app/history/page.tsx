@@ -5,14 +5,13 @@ import { useArchive, type ArchivedOrder } from "@/hooks/useArchive";
 import { useRowSelection } from "@/hooks/useRowSelection";
 import { useUserDirectory } from "@/hooks/useUserDirectory";
 import { useWhatsappSettings } from "@/hooks/useWhatsappSettings";
+import { useCrudActions } from "@/hooks/useCrudActions";
 import { fillTemplate, templateFor, waLink } from "@/lib/whatsapp";
 import { logAction } from "@/lib/logger";
-import { EMPTY_DISPLAY, formatDateTime } from "@/lib/appGlobals";
 import {
   DEFAULT_ORDER_STATUS, ORDER_STATUSES, type OrderStatus,
 } from "@/lib/types";
 import { exportWassalha } from "@/lib/wassalha";
-import { SOURCE_CLASS, STATUS_CLASS } from "@/lib/statusStyles";
 import AppShell, { useSession } from "@/components/layout/AppShell";
 import { useToast } from "@/components/ToastProvider";
 import { useConfirm } from "@/components/ConfirmProvider";
@@ -20,7 +19,7 @@ import PageHero from "@/components/ui/PageHero";
 import EmptyState from "@/components/ui/EmptyState";
 import EditOrderModal from "@/components/orders/EditOrderModal";
 import OrderDetailsModal from "@/components/orders/OrderDetailsModal";
-import { truncatedCell } from "@/components/orders/OrdersTable";
+import HistoryRow from "@/components/orders/HistoryRow";
 import type { OrderFormState } from "@/components/orders/OrderFields";
 
 const ALL = "all";
@@ -34,7 +33,7 @@ function ShipmentsPage() {
   const tOrders = useTranslations("orders");
   const tCommon = useTranslations("common");
   const { profile } = useSession();
-  const { archived, error, deleteArchived, clearArchive, setStatus, updateArchived } = useArchive(true);
+  const { archived, error, loading, deleteArchived, clearArchive, setStatus, updateArchived } = useArchive(true);
   const resolveUser = useUserDirectory();
   const { templates } = useWhatsappSettings(true);
   const flash = useToast();
@@ -92,28 +91,32 @@ function ShipmentsPage() {
     }
   }
 
+  const { runDelete, runBulkDelete } = useCrudActions({ confirm, flash, actor, clearSelection });
+
   async function handleDelete(o: ArchivedOrder) {
     if (!o.id) return;
-    if (!(await confirm({ title: tCommon("delete"), message: t("confirmDelete", { name: o.name }) }))) return;
-    try {
-      await deleteArchived(o.id);
-      flash(t("toast.deleted"));
-      logAction(actor, "history.delete", o.name);
-    } catch {
-      flash(t("toast.deleteErr"));
-    }
+    await runDelete({
+      confirmTitle: tCommon("delete"),
+      confirmMessage: t("confirmDelete", { name: o.name }),
+      successToast: t("toast.deleted"),
+      errorToast: t("toast.deleteErr"),
+      logActionName: "history.delete",
+      logDetail: o.name,
+      onDelete: () => deleteArchived(o.id!),
+    });
   }
 
   async function handleClear() {
     if (!archived.length) return;
-    if (!(await confirm({ title: t("clearAll"), message: t("confirmClear", { n: archived.length }) }))) return;
-    try {
-      await clearArchive(archived);
-      flash(t("toast.cleared"));
-      logAction(actor, "history.clear", "", archived.length);
-    } catch {
-      flash(t("toast.clearErr"));
-    }
+    await runBulkDelete({
+      count: archived.length,
+      confirmTitle: t("clearAll"),
+      confirmMessage: t("confirmClear", { n: archived.length }),
+      successToast: t("toast.cleared"),
+      errorToast: t("toast.clearErr"),
+      logActionName: "history.clear",
+      onDeleteMany: () => clearArchive(archived),
+    });
   }
 
   /** يفتح واتساب برقم العميل ورسالة جاهزة حسب حالة الأوردر */
@@ -133,15 +136,15 @@ function ShipmentsPage() {
   /** حذف نهائي للمحدد بس */
   async function handleDeleteSelected() {
     if (!selectedInView.length) return;
-    if (!(await confirm({ title: t("deleteSelected", { n: selectedInView.length }), message: t("confirmDeleteSelected", { n: selectedInView.length }) }))) return;
-    try {
-      await clearArchive(selectedInView);
-      flash(t("toast.bulkDeleted", { n: selectedInView.length }));
-      logAction(actor, "history.delete", "", selectedInView.length);
-      clearSelection();
-    } catch {
-      flash(t("toast.deleteErr"));
-    }
+    await runBulkDelete({
+      count: selectedInView.length,
+      confirmTitle: t("deleteSelected", { n: selectedInView.length }),
+      confirmMessage: t("confirmDeleteSelected", { n: selectedInView.length }),
+      successToast: t("toast.bulkDeleted", { n: selectedInView.length }),
+      errorToast: t("toast.deleteErr"),
+      logActionName: "history.delete",
+      onDeleteMany: () => clearArchive(selectedInView),
+    });
   }
 
   const exportCount = selectedInView.length || filtered.length;
@@ -202,7 +205,9 @@ function ShipmentsPage() {
       </div>
 
       <div className="table-wrap fade-up fade-up-delay-2">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-14 text-sm text-ink-500">{tCommon("loading")}</div>
+        ) : filtered.length === 0 ? (
           <EmptyState icon="local_shipping" text={t("empty")} />
         ) : (
           <table className="data-table min-w-[1080px]">
@@ -231,85 +236,22 @@ function ShipmentsPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((o) => {
-                const status = statusOf(o);
-                return (
-                  <tr key={o.id}>
-                    <td>
-                      <div className="flex items-center gap-1">
-                        <button
-                          className="btn-ghost text-[13px] px-2.5 py-1.5"
-                          onClick={() => setViewOrder(o)}
-                          aria-label={tCommon("view")}
-                          title={tCommon("view")}
-                        >
-                          <span className="icon text-base" aria-hidden>visibility</span>
-                        </button>
-                        {hasWhatsapp(o) && (
-                          <button
-                            className="btn-ghost text-[13px] px-2.5 py-1.5 !text-success"
-                            onClick={() => handleWhatsapp(o)}
-                            aria-label={t("whatsapp")}
-                            title={t("whatsapp")}
-                          >
-                            <span className="icon text-base" aria-hidden>chat</span>
-                          </button>
-                        )}
-                        <button
-                          className="btn-ghost text-[13px] px-2.5 py-1.5"
-                          onClick={() => setEditOrder(o)}
-                          aria-label={tOrders("editTitle")}
-                          title={tOrders("editTitle")}
-                        >
-                          <span className="icon text-base" aria-hidden>edit</span>
-                        </button>
-                        <button
-                          className="btn-danger-soft text-[13px]"
-                          onClick={() => handleDelete(o)}
-                          aria-label={tCommon("delete")}
-                          title={tCommon("delete")}
-                        >
-                          <span className="icon text-base" aria-hidden>delete</span>
-                        </button>
-                      </div>
-                    </td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 accent-ink-900 cursor-pointer align-middle"
-                        checked={!!o.id && selected.has(o.id)}
-                        onChange={() => o.id && toggleOne(o.id)}
-                        aria-label={o.name}
-                      />
-                    </td>
-                    <td>
-                      <select
-                        className={"pill border-0 cursor-pointer appearance-none pe-2 " + STATUS_CLASS[status]}
-                        value={status}
-                        onChange={(e) => handleStatus(o, e.target.value as OrderStatus)}
-                        aria-label={t("status")}
-                      >
-                        {ORDER_STATUSES.map((s) => (
-                          <option key={s} value={s}>{t(`statuses.${s}`)}</option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="text-ink-500" dir="ltr">{formatDateTime(o.archivedAt)}</td>
-                    <td><span className={"pill " + SOURCE_CLASS[o.source]}>{tOrders(`sources.${o.source}`)}</span></td>
-                    <td>{o.name}</td>
-                    <td dir="ltr">{o.phone}</td>
-                    <td>{truncatedCell(o.address)}</td>
-                    <td>{o.city || EMPTY_DISPLAY}</td>
-                    <td>{truncatedCell(String(o.items || "").split("\n").filter(Boolean).join(" · "))}</td>
-                    <td>{o.cod}</td>
-                    <td className="text-ink-500 text-xs">
-                      <span className="block max-w-[140px] truncate" title={resolveUser(o.archivedBy)}>
-                        {resolveUser(o.archivedBy) || EMPTY_DISPLAY}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
+              {filtered.map((o) => (
+                <HistoryRow
+                  key={o.id}
+                  order={o}
+                  status={statusOf(o)}
+                  selected={!!o.id && selected.has(o.id)}
+                  resolvedUser={resolveUser(o.archivedBy)}
+                  hasWhatsapp={hasWhatsapp(o)}
+                  onView={setViewOrder}
+                  onWhatsapp={handleWhatsapp}
+                  onEdit={setEditOrder}
+                  onDelete={handleDelete}
+                  onToggleSelect={toggleOne}
+                  onStatusChange={handleStatus}
+                />
+              ))}
             </tbody>
           </table>
         )}
