@@ -21,10 +21,12 @@ export interface ArchivedOrder extends Order {
 export function useArchive(enabled: boolean) {
   const [archived, setArchived] = useState<ArchivedOrder[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!enabled || !db) {
       setArchived([]);
+      setLoading(false);
       return;
     }
     const q = query(collection(db, COL), orderBy("archivedAt", "desc"));
@@ -35,11 +37,13 @@ export function useArchive(enabled: boolean) {
         snap.forEach((d) => arr.push({ id: d.id, ...(d.data() as Omit<ArchivedOrder, "id">) }));
         setArchived(arr);
         setError(null);
+        setLoading(false);
       },
       (err) => {
         console.error("[lumiere] archive subscription failed:", err);
         setArchived([]);
         setError(err.message);
+        setLoading(false);
       }
     );
   }, [enabled]);
@@ -74,5 +78,5 @@ export function useArchive(enabled: boolean) {
     }
   }, []);
 
-  return { archived, error, deleteArchived, clearArchive, setStatus, updateArchived };
+  return { archived, error, loading, deleteArchived, clearArchive, setStatus, updateArchived };
 }

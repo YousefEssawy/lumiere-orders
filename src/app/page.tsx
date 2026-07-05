@@ -19,8 +19,9 @@ import type { OrderFormState } from "@/components/orders/OrderFields";
 
 function OrdersPage() {
   const t = useTranslations("orders");
+  const tCommon = useTranslations("common");
   const { profile } = useSession();
-  const { orders, addOrder, importOrders, updateOrder, deleteOrder, archiveAll } = useOrders(true);
+  const { orders, loading, addOrder, importOrders, updateOrder, deleteOrder, archiveAll } = useOrders(true);
   const { products } = useProducts(true);
   const flash = useToast();
   const confirm = useConfirm();
@@ -133,7 +134,11 @@ function OrdersPage() {
           {t("moveBtn")}
         </button>
       </div>
-      <OrdersTable orders={orders} onView={setViewOrder} onEdit={setEditOrder} onDelete={handleDelete} />
+      {loading ? (
+        <div className="table-wrap fade-up fade-up-delay-2 text-center py-14 text-sm text-ink-500">{tCommon("loading")}</div>
+      ) : (
+        <OrdersTable orders={orders} onView={setViewOrder} onEdit={setEditOrder} onDelete={handleDelete} />
+      )}
 
       {viewOrder && (
         <OrderDetailsModal order={viewOrder} onClose={() => setViewOrder(null)} />

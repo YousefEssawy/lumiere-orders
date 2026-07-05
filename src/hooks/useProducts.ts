@@ -23,10 +23,12 @@ export function productDocId(code: string): string {
 export function useProducts(enabled: boolean) {
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!enabled || !db) {
       setProducts([]);
+      setLoading(false);
       return;
     }
     const q = query(collection(db, COL), orderBy("code"));
@@ -37,10 +39,12 @@ export function useProducts(enabled: boolean) {
         snap.forEach((d) => arr.push({ ...(d.data() as Product), id: d.id }));
         setProducts(arr);
         setError(null);
+        setLoading(false);
       },
       (err) => {
         console.error("[lumiere] products subscription failed:", err);
         setError(err.message);
+        setLoading(false);
       }
     );
   }, [enabled]);
@@ -99,5 +103,5 @@ export function useProducts(enabled: boolean) {
     []
   );
 
-  return { products, error, saveProduct, deleteProduct, deleteProducts, importProducts };
+  return { products, error, loading, saveProduct, deleteProduct, deleteProducts, importProducts };
 }
