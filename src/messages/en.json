@@ -347,6 +347,8 @@
     "addedBy": "Added by",
     "egp": "EGP",
     "totalLabel": "Total (filtered)",
+    "totalPaid": "Paid",
+    "totalDebt": "Debt",
     "count": "Expenses:",
     "from": "From",
     "to": "To",
