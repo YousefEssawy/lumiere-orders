@@ -4,61 +4,52 @@ import {
   collection, deleteDoc, deleteField, doc, onSnapshot, orderBy, query, setDoc, updateDoc, writeBatch,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { FIRESTORE_COLLECTIONS, type Expense } from "@/lib/types";
+import { FIRESTORE_COLLECTIONS, type Fund } from "@/lib/types";
 import { creationAudit, updateAudit } from "@/lib/audit";
 
-const COL = FIRESTORE_COLLECTIONS.expenses;
+const COL = FIRESTORE_COLLECTIONS.funds;
 const DELETE_CHUNK = 450;
 
 // الحقول الاختيارية: لو اتفضّت عند التعديل لازم تتشال من الـ document
-const OPTIONAL_EXPENSE_FIELDS = ["vendor", "paymentMethod", "notes"] as const;
+const OPTIONAL_FUND_FIELDS = ["source", "notes"] as const;
 
-export type ExpenseInput = Omit<
-  Expense, "id" | "createdAt" | "createdBy" | "updatedAt" | "updatedBy"
+export type FundInput = Omit<
+  Fund, "id" | "createdAt" | "createdBy" | "updatedAt" | "updatedBy"
 >;
 
-export function useExpenses(enabled: boolean) {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+export function useFunds(enabled: boolean) {
+  const [funds, setFunds] = useState<Fund[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!enabled || !db) {
-      setExpenses([]);
+      setFunds([]);
       return;
     }
-    // الأحدث صرفاً أولاً
+    // الأحدث إضافةً أولاً
     const q = query(collection(db, COL), orderBy("date", "desc"));
     return onSnapshot(
       q,
       (snap) => {
-        const arr: Expense[] = [];
-        snap.forEach((d) => {
-          const data = d.data() as Expense;
-          // المصاريف القديمة قبل ميزة الخزنة: تُعتبر مدفوعة ولا تُخصم من الرصيد
-          arr.push({
-            ...data,
-            id: d.id,
-            paid: data.paid ?? true,
-            deductFromBalance: data.deductFromBalance ?? false,
-          });
-        });
-        setExpenses(arr);
+        const arr: Fund[] = [];
+        snap.forEach((d) => arr.push({ ...(d.data() as Fund), id: d.id }));
+        setFunds(arr);
         setError(null);
       },
       (err) => {
-        console.error("[lumiere] expenses subscription failed:", err);
+        console.error("[lumiere] funds subscription failed:", err);
         setError(err.message);
       }
     );
   }, [enabled]);
 
-  const saveExpense = useCallback(
-    async (input: ExpenseInput, byUid: string, id?: string) => {
+  const saveFund = useCallback(
+    async (input: FundInput, byUid: string, id?: string) => {
       if (!db) return;
       if (id) {
         // updateDoc بيدمج بس — فالحقل الاختياري اللي اتفضّى لازم يتشال بـ deleteField
         const patch: Record<string, unknown> = { ...input, ...updateAudit(byUid) };
-        for (const k of OPTIONAL_EXPENSE_FIELDS) {
+        for (const k of OPTIONAL_FUND_FIELDS) {
           if (!(k in input)) patch[k] = deleteField();
         }
         await updateDoc(doc(db, COL, id), patch);
@@ -70,18 +61,12 @@ export function useExpenses(enabled: boolean) {
     []
   );
 
-  /** تحويل مصروف من دين إلى مدفوع (أو العكس) بسرعة من غير فتح مودال التعديل */
-  const setExpensePaid = useCallback(async (id: string, paid: boolean, byUid: string) => {
-    if (!db) return;
-    await updateDoc(doc(db, COL, id), { paid, ...updateAudit(byUid) });
-  }, []);
-
-  const deleteExpense = useCallback(async (id: string) => {
+  const deleteFund = useCallback(async (id: string) => {
     if (!db) return;
     await deleteDoc(doc(db, COL, id));
   }, []);
 
-  const deleteExpenses = useCallback(async (ids: string[]) => {
+  const deleteFunds = useCallback(async (ids: string[]) => {
     if (!db || !ids.length) return;
     const database = db;
     for (let i = 0; i < ids.length; i += DELETE_CHUNK) {
@@ -92,5 +77,5 @@ export function useExpenses(enabled: boolean) {
     }
   }, []);
 
-  return { expenses, error, saveExpense, setExpensePaid, deleteExpense, deleteExpenses };
+  return { funds, error, saveFund, deleteFund, deleteFunds };
 }

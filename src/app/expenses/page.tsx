@@ -23,7 +23,7 @@ function ExpensesPage() {
   const t = useTranslations("expenses");
   const tCommon = useTranslations("common");
   const { profile } = useSession();
-  const { expenses, error, saveExpense, deleteExpense, deleteExpenses } = useExpenses(true);
+  const { expenses, error, saveExpense, setExpensePaid, deleteExpense, deleteExpenses } = useExpenses(true);
   const { categories, addCategory } = useExpenseCategories(true);
   const resolveUser = useUserDirectory();
   const flash = useToast();
@@ -32,6 +32,7 @@ function ExpensesPage() {
 
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>(ALL);
+  const [statusFilter, setStatusFilter] = useState<"all" | "paid" | "debt">(ALL as "all");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [showCreate, setShowCreate] = useState(false);
@@ -44,6 +45,8 @@ function ExpensesPage() {
     const q = search.trim().toLowerCase();
     return expenses.filter((e) => {
       if (categoryFilter !== ALL && e.category !== categoryFilter) return false;
+      if (statusFilter === "paid" && !e.paid) return false;
+      if (statusFilter === "debt" && e.paid) return false;
       if (fromDate && e.date < fromDate) return false;
       if (toDate && e.date > toDate) return false;
       if (!q) return true;
@@ -52,7 +55,7 @@ function ExpensesPage() {
         (e.vendor ?? "").toLowerCase().includes(q)
       );
     });
-  }, [expenses, search, categoryFilter, fromDate, toDate]);
+  }, [expenses, search, categoryFilter, statusFilter, fromDate, toDate]);
 
   const total = useMemo(() => filtered.reduce((s, e) => s + (Number(e.amount) || 0), 0), [filtered]);
 
@@ -77,6 +80,17 @@ function ExpensesPage() {
     await addCategory(name, profile.uid);
     flash(t("toast.catCreated"));
     logAction(actor, "expenseCategory.create", name);
+  }
+
+  async function handleMarkPaid(e: Expense) {
+    if (!e.id) return;
+    try {
+      await setExpensePaid(e.id, true, profile.uid);
+      flash(t("toast.markedPaid"));
+      logAction(actor, "expense.pay", e.description);
+    } catch {
+      flash(t("toast.saveErr"));
+    }
   }
 
   async function handleDelete(e: Expense) {
@@ -111,7 +125,8 @@ function ExpensesPage() {
     if (!targets.length) return;
     exportExpensesSheet(targets, {
       date: t("date"), description: t("description"), category: t("category"),
-      amount: t("amount"), vendor: t("vendor"), paymentMethod: t("paymentMethod"),
+      amount: t("amount"), status: t("paymentStatus"), statusPaid: t("statusPaid"), statusDebt: t("statusDebt"),
+      vendor: t("vendor"), paymentMethod: t("paymentMethod"),
       notes: t("notes"), paymentLabel,
     });
     flash(t("toast.exported", { n: targets.length }));
@@ -174,6 +189,11 @@ function ExpensesPage() {
           <option value={ALL}>{t("filterCategory")}</option>
           {categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
         </select>
+        <select className="form-input sm:!w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as "all" | "paid" | "debt")}>
+          <option value="all">{t("filterAllStatus")}</option>
+          <option value="paid">{t("statusPaid")}</option>
+          <option value="debt">{t("statusDebt")}</option>
+        </select>
         <input type="date" className="form-input sm:!w-auto" value={fromDate} onChange={(e) => setFromDate(e.target.value)} dir="ltr" aria-label={t("from")} title={t("from")} />
         <input type="date" className="form-input sm:!w-auto" value={toDate} onChange={(e) => setToDate(e.target.value)} dir="ltr" aria-label={t("to")} title={t("to")} />
         <div className="flex-1" />
@@ -186,7 +206,7 @@ function ExpensesPage() {
         {filtered.length === 0 ? (
           <EmptyState icon="payments" text={t("empty")} />
         ) : (
-          <table className="data-table min-w-[860px]">
+          <table className="data-table min-w-[980px]">
             <thead>
               <tr>
                 <th></th>
@@ -203,6 +223,7 @@ function ExpensesPage() {
                 <th>{t("description")}</th>
                 <th>{t("category")}</th>
                 <th>{t("amount")}</th>
+                <th>{t("paymentStatus")}</th>
                 <th>{t("vendor")}</th>
                 <th>{t("paymentMethod")}</th>
                 <th>{t("addedBy")}</th>
@@ -213,6 +234,16 @@ function ExpensesPage() {
                 <tr key={e.id}>
                   <td>
                     <div className="flex items-center gap-1">
+                      {!e.paid && (
+                        <button
+                          className="btn-ghost text-[13px] px-2.5 py-1.5 !text-success"
+                          onClick={() => handleMarkPaid(e)}
+                          aria-label={t("markPaid")}
+                          title={t("markPaid")}
+                        >
+                          <span className="icon text-base" aria-hidden>paid</span>
+                        </button>
+                      )}
                       <button
                         className="btn-ghost text-[13px] px-2.5 py-1.5"
                         onClick={() => setEditExpense(e)}
@@ -247,6 +278,16 @@ function ExpensesPage() {
                   </td>
                   <td><span className="pill bg-pastel-lavender text-ink-700">{e.category || EMPTY_DISPLAY}</span></td>
                   <td className="font-bold" dir="ltr">{formatMoney(Number(e.amount) || 0)}</td>
+                  <td>
+                    <div className="flex items-center gap-1.5">
+                      <span className={"pill " + (e.paid ? "bg-pastel-mint text-ink-700" : "bg-pastel-butter text-ink-700")}>
+                        {e.paid ? t("statusPaid") : t("statusDebt")}
+                      </span>
+                      {e.deductFromBalance && (
+                        <span className="icon !text-[16px] text-ink-400" aria-hidden title={t("deductFromBalance")}>account_balance_wallet</span>
+                      )}
+                    </div>
+                  </td>
                   <td>{e.vendor || EMPTY_DISPLAY}</td>
                   <td>{e.paymentMethod ? <span className="pill bg-soft text-ink-500">{t(`payment.${e.paymentMethod}`)}</span> : EMPTY_DISPLAY}</td>
                   <td className="text-ink-500 text-xs">

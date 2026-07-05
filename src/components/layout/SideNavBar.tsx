@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { AppRoutes, type AppRoute } from "@/lib/appRoutes";
 
 interface NavItem {
-  labelKey: "orders" | "history" | "products" | "categories" | "expenses" | "expenseCategories" | "users" | "logs" | "settings" | "migration" | "help";
+  labelKey: "orders" | "history" | "products" | "categories" | "treasury" | "expenses" | "expenseCategories" | "users" | "logs" | "settings" | "migration" | "help";
   icon: string;
   href: AppRoute;
   adminOnly: boolean;
@@ -35,6 +35,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     sectionKey: "finance",
     items: [
+      { labelKey: "treasury", icon: "account_balance_wallet", href: AppRoutes.treasury, adminOnly: true },
       { labelKey: "expenses", icon: "payments", href: AppRoutes.expenses, adminOnly: true },
       { labelKey: "expenseCategories", icon: "sell", href: AppRoutes.expenseCategories, adminOnly: true },
     ],

@@ -8,6 +8,9 @@ type Labels = {
   description: string;
   category: string;
   amount: string;
+  status: string;
+  statusPaid: string;
+  statusDebt: string;
   vendor: string;
   paymentMethod: string;
   notes: string;
@@ -20,12 +23,13 @@ export function exportExpensesSheet(expenses: Expense[], labels: Labels): void {
     [labels.description]: e.description || "",
     [labels.category]: e.category || "",
     [labels.amount]: e.amount ?? 0,
+    [labels.status]: e.paid ? labels.statusPaid : labels.statusDebt,
     [labels.vendor]: e.vendor || "",
     [labels.paymentMethod]: labels.paymentLabel(e.paymentMethod),
     [labels.notes]: e.notes || "",
   }));
   const ws = XLSX.utils.json_to_sheet(data, {
-    header: [labels.date, labels.description, labels.category, labels.amount, labels.vendor, labels.paymentMethod, labels.notes],
+    header: [labels.date, labels.description, labels.category, labels.amount, labels.status, labels.vendor, labels.paymentMethod, labels.notes],
   });
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Expenses");
