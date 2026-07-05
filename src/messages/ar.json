@@ -31,6 +31,7 @@
     "history": "الشحنات",
     "products": "المنتجات",
     "categories": "الفئات",
+    "treasury": "الخزنة",
     "expenses": "المصروفات",
     "expenseCategories": "فئات المصروفات",
     "users": "المستخدمين",
@@ -277,6 +278,41 @@
     "updatedBy": "آخر تعديل بواسطة",
     "archivedBy": "نقله للشحنات"
   },
+  "treasury": {
+    "title": "الخزنة",
+    "subtitle": "اشحن الرصيد وتابع المصروف والديون المعلّقة",
+    "addFunds": "إضافة رصيد",
+    "addTitle": "إضافة رصيد",
+    "editTitle": "تعديل الرصيد",
+    "balance": "الرصيد الحالي",
+    "balanceHint": "الأموال المضافة ناقص المصروفات المدفوعة اللي بتتخصم",
+    "totalFunds": "الأموال المضافة",
+    "totalDeducted": "المصروف (المخصوم)",
+    "totalDebt": "الديون المعلّقة",
+    "amount": "المبلغ",
+    "amountPh": "0",
+    "amountInvalid": "اكتب مبلغ صحيح أكبر من صفر",
+    "date": "التاريخ",
+    "source": "المصدر",
+    "sourcePh": "مثال: إيداع مبيعات، شحن شخصي",
+    "notes": "ملاحظات",
+    "addedBy": "أضافه",
+    "egp": "جنيه",
+    "fundsListTitle": "إضافات الرصيد",
+    "count": "الإضافات:",
+    "empty": "مفيش رصيد مضاف لسه — ضيف أول شحنة",
+    "deleteSelected": "حذف المحدد ({n})",
+    "confirmDelete": "حذف إضافة رصيد بمبلغ {amount}؟",
+    "confirmDeleteSelected": "حذف نهائي لـ {n} إضافة محددة؟ مش هينفع ترجعهم.",
+    "loadError": "تعذّر تحميل الخزنة. اتأكد إن آخر نسخة من firestore.rules منشورة.",
+    "toast": {
+      "created": "تمت إضافة الرصيد ✓",
+      "updated": "تم تعديل الإضافة ✓",
+      "deleted": "اتحذفت الإضافة",
+      "bulkDeleted": "اتحذف {n} إضافة",
+      "saveErr": "حصل خطأ في الحفظ"
+    }
+  },
   "expenses": {
     "title": "المصروفات",
     "subtitle": "تتبّع مصروفات البراند — مواد خام، تغليف، إعلانات وغيرها",
@@ -300,6 +336,13 @@
     "vendorPh": "مثال: محل دجلة للزيوت",
     "paymentMethod": "طريقة الدفع",
     "paymentPick": "— غير محدد —",
+    "paymentStatus": "الحالة",
+    "statusPaid": "مدفوع",
+    "statusDebt": "دين",
+    "deductFromBalance": "يُخصم من الرصيد",
+    "deductHint": "بيقلّل رصيد الخزنة بالمبلغ ده لما يتدفع",
+    "markPaid": "تحديد كمدفوع",
+    "filterAllStatus": "كل الحالات",
     "notes": "ملاحظات",
     "addedBy": "أضافه",
     "egp": "جنيه",
@@ -329,6 +372,7 @@
       "exported": "تم تصدير {n} مصروف ✓",
       "catCreated": "تمت إضافة الفئة ✓",
       "catSaveErr": "تعذّر إضافة الفئة",
+      "markedPaid": "اتحدد كمدفوع ✓",
       "saveErr": "حصل خطأ في الحفظ"
     }
   },
@@ -499,7 +543,8 @@
       "expense": {
         "create": "أضاف مصروف",
         "update": "عدّل مصروف",
-        "delete": "حذف مصروف"
+        "delete": "حذف مصروف",
+        "pay": "حدّد مصروف كمدفوع"
       },
       "expenses": {
         "export": "صدّر المصروفات"
@@ -508,6 +553,11 @@
         "create": "أضاف فئة مصروفات",
         "update": "عدّل فئة مصروفات",
         "delete": "حذف فئة مصروفات"
+      },
+      "fund": {
+        "create": "أضاف رصيد",
+        "update": "عدّل إضافة رصيد",
+        "delete": "حذف إضافة رصيد"
       },
       "whatsapp": {
         "send": "فتح رسالة واتساب"

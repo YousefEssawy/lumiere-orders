@@ -6,6 +6,7 @@ import {
 } from "@/lib/types";
 import type { ExpenseInput } from "@/hooks/useExpenses";
 import ModalShell from "@/components/ui/ModalShell";
+import Toggle from "@/components/ui/Toggle";
 
 interface ExpenseModalProps {
   /** null = إنشاء جديد */
@@ -34,6 +35,9 @@ export default function ExpenseModal({ expense, categories, onSave, onCreateCate
   const [vendor, setVendor] = useState(expense?.vendor ?? "");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | "">(expense?.paymentMethod ?? "");
   const [notes, setNotes] = useState(expense?.notes ?? "");
+  // حالة الدفع والخصم من الخزنة — الجديد افتراضياً مدفوع ويُخصم
+  const [paid, setPaid] = useState(expense?.paid ?? true);
+  const [deductFromBalance, setDeductFromBalance] = useState(expense?.deductFromBalance ?? true);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
@@ -112,6 +116,8 @@ export default function ExpenseModal({ expense, categories, onSave, onCreateCate
           category,
           amount: amt,
           date,
+          paid,
+          deductFromBalance,
           ...(vendor.trim() ? { vendor: vendor.trim() } : {}),
           ...(paymentMethod ? { paymentMethod } : {}),
           ...(notes.trim() ? { notes: notes.trim() } : {}),
@@ -237,6 +243,46 @@ export default function ExpenseModal({ expense, categories, onSave, onCreateCate
               <option value="">{t("paymentPick")}</option>
               {PAYMENT_METHODS.map((m) => <option key={m} value={m}>{t(`payment.${m}`)}</option>)}
             </select>
+          </div>
+        </div>
+
+        {/* حالة الدفع + الخصم من الخزنة */}
+        <div className="mt-3 rounded-sm border border-line bg-soft p-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-[13px] font-semibold text-ink-700">{t("paymentStatus")}</span>
+            <div className="inline-flex rounded-full bg-canvas border border-line p-0.5" role="group" aria-label={t("paymentStatus")}>
+              <button
+                type="button"
+                aria-pressed={paid}
+                onClick={() => setPaid(true)}
+                className={"inline-flex items-center gap-1 rounded-full px-3 py-1 text-[13px] font-bold transition-colors " +
+                  (paid ? "bg-success text-white" : "text-ink-500 hover:text-ink-900")}
+              >
+                <span className="icon !text-[16px]" aria-hidden>check_circle</span>
+                {t("statusPaid")}
+              </button>
+              <button
+                type="button"
+                aria-pressed={!paid}
+                onClick={() => setPaid(false)}
+                className={"inline-flex items-center gap-1 rounded-full px-3 py-1 text-[13px] font-bold transition-colors " +
+                  (!paid ? "bg-warning text-white" : "text-ink-500 hover:text-ink-900")}
+              >
+                <span className="icon !text-[16px]" aria-hidden>schedule</span>
+                {t("statusDebt")}
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-line">
+            <div className="min-w-0">
+              <div className="text-[13px] font-semibold text-ink-700">{t("deductFromBalance")}</div>
+              <div className="text-[11px] text-ink-400">{t("deductHint")}</div>
+            </div>
+            <Toggle
+              checked={deductFromBalance}
+              onChange={() => setDeductFromBalance((v) => !v)}
+              label={t("deductFromBalance")}
+            />
           </div>
         </div>
 

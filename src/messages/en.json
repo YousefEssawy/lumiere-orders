@@ -31,6 +31,7 @@
     "history": "Shipments",
     "products": "Products",
     "categories": "Categories",
+    "treasury": "Treasury",
     "expenses": "Expenses",
     "expenseCategories": "Expense Categories",
     "users": "Users",
@@ -277,6 +278,41 @@
     "updatedBy": "Last updated by",
     "archivedBy": "Moved to Shipments by"
   },
+  "treasury": {
+    "title": "Treasury",
+    "subtitle": "Top up the balance and track what's been spent and what's still owed",
+    "addFunds": "Add funds",
+    "addTitle": "Add funds",
+    "editTitle": "Edit funds",
+    "balance": "Current balance",
+    "balanceHint": "Added funds minus paid expenses that deduct",
+    "totalFunds": "Funds added",
+    "totalDeducted": "Spent (deducted)",
+    "totalDebt": "Outstanding debts",
+    "amount": "Amount",
+    "amountPh": "0",
+    "amountInvalid": "Enter a valid amount greater than zero",
+    "date": "Date",
+    "source": "Source",
+    "sourcePh": "e.g. Sales deposit, personal top-up",
+    "notes": "Notes",
+    "addedBy": "Added by",
+    "egp": "EGP",
+    "fundsListTitle": "Balance top-ups",
+    "count": "Top-ups:",
+    "empty": "No funds added yet — add your first top-up",
+    "deleteSelected": "Delete selected ({n})",
+    "confirmDelete": "Delete this top-up of {amount}?",
+    "confirmDeleteSelected": "Permanently delete {n} selected top-ups? This cannot be undone.",
+    "loadError": "Could not load the treasury. Make sure the latest firestore.rules are published.",
+    "toast": {
+      "created": "Funds added ✓",
+      "updated": "Top-up updated ✓",
+      "deleted": "Top-up deleted",
+      "bulkDeleted": "{n} top-ups deleted",
+      "saveErr": "Failed to save"
+    }
+  },
   "expenses": {
     "title": "Expenses",
     "subtitle": "Track what the brand spends — materials, packaging, ads and more",
@@ -300,6 +336,13 @@
     "vendorPh": "e.g. Degla Oils",
     "paymentMethod": "Payment method",
     "paymentPick": "— Not set —",
+    "paymentStatus": "Status",
+    "statusPaid": "Paid",
+    "statusDebt": "Debt",
+    "deductFromBalance": "Deduct from balance",
+    "deductHint": "Reduces the treasury balance by this amount once paid",
+    "markPaid": "Mark as paid",
+    "filterAllStatus": "All statuses",
     "notes": "Notes",
     "addedBy": "Added by",
     "egp": "EGP",
@@ -329,6 +372,7 @@
       "exported": "Exported {n} expenses ✓",
       "catCreated": "Category added ✓",
       "catSaveErr": "Couldn't add the category",
+      "markedPaid": "Marked as paid ✓",
       "saveErr": "Failed to save"
     }
   },
@@ -499,7 +543,8 @@
       "expense": {
         "create": "Added expense",
         "update": "Updated expense",
-        "delete": "Deleted expense"
+        "delete": "Deleted expense",
+        "pay": "Marked expense as paid"
       },
       "expenses": {
         "export": "Exported expenses"
@@ -508,6 +553,11 @@
         "create": "Added expense category",
         "update": "Updated expense category",
         "delete": "Deleted expense category"
+      },
+      "fund": {
+        "create": "Added funds",
+        "update": "Updated a top-up",
+        "delete": "Deleted a top-up"
       },
       "whatsapp": {
         "send": "Opened WhatsApp message"

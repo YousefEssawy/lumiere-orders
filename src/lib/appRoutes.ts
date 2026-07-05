@@ -6,6 +6,7 @@ export const AppRoutes = {
   categories: "/categories/",
   expenses: "/expenses/",
   expenseCategories: "/expense-categories/",
+  treasury: "/treasury/",
   users: "/users/",
   logs: "/logs/",
   settings: "/settings/",
