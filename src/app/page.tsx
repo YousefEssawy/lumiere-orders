@@ -11,7 +11,7 @@ import { useToast } from "@/components/ToastProvider";
 import { useConfirm } from "@/components/ConfirmProvider";
 import PageHero from "@/components/ui/PageHero";
 import OrderForm from "@/components/orders/OrderForm";
-import SllrImport from "@/components/orders/SllrImport";
+import OrdersImport from "@/components/orders/OrdersImport";
 import OrdersTable from "@/components/orders/OrdersTable";
 import EditOrderModal from "@/components/orders/EditOrderModal";
 import OrderDetailsModal from "@/components/orders/OrderDetailsModal";
@@ -112,7 +112,7 @@ function OrdersPage() {
     }
   }
 
-  const countBySource = { Sllr: 0, WhatsApp: 0, Instagram: 0, Other: 0 } as Record<string, number>;
+  const countBySource = { Wuilt: 0, Sllr: 0, WhatsApp: 0, Instagram: 0, Other: 0 } as Record<string, number>;
   orders.forEach((o) => { countBySource[o.source] = (countBySource[o.source] || 0) + 1; });
 
   return (
@@ -120,13 +120,13 @@ function OrdersPage() {
       <PageHero icon="package_2" title={t("title")} subtitle={t("subtitle")} />
       <div className="grid gap-5 lg:grid-cols-2 fade-up fade-up-delay-1">
         <OrderForm onAdd={handleAdd} />
-        <SllrImport onImport={handleImport} />
+        <OrdersImport onImport={handleImport} />
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3 mt-6 mb-3.5">
         <div className="text-sm text-ink-500">
           {t("total")} <b className="text-ink-900 text-lg">{orders.length}</b>{" "}
           {orders.length ? (
-            <span>{t("bySource", { sllr: countBySource.Sllr, wa: countBySource.WhatsApp, ig: countBySource.Instagram })}</span>
+            <span>{t("bySource", { store: countBySource.Wuilt + countBySource.Sllr, wa: countBySource.WhatsApp, ig: countBySource.Instagram })}</span>
           ) : null}
         </div>
         <button className="btn-primary w-full sm:w-auto" onClick={handleArchiveAll} disabled={!orders.length}>

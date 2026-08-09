@@ -11,7 +11,7 @@ export const ORDER_FORM_INIT: OrderFormState = {
 };
 
 export const MANUAL_SOURCES: OrderSource[] = ["WhatsApp", "Instagram", "Other"];
-export const ALL_SOURCES: OrderSource[] = ["Sllr", ...MANUAL_SOURCES];
+export const ALL_SOURCES: OrderSource[] = ["Wuilt", "Sllr", ...MANUAL_SOURCES];
 const PACKAGE_SIZES = ["Small", "Medium", "Large"] as const;
 
 interface OrderFieldsProps {
