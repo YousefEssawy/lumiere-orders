@@ -1,11 +1,18 @@
 "use client";
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { parseSllr, type Order } from "@/lib/wassalha";
+import { parseOrdersFile, type ImportFormat, type Order } from "@/lib/wassalha";
 
-type Msg = { ok: true; n: number; unknown: number } | { ok: false } | null;
+type Msg =
+  | { ok: true; n: number; unknown: number; skipped: number; format: ImportFormat }
+  | { ok: false }
+  | null;
 
-export default function SllrImport({ onImport }: { onImport: (list: Omit<Order, "id" | "createdAt">[]) => void }) {
+/**
+ * رفع ملف أوردرات من المتجر. بيتعرّف على الفورمات لوحده — ويلت (CSV) أو سلر
+ * (xlsx القديم) — فمفيش اختيار على المستخدم.
+ */
+export default function OrdersImport({ onImport }: { onImport: (list: Omit<Order, "id" | "createdAt">[]) => void }) {
   const t = useTranslations("orders");
   const inputRef = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
@@ -16,9 +23,9 @@ export default function SllrImport({ onImport }: { onImport: (list: Omit<Order, 
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const res = parseSllr(ev.target!.result as ArrayBuffer);
+        const res = parseOrdersFile(ev.target!.result as ArrayBuffer);
         onImport(res.orders);
-        setMsg({ ok: true, n: res.orders.length, unknown: res.unknown });
+        setMsg({ ok: true, n: res.orders.length, unknown: res.unknown, skipped: res.skipped, format: res.format });
       } catch {
         setMsg({ ok: false });
       }
@@ -51,13 +58,14 @@ export default function SllrImport({ onImport }: { onImport: (list: Omit<Order, 
       <input
         ref={inputRef}
         type="file"
-        accept=".xlsx,.xls"
+        accept=".csv,.xlsx,.xls"
         className="hidden"
         onChange={(e) => { handle(e.target.files?.[0]); e.target.value = ""; }}
       />
       {msg && msg.ok && (
         <div className="text-xs text-ink-500 mt-3.5">
-          ✓ {t("importedOk", { n: msg.n })}
+          ✓ {t("importedOk", { n: msg.n, src: t(`sources.${msg.format === "wuilt" ? "Wuilt" : "Sllr"}`) })}
+          {msg.skipped ? <span> · {t("importedSkipped", { n: msg.skipped })}</span> : null}
           {msg.unknown ? (
             <span className="text-danger"> ⚠ {t("importedUnknown", { n: msg.unknown })}</span>
           ) : null}

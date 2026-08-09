@@ -93,16 +93,16 @@
     "refPh": "Optional — for your own tracking",
     "addBtn": "Add order",
     "editTitle": "Edit order",
-    "importTitle": "Import Sllr file",
-    "importSub": "Upload the Sllr export file (.xlsx) — it is parsed and converted automatically",
-    "dropText": "Drag the Sllr file here or <b>click to browse</b>",
-    "dropHint": "Items, address, governorate and phone are converted automatically",
-    "importedOk": "Imported {n} orders from Sllr.",
+    "importTitle": "Import store orders",
+    "importSub": "Drop the Wuilt orders export (.csv) — the old Sllr .xlsx still works too",
+    "dropText": "Drag the orders file here or <b>click to browse</b>",
+    "dropHint": "Format is detected automatically; items, address, governorate and phone are converted",
+    "importedOk": "Imported {n} orders from {src}.",
     "importedUnknown": "{n} orders need a governorate fix.",
-    "importErr": "Could not read the file. Make sure it is a valid Sllr export.",
-    "importNote": "Note: governorates and phone numbers are converted to the Wassalha format automatically. Unknown governorates are flagged in the table so you can fix them.",
+    "importErr": "Could not read the file. Make sure it is a Wuilt orders export or an Sllr export.",
+    "importNote": "Note: governorates and phone numbers are converted to the Wassalha format automatically. The shipping company column in the Wuilt file is ignored — we ship with Wassalha. Unknown governorates are flagged in the table so you can fix them.",
     "total": "Total orders:",
-    "bySource": "(Sllr {sllr} · WhatsApp {wa} · Instagram {ig})",
+    "bySource": "(Store {store} · WhatsApp {wa} · Instagram {ig})",
     "moveBtn": "Move to Shipments",
     "table": {
       "source": "Source",
@@ -118,6 +118,7 @@
       "empty": "No orders yet — add manually or upload a Sllr file"
     },
     "sources": {
+      "Wuilt": "Wuilt",
       "Sllr": "Sllr",
       "WhatsApp": "WhatsApp",
       "Instagram": "Instagram",
@@ -138,7 +139,8 @@
       "cleared": "Moved to Shipments ✓",
       "clearErr": "Failed to move"
     },
-    "confirmClear": "Move ALL orders to Shipments? The list will be emptied for a new batch."
+    "confirmClear": "Move ALL orders to Shipments? The list will be emptied for a new batch.",
+    "importedSkipped": "{n} already-fulfilled orders skipped."
   },
   "history": {
     "title": "Shipments",
@@ -435,7 +437,9 @@
     "confirmRun": "Apply the fixes to all listed records? This writes to the database.",
     "dryRunNote": "Scan only — nothing has been changed yet. Press Apply to write the fixes.",
     "doneNote": "Done — all listed changes have been written.",
-    "toast": { "done": "Data upgrade completed ✓" },
+    "toast": {
+      "done": "Data upgrade completed ✓"
+    },
     "table": {
       "collection": "Collection",
       "total": "Records",
@@ -470,7 +474,10 @@
     "password": "Temporary password",
     "passwordHint": "At least 6 characters — share it with the user privately",
     "role": "Role",
-    "roles": { "admin": "Admin", "staff": "Staff" },
+    "roles": {
+      "admin": "Admin",
+      "staff": "Staff"
+    },
     "rolesHint": "Admin: full access including users and logs. Staff: orders only.",
     "status": "Status",
     "active": "Active",
@@ -478,7 +485,9 @@
     "activate": "Activate",
     "deactivate": "Deactivate",
     "createdAt": "Created",
-    "table": { "empty": "No users yet" },
+    "table": {
+      "empty": "No users yet"
+    },
     "confirmDeactivate": "Deactivate {email}? They will immediately lose access to everything.",
     "toast": {
       "created": "User {email} created ✓",

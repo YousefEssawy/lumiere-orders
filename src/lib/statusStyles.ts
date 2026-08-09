@@ -4,6 +4,7 @@ import type { OrderSource } from "@/lib/wassalha";
 
 /** بادجات مصدر الأوردر */
 export const SOURCE_CLASS: Record<OrderSource, string> = {
+  Wuilt: "bg-pastel-lavender text-ink-700",
   Sllr: "bg-pastel-sky text-ink-700",
   WhatsApp: "bg-pastel-mint text-ink-700",
   Instagram: "bg-pastel-pink text-ink-700",

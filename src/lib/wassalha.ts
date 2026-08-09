@@ -1,8 +1,8 @@
-// منطق التحويل بين أوردرات سلر وملف وصلها + القواعد الثابتة
+// منطق التحويل بين أوردرات المتجر وملف وصلها + القواعد الثابتة
 import * as XLSX from "xlsx";
 import { fileDateStamp } from "@/lib/appGlobals";
 
-export type OrderSource = "Sllr" | "WhatsApp" | "Instagram" | "Other";
+export type OrderSource = "Sllr" | "Wuilt" | "WhatsApp" | "Instagram" | "Other";
 
 export interface Order {
   id?: string;
@@ -143,10 +143,55 @@ export function exportWassalha(orders: Order[]): void {
   XLSX.writeFile(wb, `Wassalha-Lumiere-${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}.xlsx`);
 }
 
-export interface ParseResult { orders: Omit<Order, "id">[]; unknown: number; }
+export type ImportFormat = "sllr" | "wuilt";
+
+export interface ParseResult {
+  orders: Omit<Order, "id">[];
+  /** أوردرات محافظتها مش متعرّفة على وصلها */
+  unknown: number;
+  /** أوردرات متشحنة خلاص واتعدّت (ويلت بس) */
+  skipped: number;
+  format: ImportFormat;
+}
+
+/**
+ * ويلت بيصدّر CSV وسلر بيصدّر xlsx — بنشوف الـ magic bytes بدل ما نعتمد على
+ * امتداد الملف: "PK" = xlsx، D0CF11E0 = xls القديم، وأي حاجة تانية نص CSV.
+ */
+function readWorkbook(arrayBuffer: ArrayBuffer): XLSX.WorkBook {
+  const bytes = new Uint8Array(arrayBuffer);
+  const isBinary =
+    (bytes[0] === 0x50 && bytes[1] === 0x4b) ||
+    (bytes[0] === 0xd0 && bytes[1] === 0xcf && bytes[2] === 0x11 && bytes[3] === 0xe0);
+  if (isBinary) return XLSX.read(bytes, { type: "array" });
+  const text = new TextDecoder("utf-8").decode(bytes).replace(/^﻿/, "");
+  return XLSX.read(text, { type: "string" });
+}
+
+function headerRow(wb: XLSX.WorkBook): string[] {
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, defval: "", blankrows: false });
+  return (rows[0] ?? []).map((h) => String(h ?? "").trim());
+}
+
+/** بيحدد الفورمات من عناوين الأعمدة — ويلت فيه "Order ID"، سلر فيه "Sales Order ID". */
+export function detectFormat(arrayBuffer: ArrayBuffer): ImportFormat | null {
+  const h = headerRow(readWorkbook(arrayBuffer)).map((x) => x.toLowerCase());
+  if (h.includes("order id") && h.includes("item name")) return "wuilt";
+  if (h.includes("sales order id") || h.includes("customer name") && h.includes("order items")) return "sllr";
+  return null;
+}
+
+/** نقطة الدخول الوحيدة للاستيراد — بتتعرّف على الملف وتنادي البارسر المناسب. */
+export function parseOrdersFile(arrayBuffer: ArrayBuffer): ParseResult {
+  const fmt = detectFormat(arrayBuffer);
+  if (fmt === "wuilt") return parseWuilt(arrayBuffer);
+  if (fmt === "sllr") return parseSllr(arrayBuffer);
+  throw new Error("Unrecognised orders file");
+}
 
 export function parseSllr(arrayBuffer: ArrayBuffer): ParseResult {
-  const wb = XLSX.read(new Uint8Array(arrayBuffer), { type: "array" });
+  const wb = readWorkbook(arrayBuffer);
   const ws = wb.Sheets[wb.SheetNames[0]];
   const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: "" });
   const out: Omit<Order, "id">[] = [];
@@ -170,5 +215,115 @@ export function parseSllr(arrayBuffer: ArrayBuffer): ParseResult {
       ref: String(r["Sales Order ID"] || "").trim(),
     });
   });
-  return { orders: out, unknown };
+  return { orders: out, unknown, skipped: 0, format: "sllr" };
+}
+
+/* ─────────────────────────── ويلت ─────────────────────────── */
+
+// "Donna W28 - (SIMPLE)" -> "Donna W28"
+function wuiltItemName(raw: unknown): string {
+  return String(raw ?? "").replace(/\s*-\s*\([^)]*\)\s*$/, "").trim();
+}
+
+// "Size:50 mL" -> "50mL"  ·  المسافات بتتشال عشان تطابق variants الكتالوج (50ml/10ml)
+function wuiltItemSize(raw: unknown): string {
+  return String(raw ?? "").replace(/^[^:]*:\s*/, "").replace(/\s+/g, "").trim();
+}
+
+/**
+ * ملف أوردرات ويلت (CSV، 50 عمود).
+ *
+ * تلات حاجات مميزة في الفورمات ده:
+ *  1. الأوردر اللي فيه أكتر من صنف بيتكتب على أكتر من صف — الصف الأول فيه بيانات
+ *     الأوردر كلها والصفوف اللي بعده فيها الأصناف بس (Order ID فاضي).
+ *  2. أسماء الأعمدة مكررة: Phone و State و City و Address Line 2 بتتكرر لبلوك
+ *     الشحن والفوترة والعميل — فبنقرأ بالترتيب مش بالاسم لوحده.
+ *  3. State = المحافظة (اللي وصلها عايزاها) و City = المنطقة (بتروح جوه العنوان).
+ *
+ * شركة الشحن اللي في الملف (Bosta وغيرها) بتتجاهل — الشحن عندنا وصلها.
+ */
+export function parseWuilt(arrayBuffer: ArrayBuffer): ParseResult {
+  const wb = readWorkbook(arrayBuffer);
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, defval: "", blankrows: false });
+  const header = (rows[0] ?? []).map((h) => String(h ?? "").trim().toLowerCase());
+  const col = (name: string, from = 0) =>
+    header.findIndex((h, i) => i >= from && h === name.toLowerCase());
+
+  const iOrderId = col("order id");
+  const iSerial = col("order serial");
+  const iFulfil = col("fulfillment");
+  const iItem = col("item name");
+  const iSel = col("item selections");
+  const iQty = col("item quantity");
+  const iPay = col("payment method");
+  const iTotal = col("total");
+  const iShip = col("shipping address");
+  const iLine2 = col("address line 2", iShip);
+  const iState = col("state", iShip);
+  const iArea = col("city", iShip);
+  const iName = col("customer name");
+  const iPhone = col("phone", iName >= 0 ? iName : 0);
+  const iShipPhone = col("phone", iShip >= 0 ? iShip : 0);
+  const iNotes = col("notes");
+
+  const val = (r: unknown[], i: number) => (i < 0 ? "" : String(r[i] ?? "").trim());
+
+  const out: Omit<Order, "id">[] = [];
+  let unknown = 0;
+  let skipped = 0;
+  let current: Omit<Order, "id"> | null = null;
+  let dropping = false; // الأوردر الحالي متشحن — نعدّي صفوف أصنافه كمان
+
+  const pushItem = (r: unknown[]) => {
+    const name = wuiltItemName(val(r, iItem));
+    if (!name) return;
+    const qty = Number(val(r, iQty)) || 1;
+    const size = wuiltItemSize(val(r, iSel));
+    // نفس صيغة formatItemLine في lib/stock.ts: "Tiger M21 50ml X 2"
+    const line = `${name}${size ? " " + size : ""} X ${qty}`;
+    if (current) current.items = current.items ? current.items + "\n" + line : line;
+  };
+
+  rows.slice(1).forEach((r) => {
+    if (!Array.isArray(r)) return;
+    const orderId = val(r, iOrderId);
+
+    if (!orderId) {           // صف صنف إضافي للأوردر اللي فوقه
+      if (!dropping) pushItem(r);
+      return;
+    }
+
+    if (/fulfilled/i.test(val(r, iFulfil)) && !/unfulfilled/i.test(val(r, iFulfil))) {
+      skipped++; current = null; dropping = true; return;   // متشحن خلاص
+    }
+    dropping = false;
+
+    const city = mapCity(val(r, iState));
+    if (!city) unknown++;
+    const pay = val(r, iPay).toLowerCase();
+    const isCod = pay.includes("cash") || pay.includes("cod");
+    const address = [val(r, iShip), val(r, iLine2), val(r, iArea)]
+      .map((s) => (s === "." ? "" : s))
+      .filter(Boolean)
+      .join(" - ");
+
+    current = {
+      source: "Wuilt",
+      name: val(r, iName),
+      phone: normPhone(val(r, iPhone) || val(r, iShipPhone)),
+      address,
+      city,
+      // Total = المنتجات + الشحن، وده اللي المندوب بيحصّله من العميل
+      cod: isCod ? Number(val(r, iTotal).replace(/[^\d.]/g, "")) || 0 : 0,
+      items: "",
+      vol: "Small",
+      notes: val(r, iNotes),
+      ref: val(r, iSerial) || orderId,
+    };
+    out.push(current);
+    pushItem(r);
+  });
+
+  return { orders: out.filter((o) => o.name || o.phone), unknown, skipped, format: "wuilt" };
 }
