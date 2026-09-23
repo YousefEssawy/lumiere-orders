@@ -2,6 +2,7 @@
 export const AppRoutes = {
   orders: "/",
   history: "/history/",
+  orderSources: "/order-sources/",
   products: "/products/",
   categories: "/categories/",
   expenses: "/expenses/",

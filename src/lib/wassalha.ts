@@ -1,12 +1,16 @@
 // منطق التحويل بين أوردرات المتجر وملف وصلها + القواعد الثابتة
 import * as XLSX from "xlsx";
 import { fileDateStamp } from "@/lib/appGlobals";
+import type { OrderOrigin } from "@/lib/types";
 
-export type OrderSource = "Sllr" | "Wuilt" | "WhatsApp" | "Instagram" | "Other";
+// اسم المصدر — القايمة بتتدار من صفحة المصادر (lib/orderSources.ts)
+export type OrderSource = string;
 
 export interface Order {
   id?: string;
   source: OrderSource;
+  /** يدوي ولا استيراد — الأوردرات القديمة من غيره (راجع orderOrigin) */
+  origin?: OrderOrigin;
   name: string;
   phone: string;
   address: string;

@@ -29,6 +29,7 @@
     },
     "orders": "Preparation",
     "history": "Shipments",
+    "orderSources": "Order Sources",
     "products": "Products",
     "categories": "Categories",
     "treasury": "Treasury",
@@ -59,14 +60,15 @@
   },
   "orders": {
     "title": "Order Preparation",
-    "subtitle": "Add orders manually or import from Sllr, then move the batch to Shipments",
+    "subtitle": "Add orders manually or import the store file (Wuilt / Sllr), then move the batch to Shipments",
     "addTitle": "Add manual order",
-    "addSub": "For WhatsApp / Instagram orders or any order outside the store",
+    "addSub": "For orders that don't come in the store file — pick where they came from",
     "name": "Customer name",
     "namePh": "e.g. Sara Mohamed",
     "phone": "Mobile number",
     "phonePh": "01xxxxxxxxx",
     "phoneInvalid": "Enter a valid Egyptian mobile number (e.g. 01xxxxxxxxx)",
+    "noSource": "No order source is available — ask an admin to turn one on in Order Sources.",
     "source": "Source",
     "address": "Full address",
     "addressPh": "Street, area, building, floor, apartment, landmark",
@@ -102,7 +104,7 @@
     "importErr": "Could not read the file. Make sure it is a Wuilt orders export or an Sllr export.",
     "importNote": "Note: governorates and phone numbers are converted to the Wassalha format automatically. The shipping company column in the Wuilt file is ignored — we ship with Wassalha. Unknown governorates are flagged in the table so you can fix them.",
     "total": "Total orders:",
-    "bySource": "(Store {store} · WhatsApp {wa} · Instagram {ig})",
+    "byOrigin": "(Imported {imported} · Manual {manual})",
     "moveBtn": "Move to Shipments",
     "table": {
       "source": "Source",
@@ -115,7 +117,7 @@
       "vol": "Size",
       "ref": "Ref",
       "fixCity": "⚠ Fix",
-      "empty": "No orders yet — add manually or upload a Sllr file"
+      "empty": "No orders yet — add manually or upload the store file"
     },
     "sources": {
       "Wuilt": "Wuilt",
@@ -124,12 +126,16 @@
       "Instagram": "Instagram",
       "Other": "Other"
     },
+    "origins": {
+      "manual": "Added manually",
+      "import": "Imported from store file"
+    },
     "toast": {
       "added": "Order added ✓",
       "addErr": "Failed to save the order",
       "updated": "Order updated ✓",
       "updateErr": "Failed to update the order",
-      "imported": "Imported {n} orders from Sllr",
+      "imported": "Imported {n} orders from the store file",
       "stockTaken": "{q} pcs deducted from stock",
       "stockWarn": "Heads up: stock not updated for {n} product(s) — check quantities manually",
       "importErr": "Import failed",
@@ -407,6 +413,46 @@
       "hasExpenses": "Cannot delete — {n} expenses use this category"
     }
   },
+  "orderSources": {
+    "title": "Order Sources",
+    "actions": "Actions",
+    "selectAll": "Select all sources",
+    "subtitle": "Where orders come from — the list in the manual order form",
+    "create": "New source",
+    "createTitle": "Add source",
+    "editTitle": "Edit source",
+    "editNamed": "Edit {name}",
+    "deleteNamed": "Delete {name}",
+    "name": "Name",
+    "namePh": "e.g. Facebook…",
+    "nameRequired": "Enter a source name",
+    "ordersCount": "Orders in preparation",
+    "active": "Active",
+    "activeNamed": "Active: {name}",
+    "system": "Store import",
+    "systemHint": "Store file imports use this exact name, so it can't be renamed or deleted — you can only turn it off for the manual form.",
+    "inUseHint": "Orders in preparation use this name, so it can't be renamed until they're moved to Shipments.",
+    "duplicate": "A source with this name already exists",
+    "deleteSelected": "Delete selected ({n})",
+    "confirmDelete": "Delete the source “{name}”?",
+    "confirmDeleteSelected": "Delete {n} sources? (Store and in-use sources are skipped)",
+    "empty": "No sources saved yet — the order form is using the default list.",
+    "seed": "Add default sources",
+    "restore": "Restore default sources ({n})",
+    "loadError": "Could not load sources. Make sure the latest firestore.rules are published.",
+    "toast": {
+      "created": "Source added ✓",
+      "updated": "Source updated ✓",
+      "deleted": "Source deleted",
+      "seeded": "Default sources added ✓",
+      "bulkDeleted": "{n} sources deleted",
+      "bulkDeletedSkipped": "{n} deleted · {s} skipped (store or in use)",
+      "noneDeletable": "Nothing to delete — selected sources are store sources or in use",
+      "isSystem": "Store sources can't be deleted",
+      "hasOrders": "Cannot delete — {n} orders in preparation use this source",
+      "saveErr": "Failed to save"
+    }
+  },
   "settings": {
     "title": "Settings",
     "subtitle": "Customer WhatsApp message templates per order status",
@@ -428,6 +474,7 @@
     "explain1": "Records created before the latest update are missing some fields. This tool scans orders, shipments and users, then fixes:",
     "fix1": "Adds the missing id field inside every document.",
     "fix2": "Converts createdBy / updatedBy / archivedBy values that contain an email into the user's uid.",
+    "fix3": "Marks each order and shipment as added manually or imported (Wuilt / Sllr orders count as imported).",
     "logsNote": "The activity log is intentionally immutable, so old log entries are not touched — new entries are already correct.",
     "scanBtn": "Scan (no changes)",
     "scanning": "Scanning…",
@@ -445,6 +492,7 @@
       "missingId": "Missing id",
       "emailBy": "Email → uid",
       "unknown": "Unknown email",
+      "origin": "Missing origin",
       "updated": "To update"
     }
   },
@@ -520,7 +568,7 @@
         "delete": "Deleted order"
       },
       "orders": {
-        "import": "Imported from Sllr",
+        "import": "Imported store orders file",
         "export": "Exported Wassalha file",
         "clear": "Moved all orders to Shipments"
       },
@@ -565,6 +613,11 @@
         "update": "Updated expense category",
         "delete": "Deleted expense category"
       },
+      "orderSource": {
+        "create": "Added order source",
+        "update": "Updated order source",
+        "delete": "Deleted order source"
+      },
       "fund": {
         "create": "Added funds",
         "update": "Updated a top-up",
@@ -589,7 +642,7 @@
       "steps": {
         "s1": {
           "title": "Collect the orders",
-          "body": "On the Preparation page: drop the Sllr export file in the import box (everything converts automatically), and add WhatsApp / Instagram orders with the manual form — pick items from the catalog so the line format and COD fill themselves."
+          "body": "On the Preparation page: drop the store orders export (Wuilt .csv or Sllr .xlsx) in the import box — everything converts automatically. Add every other order with the manual form and pick its source (WhatsApp, Instagram… admins manage the list on the Order Sources page); pick items from the catalog so the line format and COD fill themselves. In the tables, a small icon next to the source shows whether the order was imported or added manually."
         },
         "s2": {
           "title": "Review & edit",
@@ -642,7 +695,7 @@
     },
     "rolesSection": {
       "title": "Roles & permissions",
-      "admin": "Admin: everything — orders, catalog, expenses, user management, activity log.",
+      "admin": "Admin: everything — orders, order sources, catalog, expenses, user management, activity log.",
       "staff": "Staff: orders and catalog only (no expenses, users, logs or settings)."
     },
     "usersSection": {

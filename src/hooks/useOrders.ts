@@ -49,7 +49,7 @@ export function useOrders(enabled: boolean) {
     if (!db) return;
     // الـ id بيتخزن جوه الـ document نفسه كمان
     const ref = doc(collection(db, COL));
-    await setDoc(ref, { ...data, id: ref.id, ...creationAudit(byUid) });
+    await setDoc(ref, { ...data, origin: "manual", id: ref.id, ...creationAudit(byUid) });
   }, []);
 
   const importOrders = useCallback(async (list: OrderData[], byUid: string) => {
@@ -58,7 +58,7 @@ export function useOrders(enabled: boolean) {
     const batch = writeBatch(database);
     list.forEach((data) => {
       const ref = doc(collection(database, COL));
-      batch.set(ref, { ...data, id: ref.id, ...creationAudit(byUid) });
+      batch.set(ref, { ...data, origin: "import", id: ref.id, ...creationAudit(byUid) });
     });
     await batch.commit();
   }, []);

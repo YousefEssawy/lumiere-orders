@@ -64,6 +64,9 @@ export const LOG_ACTIONS = [
   "expenseCategory.create",
   "expenseCategory.update",
   "expenseCategory.delete",
+  "orderSource.create",
+  "orderSource.update",
+  "orderSource.delete",
   "fund.create",
   "fund.update",
   "fund.delete",
@@ -96,7 +99,28 @@ export const FIRESTORE_COLLECTIONS = {
   expenses: "expenses",
   expenseCategories: "expenseCategories",
   funds: "funds",
+  orderSources: "orderSources",
 } as const;
+
+// ============ مصادر الأوردرات ============
+
+/**
+ * مصدر أوردر (ويلت، واتساب...) — الأوردر بيخزن الاسم نفسه مش الـ id.
+ * system = مصدر بيكتبه الاستيراد بالاسم (Wuilt/Sllr) — ممنوع حذفه أو تغيير اسمه.
+ */
+export interface OrderSourceDoc {
+  id?: string;
+  name: string;
+  active: boolean;
+  system?: boolean;
+  createdBy?: string;
+  createdAt?: unknown;
+  updatedBy?: string;
+  updatedAt?: unknown;
+}
+
+/** الأوردر اتضاف إزاي: يدوي من الفورم أو استيراد ملف المتجر */
+export type OrderOrigin = "manual" | "import";
 
 // ============ المصروفات ============
 
