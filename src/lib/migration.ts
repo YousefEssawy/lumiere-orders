@@ -1,15 +1,18 @@
 // ترقية البيانات القديمة (one-time):
 // 1) كل document ياخد حقل id جواه
 // 2) حقول createdBy/updatedBy/archivedBy اللي فيها إيميل تتحول لـ uid
+// 3) الأوردرات والشحنات اللي من غير origin تاخد قيمته المقدّرة (orderOrigin)
 // اللوجز مستثناة — append-only بالـ rules (الجديدة سليمة أصلاً).
 import {
   collection, doc, getDocs, writeBatch,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { FIRESTORE_COLLECTIONS } from "@/lib/types";
+import { orderOrigin } from "@/lib/orderSources";
 
 const BATCH_LIMIT = 400;
 const BY_FIELDS = ["createdBy", "updatedBy", "archivedBy"] as const;
+const ORDER_COLLECTIONS: readonly string[] = [FIRESTORE_COLLECTIONS.orders, FIRESTORE_COLLECTIONS.ordersArchive];
 
 export interface CollectionStats {
   collection: string;
@@ -20,6 +23,8 @@ export interface CollectionStats {
   emailByFixed: number;
   /** حقول *By فيها إيميل مش معروف (مفيش يوزر بيه) — اتسابت زي ما هي */
   emailByUnknown: number;
+  /** أوردرات من غير origin (يدوي/استيراد) واتحدد لها */
+  missingOrigin: number;
   /** documents اتعدلت فعلاً */
   updated: number;
 }
@@ -65,6 +70,7 @@ export async function runMigration(dryRun: boolean): Promise<MigrationResult> {
       missingId: 0,
       emailByFixed: 0,
       emailByUnknown: 0,
+      missingOrigin: 0,
       updated: 0,
     };
 
@@ -92,6 +98,11 @@ export async function runMigration(dryRun: boolean): Promise<MigrationResult> {
             stat.emailByUnknown++;
           }
         }
+      }
+
+      if (ORDER_COLLECTIONS.includes(colName) && !data.origin) {
+        changes.origin = orderOrigin({ source: String(data.source ?? "") });
+        stat.missingOrigin++;
       }
 
       if (Object.keys(changes).length) {

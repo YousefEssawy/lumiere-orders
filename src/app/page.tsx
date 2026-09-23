@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useOrders } from "@/hooks/useOrders";
 import { useProducts } from "@/hooks/useProducts";
 import type { Order } from "@/lib/wassalha";
+import { orderOrigin } from "@/lib/orderSources";
 import { logAction } from "@/lib/logger";
 import { applyStock, diffConsumption, parseItemsConsumption } from "@/lib/stock";
 import AppShell, { useSession } from "@/components/layout/AppShell";
@@ -112,8 +113,7 @@ function OrdersPage() {
     }
   }
 
-  const countBySource = { Wuilt: 0, Sllr: 0, WhatsApp: 0, Instagram: 0, Other: 0 } as Record<string, number>;
-  orders.forEach((o) => { countBySource[o.source] = (countBySource[o.source] || 0) + 1; });
+  const importedCount = orders.filter((o) => orderOrigin(o) === "import").length;
 
   return (
     <>
@@ -126,7 +126,7 @@ function OrdersPage() {
         <div className="text-sm text-ink-500">
           {t("total")} <b className="text-ink-900 text-lg">{orders.length}</b>{" "}
           {orders.length ? (
-            <span>{t("bySource", { store: countBySource.Wuilt + countBySource.Sllr, wa: countBySource.WhatsApp, ig: countBySource.Instagram })}</span>
+            <span>{t("byOrigin", { imported: importedCount, manual: orders.length - importedCount })}</span>
           ) : null}
         </div>
         <button className="btn-primary w-full sm:w-auto" onClick={handleArchiveAll} disabled={!orders.length}>

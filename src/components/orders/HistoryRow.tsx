@@ -4,8 +4,9 @@ import { useTranslations } from "next-intl";
 import type { ArchivedOrder } from "@/hooks/useArchive";
 import { EMPTY_DISPLAY, formatDateTime } from "@/lib/appGlobals";
 import { ORDER_STATUSES, type OrderStatus } from "@/lib/types";
-import { SOURCE_CLASS, STATUS_CLASS } from "@/lib/statusStyles";
+import { STATUS_CLASS } from "@/lib/statusStyles";
 import { truncatedCell } from "@/components/orders/OrdersTable";
+import SourceBadge from "@/components/orders/SourceBadge";
 
 interface HistoryRowProps {
   order: ArchivedOrder;
@@ -91,7 +92,7 @@ function HistoryRow({
         </select>
       </td>
       <td className="text-ink-500" dir="ltr">{formatDateTime(o.archivedAt)}</td>
-      <td><span className={"pill " + SOURCE_CLASS[o.source]}>{tOrders(`sources.${o.source}`)}</span></td>
+      <td><SourceBadge order={o} /></td>
       <td>{o.name}</td>
       <td dir="ltr">{o.phone}</td>
       <td>{truncatedCell(o.address)}</td>

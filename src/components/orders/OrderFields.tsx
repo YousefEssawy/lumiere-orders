@@ -2,28 +2,28 @@
 import { useTranslations } from "next-intl";
 import { WASSALHA_CITIES, type Order, type OrderSource } from "@/lib/wassalha";
 import ItemsPicker from "@/components/orders/ItemsPicker";
+import { useSourceLabel } from "@/hooks/useSourceLabel";
 
 export type OrderFormState = Omit<Order, "id" | "createdAt">;
 
 export const ORDER_FORM_INIT: OrderFormState = {
-  source: "WhatsApp", name: "", phone: "", address: "", city: "",
+  source: "", name: "", phone: "", address: "", city: "",
   cod: "", items: "", vol: "Small", notes: "", ref: "",
 };
 
-export const MANUAL_SOURCES: OrderSource[] = ["WhatsApp", "Instagram", "Other"];
-export const ALL_SOURCES: OrderSource[] = ["Wuilt", "Sllr", ...MANUAL_SOURCES];
 const PACKAGE_SIZES = ["Small", "Medium", "Large"] as const;
 
 interface OrderFieldsProps {
   value: OrderFormState;
   onChange: (key: keyof OrderFormState, v: string) => void;
-  /** مصادر القايمة — الإضافة اليدوية من غير سلر، التعديل بكل المصادر */
-  sources?: OrderSource[];
+  /** مصادر القايمة: المفعّلة من صفحة المصادر، + مصدر الأوردر الحالي في التعديل */
+  sources: OrderSource[];
 }
 
 /** حقول الأوردر المشتركة بين الإضافة والتعديل — مصدر واحد للفورم */
-export default function OrderFields({ value: f, onChange, sources = MANUAL_SOURCES }: OrderFieldsProps) {
+export default function OrderFields({ value: f, onChange, sources }: OrderFieldsProps) {
   const t = useTranslations("orders");
+  const sourceLabel = useSourceLabel();
   const up = (k: keyof OrderFormState) => (e: { target: { value: string } }) =>
     onChange(k, e.target.value);
 
@@ -40,7 +40,7 @@ export default function OrderFields({ value: f, onChange, sources = MANUAL_SOURC
           <label className="form-label">{t("source")}</label>
           <select className="form-input" value={f.source} onChange={up("source")}>
             {sources.map((s) => (
-              <option key={s} value={s}>{t(`sources.${s}`)}</option>
+              <option key={s} value={s}>{sourceLabel(s)}</option>
             ))}
           </select>
         </div>
