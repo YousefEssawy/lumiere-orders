@@ -139,8 +139,7 @@
       "cleared": "Moved to Shipments ✓",
       "clearErr": "Failed to move"
     },
-    "confirmClear": "Move ALL orders to Shipments? The list will be emptied for a new batch.",
-    "importedSkipped": "{n} already-fulfilled orders skipped."
+    "confirmClear": "Move ALL orders to Shipments? The list will be emptied for a new batch."
   },
   "history": {
     "title": "Shipments",
