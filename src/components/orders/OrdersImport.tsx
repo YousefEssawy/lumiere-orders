@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { parseOrdersFile, type ImportFormat, type Order } from "@/lib/wassalha";
 
 type Msg =
-  | { ok: true; n: number; unknown: number; skipped: number; format: ImportFormat }
+  | { ok: true; n: number; unknown: number; format: ImportFormat }
   | { ok: false }
   | null;
 
@@ -25,7 +25,7 @@ export default function OrdersImport({ onImport }: { onImport: (list: Omit<Order
       try {
         const res = parseOrdersFile(ev.target!.result as ArrayBuffer);
         onImport(res.orders);
-        setMsg({ ok: true, n: res.orders.length, unknown: res.unknown, skipped: res.skipped, format: res.format });
+        setMsg({ ok: true, n: res.orders.length, unknown: res.unknown, format: res.format });
       } catch {
         setMsg({ ok: false });
       }
@@ -65,7 +65,6 @@ export default function OrdersImport({ onImport }: { onImport: (list: Omit<Order
       {msg && msg.ok && (
         <div className="text-xs text-ink-500 mt-3.5">
           ✓ {t("importedOk", { n: msg.n, src: t(`sources.${msg.format === "wuilt" ? "Wuilt" : "Sllr"}`) })}
-          {msg.skipped ? <span> · {t("importedSkipped", { n: msg.skipped })}</span> : null}
           {msg.unknown ? (
             <span className="text-danger"> ⚠ {t("importedUnknown", { n: msg.unknown })}</span>
           ) : null}

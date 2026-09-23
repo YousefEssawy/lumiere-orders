@@ -149,8 +149,6 @@ export interface ParseResult {
   orders: Omit<Order, "id">[];
   /** أوردرات محافظتها مش متعرّفة على وصلها */
   unknown: number;
-  /** أوردرات متشحنة خلاص واتعدّت (ويلت بس) */
-  skipped: number;
   format: ImportFormat;
 }
 
@@ -215,7 +213,7 @@ export function parseSllr(arrayBuffer: ArrayBuffer): ParseResult {
       ref: String(r["Sales Order ID"] || "").trim(),
     });
   });
-  return { orders: out, unknown, skipped: 0, format: "sllr" };
+  return { orders: out, unknown, format: "sllr" };
 }
 
 /* ─────────────────────────── ويلت ─────────────────────────── */
@@ -225,9 +223,21 @@ function wuiltItemName(raw: unknown): string {
   return String(raw ?? "").replace(/\s*-\s*\([^)]*\)\s*$/, "").trim();
 }
 
-// "Size:50 mL" -> "50mL"  ·  المسافات بتتشال عشان تطابق variants الكتالوج (50ml/10ml)
+// "Size:50 mL" -> "50ml"  ·  "الحجم:٥٠ مل" -> "50ml"  ·  "50 مل + 50 مل" -> "50ml+50ml"
+// المسافات بتتشال عشان تطابق variants الكتالوج (50ml/10ml)
 function wuiltItemSize(raw: unknown): string {
-  return String(raw ?? "").replace(/^[^:]*:\s*/, "").replace(/\s+/g, "").trim();
+  return String(raw ?? "")
+    .replace(/^[^:]*:\s*/, "")
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+    .replace(/مل/g, "ml")
+    .replace(/\s+/g, "")
+    .toLowerCase();
+}
+
+// SKU ويلت "{كود}-{حجم}": "W28-50" -> { code: "W28", size: "50ml" }  ·  "BUNDLE-1" -> {}
+function wuiltSku(raw: unknown): { code?: string; size?: string } {
+  const m = /^([MWU]\d{2,})-(\d+)$/i.exec(String(raw ?? "").trim());
+  return m ? { code: m[1].toUpperCase(), size: `${m[2]}ml` } : {};
 }
 
 /**
@@ -252,8 +262,8 @@ export function parseWuilt(arrayBuffer: ArrayBuffer): ParseResult {
 
   const iOrderId = col("order id");
   const iSerial = col("order serial");
-  const iFulfil = col("fulfillment");
   const iItem = col("item name");
+  const iSku = col("item sku");
   const iSel = col("item selections");
   const iQty = col("item quantity");
   const iPay = col("payment method");
@@ -271,17 +281,20 @@ export function parseWuilt(arrayBuffer: ArrayBuffer): ParseResult {
 
   const out: Omit<Order, "id">[] = [];
   let unknown = 0;
-  let skipped = 0;
   let current: Omit<Order, "id"> | null = null;
-  let dropping = false; // الأوردر الحالي متشحن — نعدّي صفوف أصنافه كمان
 
   const pushItem = (r: unknown[]) => {
     const name = wuiltItemName(val(r, iItem));
     if (!name) return;
     const qty = Number(val(r, iQty)) || 1;
-    const size = wuiltItemSize(val(r, iSel));
+    const sku = wuiltSku(val(r, iSku));
+    const size = wuiltItemSize(val(r, iSel)) || sku.size || "";
+    // المتجر العربي بيكتب "دونا" من غير كود — بنضيف الكود من الـ SKU عشان
+    // parseItemsConsumption يطابق بالكود مع الكتالوج
+    const hasCode = sku.code && new RegExp(`\\b${sku.code}\\b`, "i").test(name);
+    const label = sku.code && !hasCode ? `${name} ${sku.code}` : name;
     // نفس صيغة formatItemLine في lib/stock.ts: "Tiger M21 50ml X 2"
-    const line = `${name}${size ? " " + size : ""} X ${qty}`;
+    const line = `${label}${size ? " " + size : ""} X ${qty}`;
     if (current) current.items = current.items ? current.items + "\n" + line : line;
   };
 
@@ -290,15 +303,11 @@ export function parseWuilt(arrayBuffer: ArrayBuffer): ParseResult {
     const orderId = val(r, iOrderId);
 
     if (!orderId) {           // صف صنف إضافي للأوردر اللي فوقه
-      if (!dropping) pushItem(r);
+      pushItem(r);
       return;
     }
 
-    if (/fulfilled/i.test(val(r, iFulfil)) && !/unfulfilled/i.test(val(r, iFulfil))) {
-      skipped++; current = null; dropping = true; return;   // متشحن خلاص
-    }
-    dropping = false;
-
+    // Fulfillment بتتجاهل: FULFILLED في ويلت معناها اتجهّز مش اتشحن
     const city = mapCity(val(r, iState));
     if (!city) unknown++;
     const pay = val(r, iPay).toLowerCase();
@@ -325,5 +334,5 @@ export function parseWuilt(arrayBuffer: ArrayBuffer): ParseResult {
     pushItem(r);
   });
 
-  return { orders: out.filter((o) => o.name || o.phone), unknown, skipped, format: "wuilt" };
+  return { orders: out.filter((o) => o.name || o.phone), unknown, format: "wuilt" };
 }
