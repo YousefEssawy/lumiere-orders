@@ -1,8 +1,9 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { isValidEgyptPhone, normPhone, type Order, type OrderSource } from "@/lib/wassalha";
-import OrderFields, { ALL_SOURCES, type OrderFormState } from "@/components/orders/OrderFields";
+import { isValidEgyptPhone, normPhone, type Order } from "@/lib/wassalha";
+import { useOrderSources } from "@/hooks/useOrderSources";
+import OrderFields, { type OrderFormState } from "@/components/orders/OrderFields";
 import ModalShell from "@/components/ui/ModalShell";
 
 interface EditOrderModalProps {
@@ -29,6 +30,9 @@ export default function EditOrderModal({ order, onSave, onClose }: EditOrderModa
   });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const { activeNames } = useOrderSources(true);
+  // مصدر الأوردر الحالي بيفضل في القايمة حتى لو اتقفل أو اتمسح
+  const sources = !order.source || activeNames.includes(order.source) ? activeNames : [order.source, ...activeNames];
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -40,7 +44,7 @@ export default function EditOrderModal({ order, onSave, onClose }: EditOrderModa
     }
     setBusy(true);
     await onSave({
-      source: f.source as OrderSource,
+      source: f.source,
       name: f.name.trim(),
       phone,
       address: f.address.trim(),
@@ -59,7 +63,7 @@ export default function EditOrderModal({ order, onSave, onClose }: EditOrderModa
         <OrderFields
           value={f}
           onChange={(k, v) => setF((o) => ({ ...o, [k]: v }))}
-          sources={ALL_SOURCES}
+          sources={sources}
         />
 
         {err && <div className="text-danger text-[13px] mt-2">{err}</div>}

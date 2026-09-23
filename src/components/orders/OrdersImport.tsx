@@ -2,6 +2,7 @@
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { parseOrdersFile, type ImportFormat, type Order } from "@/lib/wassalha";
+import { useSourceLabel } from "@/hooks/useSourceLabel";
 
 type Msg =
   | { ok: true; n: number; unknown: number; format: ImportFormat }
@@ -14,6 +15,7 @@ type Msg =
  */
 export default function OrdersImport({ onImport }: { onImport: (list: Omit<Order, "id" | "createdAt">[]) => void }) {
   const t = useTranslations("orders");
+  const sourceLabel = useSourceLabel();
   const inputRef = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
   const [msg, setMsg] = useState<Msg>(null);
@@ -64,7 +66,7 @@ export default function OrdersImport({ onImport }: { onImport: (list: Omit<Order
       />
       {msg && msg.ok && (
         <div className="text-xs text-ink-500 mt-3.5">
-          ✓ {t("importedOk", { n: msg.n, src: t(`sources.${msg.format === "wuilt" ? "Wuilt" : "Sllr"}`) })}
+          ✓ {t("importedOk", { n: msg.n, src: sourceLabel(msg.format === "wuilt" ? "Wuilt" : "Sllr") })}
           {msg.unknown ? (
             <span className="text-danger"> ⚠ {t("importedUnknown", { n: msg.unknown })}</span>
           ) : null}

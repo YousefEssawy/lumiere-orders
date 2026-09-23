@@ -56,6 +56,28 @@ service cloud.firestore {
       allow read, write: if isActiveUser();
     }
 
+    // مصادر الأوردرات: أي مستخدم نشط يقرأها (قايمة الفورم)، والأدمن بس يديرها.
+    // مصادر المتجر (system: Wuilt/Sllr) الاستيراد بيكتبها بالاسم — ممنوع حذفها
+    // أو تغيير اسمها أو شيل علامة system عنها، حتى للأدمن.
+    function validSourceDoc() {
+      let d = request.resource.data;
+      return d.name is string
+        && d.name.trim().size() > 0
+        && d.name.size() <= 40
+        && d.active is bool
+        // اسم مصدر متجر لازم يفضل system — مايتعملش مصدر عادي باسم Wuilt/Sllr
+        && (!(d.name.trim().lower() in ["wuilt", "sllr"]) || d.get("system", false) == true);
+    }
+    match /orderSources/{sourceId} {
+      allow read: if isActiveUser();
+      allow create: if isAdmin() && validSourceDoc();
+      allow update: if isAdmin() && validSourceDoc()
+        && (resource.data.get("system", false) != true
+            || (request.resource.data.name == resource.data.name
+                && request.resource.data.get("system", false) == true));
+      allow delete: if isAdmin() && resource.data.get("system", false) != true;
+    }
+
     // الكتالوج: المنتجات والفئات — أي مستخدم نشط (إدارة + اختيار)
     match /products/{productId} {
       allow read, write: if isActiveUser();

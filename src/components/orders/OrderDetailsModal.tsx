@@ -4,10 +4,11 @@ import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { useUserDirectory } from "@/hooks/useUserDirectory";
 import { EMPTY_DISPLAY, formatDateTime } from "@/lib/appGlobals";
-import { SOURCE_CLASS, STATUS_CLASS } from "@/lib/statusStyles";
+import { STATUS_CLASS } from "@/lib/statusStyles";
 import { DEFAULT_ORDER_STATUS, ORDER_STATUSES } from "@/lib/types";
 import type { ArchivedOrder } from "@/hooks/useArchive";
 import AuditTimeline from "@/components/ui/AuditTimeline";
+import SourceBadge from "@/components/orders/SourceBadge";
 
 interface OrderDetailsModalProps {
   /** Order أو ArchivedOrder — الحقول الإضافية بتظهر لو موجودة */
@@ -59,7 +60,7 @@ export default function OrderDetailsModal({ order: o, onClose }: OrderDetailsMod
             </button>
           </div>
           <div className="flex flex-wrap items-center gap-2 mt-3">
-            <span className={"pill " + SOURCE_CLASS[o.source]}>{t(`sources.${o.source}`)}</span>
+            <SourceBadge order={o} />
             {status && ORDER_STATUSES.includes(status) && (
               <span className={"pill " + STATUS_CLASS[status]}>{tHistory(`statuses.${status}`)}</span>
             )}

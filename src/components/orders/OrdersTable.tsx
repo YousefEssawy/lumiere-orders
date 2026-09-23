@@ -1,8 +1,8 @@
 "use client";
 import { useTranslations } from "next-intl";
 import type { Order } from "@/lib/wassalha";
-import { SOURCE_CLASS } from "@/lib/statusStyles";
 import EmptyState from "@/components/ui/EmptyState";
+import SourceBadge from "@/components/orders/SourceBadge";
 
 interface OrdersTableProps {
   orders: Order[];
@@ -80,7 +80,7 @@ export default function OrdersTable({ orders, onView, onEdit, onDelete }: Orders
                   </button>
                 </div>
               </td>
-              <td><span className={"pill " + SOURCE_CLASS[o.source]}>{t(`sources.${o.source}`)}</span></td>
+              <td><SourceBadge order={o} /></td>
               <td>{o.name}</td>
               <td dir="ltr">{o.phone}</td>
               <td>{truncatedCell(o.address)}</td>

@@ -1,15 +1,20 @@
 // ألوان حالات الأوردر ومصادره وعمليات اللوجز — من باستيلات الهوية. مصدر واحد لكل الصفحات.
 import type { LogAction, OrderStatus } from "@/lib/types";
-import type { OrderSource } from "@/lib/wassalha";
 
-/** بادجات مصدر الأوردر */
-export const SOURCE_CLASS: Record<OrderSource, string> = {
+/** بادجات مصادر الأوردر المعروفة — أي مصدر جديد بياخد SOURCE_FALLBACK_CLASS */
+const SOURCE_CLASS: Record<string, string> = {
   Wuilt: "bg-pastel-lavender text-ink-700",
   Sllr: "bg-pastel-sky text-ink-700",
   WhatsApp: "bg-pastel-mint text-ink-700",
   Instagram: "bg-pastel-pink text-ink-700",
   Other: "bg-soft text-ink-500",
 };
+// إطار بدل خلفية باستيل — عشان مايتلخبطش مع بادجات الحالة (preparing = butter)
+const SOURCE_FALLBACK_CLASS = "bg-canvas border border-line text-ink-700";
+
+export function sourceClass(name: string): string {
+  return SOURCE_CLASS[name] ?? SOURCE_FALLBACK_CLASS;
+}
 
 export const STATUS_CLASS: Record<OrderStatus, string> = {
   preparing: "bg-pastel-butter text-ink-700",
@@ -56,6 +61,9 @@ export const ACTION_CLASS: Record<LogAction, string> = {
   "expenseCategory.create": "bg-pastel-mint text-ink-700",
   "expenseCategory.update": "bg-pastel-sky text-ink-700",
   "expenseCategory.delete": "bg-pastel-pink text-danger",
+  "orderSource.create": "bg-pastel-mint text-ink-700",
+  "orderSource.update": "bg-pastel-sky text-ink-700",
+  "orderSource.delete": "bg-pastel-pink text-danger",
   "fund.create": "bg-pastel-mint text-ink-700",
   "fund.update": "bg-pastel-sky text-ink-700",
   "fund.delete": "bg-pastel-pink text-danger",

@@ -61,6 +61,7 @@ function MigrationPage() {
         <ul className="text-[13px] text-ink-500 leading-relaxed list-disc ps-5 mt-2 space-y-1.5 marker:text-ink-300">
           <li>{t("fix1")}</li>
           <li>{t("fix2")}</li>
+          <li>{t("fix3")}</li>
         </ul>
         <p className="text-xs text-ink-300 mt-3">{t("logsNote")}</p>
 
@@ -95,6 +96,7 @@ function MigrationPage() {
                 <th>{t("table.missingId")}</th>
                 <th>{t("table.emailBy")}</th>
                 <th>{t("table.unknown")}</th>
+                <th>{t("table.origin")}</th>
                 <th>{t("table.updated")}</th>
               </tr>
             </thead>
@@ -106,6 +108,7 @@ function MigrationPage() {
                   <td>{s.missingId}</td>
                   <td>{s.emailByFixed}</td>
                   <td className={s.emailByUnknown ? "text-warning font-bold" : ""}>{s.emailByUnknown}</td>
+                  <td>{s.missingOrigin}</td>
                   <td className="font-bold">{s.updated}</td>
                 </tr>
               ))}
